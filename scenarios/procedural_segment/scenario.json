@@ -1,0 +1,20 @@
+{
+  "scenario_id": "procedural_segment",
+  "match_id": "procedural-match-2026",
+  "title": "Procedural match - 10 minute segment",
+  "description": "Fully procedural synthetic play from a kick-off at 60:00: no script, every decision made by the stochastic team policy. The decision detector finds the interesting moments on its own.",
+  "mode": "procedural",
+  "seed": 2026,
+  "period": 2,
+  "start_clock": "60:00",
+  "score": { "HCF": 1, "NVA": 1 },
+  "attacking_team": "NVA",
+  "carrier": null,
+  "coordinates": "attack_frame",
+  "positions": null,
+  "velocities": null,
+  "script": [],
+  "continuation_s": 600,
+  "frame_hz": 5,
+  "labels": null
+}

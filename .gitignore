@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+apps/api/data/cache/
+apps/api/data/generated/
+
+# Node
+node_modules/
+.next/
+out/
+apps/web/test-results/
+apps/web/playwright-report/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

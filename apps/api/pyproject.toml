@@ -1,0 +1,51 @@
+[project]
+name = "parallel-api"
+version = "0.1.0"
+description = "PARALLEL - multi-agent counterfactual football intelligence (backend)"
+readme = "../../README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "agent-framework-core==1.22.0",
+    "agent-framework-foundry==1.15.0",
+    "azure-identity>=1.26,<2",
+    "fastapi>=0.150,<1",
+    "uvicorn[standard]>=0.54,<1",
+    "pydantic>=2.14,<3",
+    "pydantic-settings>=2.16,<3",
+    "numpy>=2.3,<3",
+]
+
+[project.optional-dependencies]
+telemetry = ["azure-monitor-opentelemetry>=1.8,<2"]
+dev = [
+    "pytest>=9,<10",
+    "pytest-asyncio>=1.4,<2",
+    "httpx>=0.28,<1",
+    "ruff>=0.17,<1",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "foundry: integration tests that call a real Microsoft Foundry deployment (opt-in)",
+    "slow: longer-running statistical tests",
+]
+addopts = "-m 'not foundry'"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501", "B008"]

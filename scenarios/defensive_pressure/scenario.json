@@ -1,0 +1,39 @@
+{
+  "scenario_id": "defensive_pressure",
+  "match_id": "demo-match-012",
+  "title": "12' - Trapped on the touchline",
+  "description": "Samir El-Haddou receives on the right touchline and is immediately surrounded by three Harbour City players. Some of his options are no longer realistic.",
+  "mode": "scenario",
+  "seed": 1200,
+  "period": 1,
+  "start_clock": "11:52",
+  "score": { "HCF": 0, "NVA": 0 },
+  "attacking_team": "NVA",
+  "carrier": "A08",
+  "coordinates": "attack_frame",
+  "positions": {
+    "A01": [12, 34], "A02": [58, 62], "A04": [38, 28], "A05": [38, 44], "A03": [50, 10],
+    "A06": [56, 40], "A08": [63, 48], "A10": [70, 58], "A07": [78, 60], "A11": [76, 14], "A09": [82, 36],
+    "H01": [101, 34], "H02": [88, 14], "H04": [86, 30], "H05": [85, 40], "H03": [80, 56],
+    "H06": [72, 46], "H08": [70, 36], "H10": [66, 52], "H07": [64, 18], "H11": [74, 63], "H09": [60, 40]
+  },
+  "velocities": {
+    "H11": [-1.5, -0.5], "H03": [-1.0, 0.5], "H10": [1.5, 1.0], "A07": [2.0, 0.0]
+  },
+  "script": [
+    { "type": "pass", "actor": "A08", "target": "A10" },
+    {
+      "type": "decision",
+      "actor": "A10",
+      "action": { "type": "dribble", "to": [76.0, 54.0] }
+    }
+  ],
+  "continuation_s": 25,
+  "frame_hz": 10,
+  "labels": {
+    "decision_actor": "A10",
+    "expected_triggers": ["DECISION_UNDER_PRESSURE"],
+    "expected_alternative_types": ["pass"],
+    "expected_observed_outcomes": ["DRIBBLE_FAILED", "DRIBBLE_COMPLETED", "PRESSURE_APPLIED"]
+  }
+}

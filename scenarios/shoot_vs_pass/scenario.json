@@ -1,0 +1,47 @@
+{
+  "scenario_id": "shoot_vs_pass",
+  "match_id": "demo-match-073",
+  "title": "73' - The decision that changed the attack",
+  "description": "Harbour City FC break into the final third at 1-1. Ravi Castellane drives at the box while Theo Mbeki-Larsen makes an overlapping run into the right side of the area. Castellane chooses to shoot from distance.",
+  "mode": "scenario",
+  "seed": 7300,
+  "period": 2,
+  "start_clock": "72:44",
+  "score": { "HCF": 1, "NVA": 1 },
+  "attacking_team": "HCF",
+  "carrier": "H08",
+  "coordinates": "attack_frame",
+  "positions": {
+    "H01": [14, 34], "H02": [55, 60], "H04": [38, 24], "H05": [37, 43], "H03": [52, 8],
+    "H06": [52, 36], "H08": [61, 40], "H10": [70, 30], "H07": [72, 54], "H11": [80, 12], "H09": [86, 37],
+    "A01": [102.5, 34], "A02": [91, 15], "A05": [92, 31], "A04": [92, 37], "A03": [90, 47],
+    "A06": [79, 34], "A08": [76, 25], "A10": [64, 48], "A07": [66, 15], "A11": [60, 57], "A09": [58, 32]
+  },
+  "velocities": {
+    "H07": [7.0, -0.8], "H10": [2.0, 0.0], "H09": [1.0, 0.0], "H11": [2.0, 0.0],
+    "A06": [-1.0, -0.5], "A03": [0.5, -0.5]
+  },
+  "script": [
+    {
+      "type": "pass", "actor": "H08", "target": "H10",
+      "runs": { "H07": [83, 51], "H09": [89, 39], "A03": [91, 43] }
+    },
+    {
+      "type": "dribble", "actor": "H10", "to": [81.5, 31.0],
+      "runs": { "H07": [93.2, 47.5], "H09": [92.8, 36.0], "A03": [93.5, 37.6], "A04": [93.6, 33.6], "A05": [92.6, 30.4] }
+    },
+    {
+      "type": "decision",
+      "actor": "H10",
+      "action": { "type": "shoot" }
+    }
+  ],
+  "continuation_s": 30,
+  "frame_hz": 10,
+  "labels": {
+    "decision_actor": "H10",
+    "expected_triggers": ["SHOT_WITH_TEAMMATE_AVAILABLE"],
+    "expected_alternative_types": ["pass", "dribble"],
+    "expected_observed_outcomes": ["SHOT_BLOCKED", "SHOT_SAVED", "SHOT_MISSED"]
+  }
+}

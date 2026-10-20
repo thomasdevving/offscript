@@ -1,0 +1,40 @@
+{
+  "scenario_id": "risky_through_ball",
+  "match_id": "demo-match-031",
+  "title": "31' - The risky through ball",
+  "description": "Northvale Athletic probe at 0-0. Nico Albescu tries to split the centre-backs for Viktor Saelens while Samir El-Haddou is free for a safer pass.",
+  "mode": "scenario",
+  "seed": 3100,
+  "period": 1,
+  "start_clock": "31:05",
+  "score": { "HCF": 0, "NVA": 0 },
+  "attacking_team": "NVA",
+  "carrier": "A06",
+  "coordinates": "attack_frame",
+  "positions": {
+    "A01": [10, 34], "A02": [48, 60], "A04": [33, 26], "A05": [33, 42], "A03": [46, 9],
+    "A06": [50, 36], "A08": [57, 28], "A10": [60, 46], "A07": [72, 58], "A11": [71, 11], "A09": [74, 33],
+    "H01": [101, 34], "H02": [84, 13], "H04": [80, 30], "H05": [79, 39], "H03": [83, 54],
+    "H06": [68, 33], "H08": [66, 24], "H10": [64, 42], "H07": [62, 12], "H11": [61, 56], "H09": [57, 36]
+  },
+  "velocities": {
+    "A09": [5.0, 0.3], "A07": [3.0, 0.0], "A11": [3.0, 0.0], "H04": [-1.5, 0.0], "H05": [-1.5, 0.0]
+  },
+  "script": [
+    { "type": "pass", "actor": "A06", "target": "A08" },
+    { "type": "dribble", "actor": "A08", "to": [60.5, 30.0] },
+    {
+      "type": "decision",
+      "actor": "A08",
+      "action": { "type": "pass", "target": "A09" }
+    }
+  ],
+  "continuation_s": 25,
+  "frame_hz": 10,
+  "labels": {
+    "decision_actor": "A08",
+    "expected_triggers": ["DIFFICULT_PASS"],
+    "expected_alternative_types": ["pass"],
+    "expected_observed_outcomes": ["PASS_FAILED", "PASS_COMPLETED"]
+  }
+}

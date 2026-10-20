@@ -1,0 +1,41 @@
+{
+  "scenario_id": "counterattack",
+  "match_id": "demo-match-058",
+  "title": "58' - Three on two on the break",
+  "description": "Harbour City win the ball and break. Ravi Castellane carries into a three-against-two with Ade Valcourt and Theo Mbeki-Larsen alongside him: dribble, pass or shoot?",
+  "mode": "scenario",
+  "seed": 5800,
+  "period": 2,
+  "start_clock": "57:48",
+  "score": { "HCF": 0, "NVA": 1 },
+  "attacking_team": "HCF",
+  "carrier": "H06",
+  "coordinates": "attack_frame",
+  "positions": {
+    "H01": [12, 34], "H02": [40, 60], "H04": [30, 26], "H05": [30, 42], "H03": [40, 8],
+    "H06": [46, 33], "H08": [44, 44], "H10": [53, 35], "H07": [55, 54], "H11": [52, 13], "H09": [57, 26],
+    "A01": [100, 34], "A02": [70, 18], "A05": [74, 30], "A04": [73, 41], "A03": [62, 58],
+    "A06": [50, 40], "A08": [47, 28], "A10": [44, 52], "A07": [38, 16], "A11": [36, 54], "A09": [42, 36]
+  },
+  "velocities": {
+    "H10": [5.0, 0.0], "H09": [6.5, 0.2], "H07": [7.0, -0.8], "H11": [5.0, 0.5],
+    "A05": [-1.0, 0.0], "A04": [-1.0, 0.0], "A06": [2.5, 0.0], "A08": [3.0, 0.0], "A10": [3.0, -0.5]
+  },
+  "script": [
+    { "type": "pass", "actor": "H06", "target": "H10" },
+    { "type": "dribble", "actor": "H10", "to": [66.0, 34.5] },
+    {
+      "type": "decision",
+      "actor": "H10",
+      "action": { "type": "dribble", "to": [76.0, 35.0] }
+    }
+  ],
+  "continuation_s": 25,
+  "frame_hz": 10,
+  "labels": {
+    "decision_actor": "H10",
+    "expected_triggers": ["MULTIPLE_OPTIONS", "HIGH_VALUE_POSSESSION"],
+    "expected_alternative_types": ["pass", "shoot"],
+    "expected_observed_outcomes": ["DRIBBLE_COMPLETED", "DRIBBLE_FAILED", "PRESSURE_APPLIED"]
+  }
+}
