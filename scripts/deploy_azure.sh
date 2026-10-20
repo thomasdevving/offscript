@@ -13,7 +13,7 @@
 #   RESOURCE_GROUP  (parallel-rg)          LOCATION      (germanywestcentral)
 #   CREATE_FOUNDRY  (true)  new Foundry project + gpt-4.1-mini for the agents; false = policy planner
 #   MIN_REPLICAS    (0)     0 = scale to zero when idle (cold start), 1 = always on (always billed)
-#   API_IMAGE       (ghcr.io/thomasdevving/parallel-api:latest)
+#   API_IMAGE       (ghcr.io/thomasdevving/parallel-api:<this commit>, else :latest)
 #   ONLY_WEB        (false) true = only rebuild and re-upload the web app (infrastructure must exist)
 #   AZ              (az)    path to the Azure CLI
 set -euo pipefail
@@ -23,9 +23,26 @@ RG="${RESOURCE_GROUP:-parallel-rg}"
 LOCATION="${LOCATION:-germanywestcentral}"
 CREATE_FOUNDRY="${CREATE_FOUNDRY:-true}"
 MIN_REPLICAS="${MIN_REPLICAS:-0}"
-API_IMAGE="${API_IMAGE:-ghcr.io/thomasdevving/parallel-api:latest}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+# Prefer the immutable per-commit tag published by the image workflow (a moving :latest can be served
+# from a node cache); fall back to :latest when this commit did not change the API.
+image_exists() {
+  local token
+  token="$(curl -fsS "https://ghcr.io/token?scope=repository:$1:pull" | sed -E 's/.*"token":"([^"]+)".*/\1/')" || return 1
+  curl -fsS -o /dev/null -H "Authorization: Bearer $token" \
+    -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
+    "https://ghcr.io/v2/$1/manifests/$2"
+}
+if [ -z "${API_IMAGE:-}" ]; then
+  sha="$(git rev-parse HEAD 2>/dev/null || true)"
+  if [ -n "$sha" ] && image_exists thomasdevving/parallel-api "$sha"; then
+    API_IMAGE="ghcr.io/thomasdevving/parallel-api:$sha"
+  else
+    API_IMAGE="ghcr.io/thomasdevving/parallel-api:latest"
+  fi
+fi
 
 az_() { "$AZ" "$@" | tr -d '\r'; }
 output() { az_ deployment group show -g "$RG" -n parallel --query "properties.outputs.$1.value" -o tsv; }

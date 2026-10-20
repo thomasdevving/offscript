@@ -142,13 +142,16 @@ async def _foundry_connectivity(endpoint: str | None) -> dict:
 
     from azure.identity.aio import DefaultAzureCredential
 
-    out: dict = {}
-    host = urlparse(endpoint or "").hostname
-    try:
-        infos = await asyncio.get_running_loop().getaddrinfo(host, 443, type=socket.SOCK_STREAM)
-        out["dns"] = f"ok ({infos[0][4][0]})"
-    except Exception as exc:
-        out["dns"] = f"{type(exc).__name__}: {exc}"
+    out: dict = {"dns": {}}
+    host = urlparse(endpoint or "").hostname or ""
+    account = host.split(".")[0]
+    hosts = [host, f"{account}.openai.azure.com", f"{account}.cognitiveservices.azure.com", "login.microsoftonline.com"]
+    for h in hosts:
+        try:
+            infos = await asyncio.get_running_loop().getaddrinfo(h, 443, type=socket.SOCK_STREAM)
+            out["dns"][h] = f"ok ({infos[0][4][0]})"
+        except Exception as exc:
+            out["dns"][h] = f"{type(exc).__name__}: {exc}"
     try:
         async with DefaultAzureCredential(exclude_interactive_browser_credential=True) as cred:
             tok = await asyncio.wait_for(cred.get_token("https://ai.azure.com/.default"), 30)
