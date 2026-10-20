@@ -5,8 +5,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
-apps/api/data/cache/
-apps/api/data/generated/
+apps/api/data/
 
 # Node
 node_modules/

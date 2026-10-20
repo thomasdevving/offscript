@@ -1,0 +1,361 @@
+{
+  "generated_at": "2026-10-20 04:39:29",
+  "quick": false,
+  "detection": {
+    "rows": [
+      {
+        "scenario": "shoot_vs_pass",
+        "labelled": 1,
+        "recalled": 1,
+        "detections": 2,
+        "on_ball_actions": 17,
+        "scripted_flagged": 0,
+        "suppressed": 1,
+        "minutes": 0.57
+      },
+      {
+        "scenario": "risky_through_ball",
+        "labelled": 1,
+        "recalled": 1,
+        "detections": 2,
+        "on_ball_actions": 17,
+        "scripted_flagged": 0,
+        "suppressed": 0,
+        "minutes": 0.58
+      },
+      {
+        "scenario": "counterattack",
+        "labelled": 1,
+        "recalled": 0,
+        "detections": 1,
+        "on_ball_actions": 16,
+        "scripted_flagged": 0,
+        "suppressed": 1,
+        "minutes": 0.53
+      },
+      {
+        "scenario": "defensive_pressure",
+        "labelled": 1,
+        "recalled": 1,
+        "detections": 1,
+        "on_ball_actions": 15,
+        "scripted_flagged": 0,
+        "suppressed": 2,
+        "minutes": 0.49
+      },
+      {
+        "scenario": "procedural_segment",
+        "labelled": 0,
+        "recalled": 0,
+        "detections": 18,
+        "on_ball_actions": 297,
+        "scripted_flagged": 0,
+        "suppressed": 14,
+        "minutes": 10.02
+      }
+    ],
+    "recall": 0.75,
+    "scripted_false_flags": 0
+  },
+  "candidate_validity": {
+    "generated": 346,
+    "valid": 346,
+    "rate": 1.0
+  },
+  "baseline_analyses": [
+    {
+      "decision": "demo-match-073-dp-001",
+      "status": "verified",
+      "verdict": "more_promising",
+      "options": [
+        "Shoot (actual)",
+        "Pass to Mbeki-Larsen",
+        "Pass to Kestrel"
+      ]
+    },
+    {
+      "decision": "demo-match-031-dp-001",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Saelens (actual)",
+        "Pass to El-Haddou",
+        "Dribble towards goal"
+      ]
+    },
+    {
+      "decision": "demo-match-012-dp-001",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Dribble (actual)",
+        "Through ball to Thornquist",
+        "Pass to Saelens"
+      ]
+    }
+  ],
+  "recovery": {
+    "rows": [
+      {
+        "decision": "demo-match-073-dp-001",
+        "fault": "invalid_candidate",
+        "final_status": "verified",
+        "agent_runs": 7,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-073-dp-001",
+        "fault": "contradictory_claim",
+        "final_status": "verified",
+        "agent_runs": 8,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-073-dp-001",
+        "fault": "model_unavailable",
+        "final_status": "verified",
+        "agent_runs": 6,
+        "baseline_runs": 6,
+        "retries": 0,
+        "degraded": true
+      },
+      {
+        "decision": "demo-match-073-dp-001",
+        "fault": "simulation_timeout",
+        "final_status": "verified",
+        "agent_runs": 6,
+        "baseline_runs": 6,
+        "retries": 0,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-031-dp-001",
+        "fault": "invalid_candidate",
+        "final_status": "verified",
+        "agent_runs": 7,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-031-dp-001",
+        "fault": "contradictory_claim",
+        "final_status": "verified",
+        "agent_runs": 8,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-031-dp-001",
+        "fault": "model_unavailable",
+        "final_status": "verified",
+        "agent_runs": 6,
+        "baseline_runs": 6,
+        "retries": 0,
+        "degraded": true
+      },
+      {
+        "decision": "demo-match-031-dp-001",
+        "fault": "simulation_timeout",
+        "final_status": "verified",
+        "agent_runs": 8,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-012-dp-001",
+        "fault": "invalid_candidate",
+        "final_status": "verified",
+        "agent_runs": 7,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-012-dp-001",
+        "fault": "contradictory_claim",
+        "final_status": "verified",
+        "agent_runs": 8,
+        "baseline_runs": 6,
+        "retries": 1,
+        "degraded": false
+      },
+      {
+        "decision": "demo-match-012-dp-001",
+        "fault": "model_unavailable",
+        "final_status": "verified",
+        "agent_runs": 6,
+        "baseline_runs": 6,
+        "retries": 0,
+        "degraded": true
+      },
+      {
+        "decision": "demo-match-012-dp-001",
+        "fault": "simulation_timeout",
+        "final_status": "verified",
+        "agent_runs": 6,
+        "baseline_runs": 6,
+        "retries": 0,
+        "degraded": false
+      }
+    ],
+    "recovered": 12,
+    "total": 12
+  },
+  "verification": {
+    "numeric_corruptions": 30,
+    "numeric_detected": 30,
+    "narrative_corruptions": 54,
+    "narrative_detected": 54,
+    "clean_narratives": 18,
+    "clean_false_positives": 0
+  },
+  "narrative_grounding": {
+    "verified_narratives": 18,
+    "all_numbers_grounded": true
+  },
+  "reproducibility": {
+    "identical_results": true,
+    "identical_trajectory": true,
+    "regenerated_match_identical": true
+  },
+  "convergence": [
+    {
+      "rollouts": 50,
+      "p_turnover": 0.26,
+      "turnover_ci_width": 0.23682,
+      "p_goal": 0.04,
+      "goal_ci_width": 0.12356400000000001,
+      "seconds_for_2_options": 0.27
+    },
+    {
+      "rollouts": 100,
+      "p_turnover": 0.3,
+      "turnover_ci_width": 0.17690199999999998,
+      "p_goal": 0.02,
+      "goal_ci_width": 0.06451100000000001,
+      "seconds_for_2_options": 0.43
+    },
+    {
+      "rollouts": 200,
+      "p_turnover": 0.275,
+      "turnover_ci_width": 0.12288900000000003,
+      "p_goal": 0.02,
+      "goal_ci_width": 0.042484,
+      "seconds_for_2_options": 0.76
+    },
+    {
+      "rollouts": 500,
+      "p_turnover": 0.282,
+      "turnover_ci_width": 0.07865300000000003,
+      "p_goal": 0.01,
+      "goal_ci_width": 0.018914,
+      "seconds_for_2_options": 1.7
+    }
+  ],
+  "latency": {
+    "agent.decision_agent": {
+      "count": 16,
+      "p50_ms": 2.085,
+      "p95_ms": 7.402,
+      "max_ms": 22.32,
+      "mean_ms": 3.337
+    },
+    "agent.explanation_agent": {
+      "count": 20,
+      "p50_ms": 2.945,
+      "p95_ms": 6.653,
+      "max_ms": 62.38,
+      "mean_ms": 5.95
+    },
+    "agent.simulation_agent": {
+      "count": 16,
+      "p50_ms": 2056.71,
+      "p95_ms": 3165.588,
+      "max_ms": 3187.57,
+      "mean_ms": 2125.102
+    },
+    "agent.strategy_agent": {
+      "count": 19,
+      "p50_ms": 7.68,
+      "p95_ms": 73.843,
+      "max_ms": 74.32,
+      "mean_ms": 31.566
+    },
+    "agent.verification_agent": {
+      "count": 36,
+      "p50_ms": 3.21,
+      "p95_ms": 4.735,
+      "max_ms": 5.53,
+      "mean_ms": 3.517
+    },
+    "analysis.end_to_end": {
+      "count": 16,
+      "p50_ms": 2092.921,
+      "p95_ms": 3201.007,
+      "max_ms": 3227.286,
+      "mean_ms": 2194.937
+    },
+    "detector.on_event": {
+      "count": 1929,
+      "p50_ms": 0.001,
+      "p95_ms": 5.577,
+      "max_ms": 112.787,
+      "mean_ms": 2.113
+    },
+    "eval.analysis_wall": {
+      "count": 3,
+      "p50_ms": 2273.1,
+      "p95_ms": 3081.128,
+      "max_ms": 3170.909,
+      "mean_ms": 2377.522
+    },
+    "ingest.event_to_state": {
+      "count": 1929,
+      "p50_ms": 0.002,
+      "p95_ms": 0.004,
+      "max_ms": 0.067,
+      "mean_ms": 0.002
+    },
+    "simulation.run": {
+      "count": 16,
+      "p50_ms": 1921.3,
+      "p95_ms": 3162.825,
+      "max_ms": 3185.1,
+      "mean_ms": 2066.481
+    },
+    "tool.run_simulation": {
+      "count": 19,
+      "p50_ms": 1565.51,
+      "p95_ms": 3158.804,
+      "max_ms": 3185.57,
+      "mean_ms": 1787.657
+    },
+    "tool.run_verification_checks": {
+      "count": 16,
+      "p50_ms": 2.785,
+      "p95_ms": 3.33,
+      "max_ms": 3.51,
+      "mean_ms": 2.808
+    }
+  },
+  "simulator_sanity": {
+    "unpressured_central_shot_goal_probability": {
+      "6 m": 0.514,
+      "11 m": 0.291,
+      "16 m": 0.135,
+      "20 m": 0.071,
+      "25 m": 0.036,
+      "30 m": 0.022
+    },
+    "procedural_pass_completion": 0.844,
+    "procedural_shots_per_10_min": 2,
+    "procedural_minutes": 10.0
+  }
+}

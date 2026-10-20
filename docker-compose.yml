@@ -1,0 +1,18 @@
+# Local full stack: docker compose up --build  ->  web http://localhost:3000, API http://localhost:8000/docs
+services:
+  api:
+    build: { context: ., dockerfile: infra/docker/api.Dockerfile }
+    ports: ["8000:8000"]
+    environment:
+      AGENT_MODE: ${AGENT_MODE:-auto}
+      FOUNDRY_PROJECT_ENDPOINT: ${FOUNDRY_PROJECT_ENDPOINT:-}
+      FOUNDRY_MODEL: ${FOUNDRY_MODEL:-}
+      CORS_ORIGINS: http://localhost:3000
+      ENVIRONMENT: local
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+      args: { NEXT_PUBLIC_API_BASE_URL: "http://localhost:8000" }
+    ports: ["3000:80"]
+    depends_on: [api]

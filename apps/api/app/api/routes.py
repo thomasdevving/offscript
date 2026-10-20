@@ -86,6 +86,43 @@ def get_metrics() -> dict:
     return metrics.summary()
 
 
+diagnostics_limiter = RateLimiter(limit=3, window_s=60)
+
+
+@router.post("/diagnostics/foundry")
+async def foundry_diagnostics(request: Request) -> dict:
+    """One tiny structured-output call through Agent Framework's FoundryChatClient (rate limited)."""
+    import asyncio
+
+    from agent_framework import Agent
+    from pydantic import BaseModel
+
+    diagnostics_limiter.check(request)
+    provider = _svc(request).analyses.provider
+    s = get_settings()
+    if provider.mode != "foundry":
+        return {"configured": False, "live": False, "detail": "Foundry not configured; agents use the deterministic policy planner"}
+    client = provider.live_client()
+    if client is None:
+        return {"configured": True, "live": False, "detail": provider.init_error}
+
+    class Ping(BaseModel):
+        ok: bool
+        model_says: str
+
+    t0 = time.perf_counter()
+    try:
+        agent = Agent(client=client, name="diagnostics", instructions="Reply with JSON only.")
+        resp = await asyncio.wait_for(agent.run('Return {"ok": true, "model_says": "<one word>"}',
+                                                options={"response_format": Ping}), s.foundry_timeout_s)
+        value = resp.value
+        return {"configured": True, "live": True, "deployment": s.foundry_model, "response": value.model_dump()
+                if value else resp.text[:200], "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
+    except Exception as exc:  # report, never crash
+        return {"configured": True, "live": False, "deployment": s.foundry_model,
+                "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+
+
 # ------------------------------------------------------------------------------- scenarios / matches
 @router.get("/scenarios")
 def scenarios(request: Request) -> list[dict]:

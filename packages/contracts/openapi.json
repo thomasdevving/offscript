@@ -4307,6 +4307,27 @@
         "summary": "Decision Snapshot"
       }
     },
+    "/api/diagnostics/foundry": {
+      "post": {
+        "description": "One tiny structured-output call through Agent Framework's FoundryChatClient (rate limited).",
+        "operationId": "foundry_diagnostics_api_diagnostics_foundry_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Foundry Diagnostics Api Diagnostics Foundry Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Foundry Diagnostics"
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "health_api_health_get",

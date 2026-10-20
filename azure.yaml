@@ -1,0 +1,21 @@
+# Azure Developer CLI manifest: `azd up` provisions infra/azure/main.bicep and deploys both services.
+name: parallel
+metadata:
+  template: parallel-football-intelligence
+infra:
+  provider: bicep
+  path: infra/azure
+  module: main
+services:
+  api:
+    project: .
+    language: python
+    host: containerapp
+    docker:
+      path: infra/docker/api.Dockerfile
+      context: .
+  web:
+    project: apps/web
+    language: js
+    host: staticwebapp
+    dist: out
