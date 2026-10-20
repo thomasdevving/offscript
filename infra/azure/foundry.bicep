@@ -59,5 +59,6 @@ resource access 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 output projectEndpoint string = 'https://${accountName}.services.ai.azure.com/api/projects/${project.name}'
+output openaiEndpoint string = 'https://${accountName}.openai.azure.com/'
 output deploymentName string = model.name
 output accountId string = account.id

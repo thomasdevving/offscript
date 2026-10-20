@@ -80,15 +80,27 @@ class ChatClientProvider:
             return None
         if self._foundry is None and self.init_error is None:
             try:
-                from agent_framework.foundry import FoundryChatClient
                 from azure.identity import DefaultAzureCredential
 
-                self._foundry = FoundryChatClient(
-                    project_endpoint=self.settings.foundry_project_endpoint,
-                    model=self.settings.foundry_model,
-                    credential=DefaultAzureCredential(exclude_interactive_browser_credential=True),
-                    function_invocation_configuration=self.function_config(),
-                )
+                credential = DefaultAzureCredential(exclude_interactive_browser_credential=True)
+                if self.settings.foundry_openai_endpoint:
+                    from agent_framework.openai import OpenAIChatClient
+
+                    self._foundry = OpenAIChatClient(
+                        model=self.settings.foundry_model,
+                        azure_endpoint=self.settings.foundry_openai_endpoint,
+                        credential=credential,
+                        function_invocation_configuration=self.function_config(),
+                    )
+                else:
+                    from agent_framework.foundry import FoundryChatClient
+
+                    self._foundry = FoundryChatClient(
+                        project_endpoint=self.settings.foundry_project_endpoint,
+                        model=self.settings.foundry_model,
+                        credential=credential,
+                        function_invocation_configuration=self.function_config(),
+                    )
             except Exception as exc:  # configuration errors -> degrade to policy
                 self.init_error = f"{type(exc).__name__}: {exc}"
                 log.warning("Foundry client unavailable: %s", self.init_error)

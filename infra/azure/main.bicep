@@ -31,6 +31,9 @@ param createRegistry bool = false
 @description('Microsoft Foundry project endpoint (https://<resource>.services.ai.azure.com/api/projects/<project>). Leave empty to run agents in deterministic policy mode.')
 param foundryProjectEndpoint string = ''
 
+@description('Optional Azure OpenAI endpoint of the same Foundry account (https://<account>.openai.azure.com/); used instead of the project endpoint when set.')
+param foundryOpenAiEndpoint string = ''
+
 @description('Model deployment name in the Foundry project (e.g. gpt-4.1-mini).')
 param foundryModel string = ''
 
@@ -124,6 +127,9 @@ module foundry 'foundry.bicep' = if (createFoundry) {
 
 var effectiveFoundryEndpoint = createFoundry ? foundry!.outputs.projectEndpoint : foundryProjectEndpoint
 var effectiveFoundryModel = createFoundry ? foundry!.outputs.deploymentName : foundryModel
+// Container Apps in some regions cannot resolve *.services.ai.azure.com; the account's Azure OpenAI
+// endpoint serves the same deployment with the same keyless auth (see docs/deployment.md).
+var effectiveFoundryOpenAi = createFoundry ? foundry!.outputs.openaiEndpoint : foundryOpenAiEndpoint
 
 resource env 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: '${namePrefix}-env-${suffix}'
@@ -193,6 +199,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'AGENT_MODE', value: empty(effectiveFoundryEndpoint) ? 'policy' : 'auto' }
             { name: 'FOUNDRY_PROJECT_ENDPOINT', value: effectiveFoundryEndpoint }
             { name: 'FOUNDRY_MODEL', value: effectiveFoundryModel }
+            { name: 'FOUNDRY_OPENAI_ENDPOINT', value: effectiveFoundryOpenAi }
             { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsights.properties.ConnectionString }
             { name: 'CORS_ORIGINS', value: webOrigin }

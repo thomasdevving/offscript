@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     # Otherwise agents run on the clearly-labelled deterministic policy client.
     foundry_project_endpoint: str | None = None
     foundry_model: str | None = None
+    # Optional: reach the same Foundry account's model deployment through its Azure OpenAI endpoint
+    # (https://<account>.openai.azure.com/) instead of the project endpoint - e.g. where the network
+    # cannot resolve *.services.ai.azure.com. Same deployment, same keyless Entra ID auth.
+    foundry_openai_endpoint: str | None = None
     agent_mode: Literal["auto", "foundry", "policy"] = "auto"
     foundry_timeout_s: float = 25.0
     foundry_max_output_tokens: int = 1200
