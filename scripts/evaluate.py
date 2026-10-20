@@ -119,6 +119,12 @@ async def main(quick: bool) -> dict:
                                   "agent_runs": len(r.workflow.steps), "baseline_runs": len(a.workflow.steps),
                                   "retries": r.workflow.retry_count + r.workflow.explanation_retries,
                                   "degraded": r.model.degraded})
+    # Grounding / verification is also exercised on every *unlabelled* detected decision.
+    for md in store.matches.values():
+        for dp in md.decisions:
+            if dp.decision_point_id not in base_analyses:
+                base_analyses[dp.decision_point_id] = await svc.wait(
+                    (await svc.start(dp.decision_point_id, AnalyzeRequest())).analysis_id)
     out["baseline_analyses"] = [{"decision": k, "status": a.status, "verdict": a.simulation.overall_verdict if a.simulation
                                  else None, "options": [c.label for c in a.candidates]} for k, a in base_analyses.items()]
     ok = sum(1 for r in recovery_rows if r["final_status"] == "verified")
@@ -175,8 +181,12 @@ async def main(quick: bool) -> dict:
         "narrative_corruptions": narrative_trials, "narrative_detected": narrative_caught,
         "clean_narratives": clean_trials, "clean_false_positives": clean_flagged,
     }
-    out["narrative_grounding"] = {"verified_narratives": sum(len(a.narratives) for a in base_analyses.values()),
-                                  "all_numbers_grounded": clean_flagged == 0}
+    out["narrative_grounding"] = {
+        "analyses": len(base_analyses),
+        "verified_analyses": sum(1 for a in base_analyses.values() if a.status == "verified"),
+        "verified_narratives": sum(len(a.narratives) for a in base_analyses.values()),
+        "first_attempt_rejections": sum(1 for a in base_analyses.values() if a.workflow.explanation_retries),
+        "all_numbers_grounded": clean_flagged == 0}
 
     # 6. Reproducibility ----------------------------------------------------------------------
     dp0 = labelled[0]
@@ -270,8 +280,10 @@ def to_markdown(r: dict) -> str:
           f"**{v['narrative_detected']}/{v['narrative_corruptions']}**",
           f"- Clean narratives wrongly flagged: **{v['clean_false_positives']}/{v['clean_narratives']}**", ""]
     g = r["narrative_grounding"]
-    L += ["## 4. Narrative numerical grounding", "", f"{g['verified_narratives']} published narratives; every number "
-          f"traceable to an evidence field: **{g['all_numbers_grounded']}**.", ""]
+    L += ["## 4. Narrative numerical grounding", "", f"{g['verified_analyses']}/{g['analyses']} analyses of every detected "
+          f"decision (all scenarios + procedural segment) verified; {g['verified_narratives']} published narratives; "
+          f"analyses needing a narrative regeneration: {g['first_attempt_rejections']}; every published number traceable "
+          f"to an evidence field: **{g['all_numbers_grounded']}**.", ""]
     rc = r["recovery"]
     L += ["## 5. Workflow recovery", "", f"Recovered to a verified analysis: **{rc['recovered']}/{rc['total']}**", "",
           "| Decision | Fault | Final status | Agent runs (baseline) | Retries | Degraded |", "|---|---|---|---|---|---|"]

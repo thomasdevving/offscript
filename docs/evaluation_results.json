@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20 04:39:29",
+  "generated_at": "2026-10-20 04:52:03",
   "quick": false,
   "detection": {
     "rows": [
@@ -92,6 +92,216 @@
         "Through ball to Thornquist",
         "Pass to Saelens"
       ]
+    },
+    {
+      "decision": "demo-match-073-dp-002",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Shoot (actual)",
+        "Pass to Valcourt",
+        "Through ball to Mbeki-Larsen"
+      ]
+    },
+    {
+      "decision": "demo-match-031-dp-002",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Varga (actual)",
+        "Pass to Saelens",
+        "Pass to El-Haddou"
+      ]
+    },
+    {
+      "decision": "demo-match-058-dp-001",
+      "status": "verified",
+      "verdict": "more_promising",
+      "options": [
+        "Pass to Lindqvist-Sa (actual)",
+        "Through ball to Castellane",
+        "Through ball to Kestrel"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-001",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Lindqvist-Sa (actual)",
+        "Through ball to Valcourt",
+        "Dribble wide left"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-002",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Varga (actual)",
+        "Pass to Rossi-Blane",
+        "Pass to Saelens"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-003",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Kestrel (actual)",
+        "Through ball to Ferreira-Holm",
+        "Pass to Castellane"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-004",
+      "status": "verified",
+      "verdict": "more_promising",
+      "options": [
+        "Pass to Okereke-Voss (actual)",
+        "Through ball to Castellane",
+        "Through ball to Mbeki-Larsen"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-005",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Thornquist (actual)",
+        "Through ball to Rossi-Blane",
+        "Pass to El-Haddou"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-006",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Albescu (actual)",
+        "Pass to El-Haddou",
+        "Dribble diagonally right"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-007",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Renner (actual)",
+        "Through ball to Albescu",
+        "Through ball to El-Haddou"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-008",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Okereke-Voss (actual)",
+        "Pass to Castellane",
+        "Dribble towards goal"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-009",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Annerud (actual)",
+        "Pass to Valcourt",
+        "Dribble towards goal"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-010",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Marchetti (actual)",
+        "Pass to Kestrel",
+        "Pass to Castellane"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-011",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Dribble (actual)",
+        "Pass to Ferreira-Holm",
+        "Dribble wide left"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-012",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Marchetti (actual)",
+        "Pass to Kestrel",
+        "Pass to Quist"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-013",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to El-Haddou (actual)",
+        "Pass to Saelens",
+        "Pass to Thornquist"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-014",
+      "status": "verified",
+      "verdict": "inconclusive",
+      "options": [
+        "Pass to Okereke-Voss (actual)",
+        "Through ball to Mbeki-Larsen",
+        "Through ball to Kestrel"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-015",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Marchetti (actual)",
+        "Pass to Castellane",
+        "Dribble diagonally right"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-016",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Ferreira-Holm (actual)",
+        "Through ball to Castellane",
+        "Shoot"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-017",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Renner (actual)",
+        "Pass to Rossi-Blane",
+        "Pass to Thornquist"
+      ]
+    },
+    {
+      "decision": "procedural-match-2026-dp-018",
+      "status": "verified",
+      "verdict": "similar",
+      "options": [
+        "Pass to Mbeki-Larsen (actual)",
+        "Pass to Castellane",
+        "Dribble towards goal"
+      ]
     }
   ],
   "recovery": {
@@ -163,9 +373,9 @@
         "decision": "demo-match-031-dp-001",
         "fault": "simulation_timeout",
         "final_status": "verified",
-        "agent_runs": 8,
+        "agent_runs": 6,
         "baseline_runs": 6,
-        "retries": 1,
+        "retries": 0,
         "degraded": false
       },
       {
@@ -209,15 +419,18 @@
     "total": 12
   },
   "verification": {
-    "numeric_corruptions": 30,
-    "numeric_detected": 30,
-    "narrative_corruptions": 54,
-    "narrative_detected": 54,
-    "clean_narratives": 18,
+    "numeric_corruptions": 240,
+    "numeric_detected": 240,
+    "narrative_corruptions": 432,
+    "narrative_detected": 432,
+    "clean_narratives": 144,
     "clean_false_positives": 0
   },
   "narrative_grounding": {
-    "verified_narratives": 18,
+    "analyses": 24,
+    "verified_analyses": 24,
+    "verified_narratives": 144,
+    "first_attempt_rejections": 0,
     "all_numbers_grounded": true
   },
   "reproducibility": {
@@ -248,7 +461,7 @@
       "turnover_ci_width": 0.12288900000000003,
       "p_goal": 0.02,
       "goal_ci_width": 0.042484,
-      "seconds_for_2_options": 0.76
+      "seconds_for_2_options": 0.74
     },
     {
       "rollouts": 500,
@@ -256,93 +469,93 @@
       "turnover_ci_width": 0.07865300000000003,
       "p_goal": 0.01,
       "goal_ci_width": 0.018914,
-      "seconds_for_2_options": 1.7
+      "seconds_for_2_options": 1.73
     }
   ],
   "latency": {
     "agent.decision_agent": {
-      "count": 16,
-      "p50_ms": 2.085,
-      "p95_ms": 7.402,
-      "max_ms": 22.32,
-      "mean_ms": 3.337
+      "count": 37,
+      "p50_ms": 2.09,
+      "p95_ms": 2.478,
+      "max_ms": 23.16,
+      "mean_ms": 2.703
     },
     "agent.explanation_agent": {
-      "count": 20,
-      "p50_ms": 2.945,
-      "p95_ms": 6.653,
-      "max_ms": 62.38,
-      "mean_ms": 5.95
+      "count": 40,
+      "p50_ms": 3.02,
+      "p95_ms": 3.575,
+      "max_ms": 4.08,
+      "mean_ms": 3.048
     },
     "agent.simulation_agent": {
-      "count": 16,
-      "p50_ms": 2056.71,
-      "p95_ms": 3165.588,
-      "max_ms": 3187.57,
-      "mean_ms": 2125.102
+      "count": 37,
+      "p50_ms": 2601.4,
+      "p95_ms": 3922.636,
+      "max_ms": 4936.88,
+      "mean_ms": 2613.147
     },
     "agent.strategy_agent": {
-      "count": 19,
-      "p50_ms": 7.68,
-      "p95_ms": 73.843,
-      "max_ms": 74.32,
-      "mean_ms": 31.566
+      "count": 40,
+      "p50_ms": 7.815,
+      "p95_ms": 74.686,
+      "max_ms": 75.01,
+      "mean_ms": 30.55
     },
     "agent.verification_agent": {
-      "count": 36,
-      "p50_ms": 3.21,
-      "p95_ms": 4.735,
-      "max_ms": 5.53,
-      "mean_ms": 3.517
+      "count": 77,
+      "p50_ms": 6.73,
+      "p95_ms": 14.162,
+      "max_ms": 25.75,
+      "mean_ms": 7.165
     },
     "analysis.end_to_end": {
-      "count": 16,
-      "p50_ms": 2092.921,
-      "p95_ms": 3201.007,
-      "max_ms": 3227.286,
-      "mean_ms": 2194.937
+      "count": 37,
+      "p50_ms": 2636.961,
+      "p95_ms": 3969.565,
+      "max_ms": 5062.005,
+      "mean_ms": 2681.907
     },
     "detector.on_event": {
       "count": 1929,
       "p50_ms": 0.001,
-      "p95_ms": 5.577,
-      "max_ms": 112.787,
-      "mean_ms": 2.113
+      "p95_ms": 5.519,
+      "max_ms": 115.043,
+      "mean_ms": 2.129
     },
     "eval.analysis_wall": {
       "count": 3,
-      "p50_ms": 2273.1,
-      "p95_ms": 3081.128,
-      "max_ms": 3170.909,
-      "mean_ms": 2377.522
+      "p50_ms": 2282.769,
+      "p95_ms": 3100.652,
+      "max_ms": 3191.528,
+      "mean_ms": 2391.476
     },
     "ingest.event_to_state": {
       "count": 1929,
-      "p50_ms": 0.002,
+      "p50_ms": 0.001,
       "p95_ms": 0.004,
-      "max_ms": 0.067,
+      "max_ms": 0.042,
       "mean_ms": 0.002
     },
     "simulation.run": {
-      "count": 16,
-      "p50_ms": 1921.3,
-      "p95_ms": 3162.825,
-      "max_ms": 3185.1,
-      "mean_ms": 2066.481
+      "count": 37,
+      "p50_ms": 2599.0,
+      "p95_ms": 3920.34,
+      "max_ms": 4934.9,
+      "mean_ms": 2587.022
     },
     "tool.run_simulation": {
-      "count": 19,
-      "p50_ms": 1565.51,
-      "p95_ms": 3158.804,
-      "max_ms": 3185.57,
-      "mean_ms": 1787.657
+      "count": 40,
+      "p50_ms": 2560.25,
+      "p95_ms": 3868.133,
+      "max_ms": 4935.2,
+      "mean_ms": 2415.228
     },
     "tool.run_verification_checks": {
-      "count": 16,
-      "p50_ms": 2.785,
-      "p95_ms": 3.33,
-      "max_ms": 3.51,
-      "mean_ms": 2.808
+      "count": 37,
+      "p50_ms": 3.12,
+      "p95_ms": 17.132,
+      "max_ms": 24.27,
+      "mean_ms": 5.809
     }
   },
   "simulator_sanity": {

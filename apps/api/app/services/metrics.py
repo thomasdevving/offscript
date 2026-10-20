@@ -73,3 +73,4 @@ def configure_logging(level: str = "INFO") -> None:
     root.setLevel(level)
     logging.getLogger("httpx").setLevel("WARNING")
     logging.getLogger("azure").setLevel("WARNING")
+    logging.getLogger("agent_framework").setLevel("WARNING")

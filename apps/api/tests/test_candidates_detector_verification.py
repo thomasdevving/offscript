@@ -166,3 +166,15 @@ def test_actual_action_is_rebuilt_from_snapshot(demo_match, demo_decision_snapsh
     ev, snap = demo_decision_snapshot
     a = actual_action_from_event(snap, demo_match.roster, ev.event_type.value, None, None, None)
     assert a.is_actual and a.initial_state_id == snap.snapshot_id and a.action_type == "shoot"
+
+
+def test_name_check_uses_whole_words(verified_analysis, demo_match):
+    a, dp, snap = verified_analysis
+    ev = build_evidence(a, dp, demo_match.roster)
+    roster = demo_match.roster
+    # Thornquist (A07) is allowed; Quist (H06) is not, but "Quist" is a substring of "Thornquist".
+    allowed = {dp.actor_id, "A07"} - {"H06"}
+    ok = "Under our simulation model Thornquist closed the lane."
+    assert not any("not part" in i for i in verify_narrative(_nar(ok), ev, roster, allowed))
+    bad = "Under our simulation model Quist closed the lane."
+    assert any("Sander Quist" in i for i in verify_narrative(_nar(bad), ev, roster, allowed))

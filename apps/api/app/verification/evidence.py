@@ -57,6 +57,7 @@ def build_evidence(analysis: CounterfactualAnalysis, decision: DecisionPoint, ro
     f = decision.features
     add("decision.distance_to_goal_m", "Distance to goal", round(f.distance_to_goal_m, 1), "m")
     add("decision.pressure_count_5m", "Opponents within 5 m", f.pressure_count_5m)
+    add("decision.pressure_radius_m", "Radius used for the pressure count", 5, "m")
     add("decision.nearest_defender_m", "Nearest defender", round(f.nearest_defender_m, 1), "m")
     add("decision.open_teammates", "Teammates with a likely-completed pass (model)", f.open_teammates)
     if f.actual_shot_quality is not None:
@@ -66,6 +67,9 @@ def build_evidence(analysis: CounterfactualAnalysis, decision: DecisionPoint, ro
         add("decision.actual_pass_difficulty", "Modeled pass difficulty", f.actual_pass_difficulty, "%")
     add("decision.observed_outcome", "Observed outcome (synthetic match)", decision.actual_outcome)
 
+    n_alts = sum(1 for c in analysis.candidates if not c.is_actual)
+    add("analysis.alternatives", "Alternatives compared with the observed action", n_alts)
+    add("analysis.options", "Options compared (including the observed action)", len(analysis.candidates))
     sim = analysis.simulation
     keys = action_keys(analysis)
     if sim is not None:

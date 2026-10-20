@@ -156,3 +156,24 @@ async def test_trajectory_matches_recorded_outcome(settings, store, hub):
         assert t.outcome == r.representative_outcome
         assert t.kind == "simulated" and t.frames
         assert t.rollout_index == r.representative_rollout
+
+
+async def test_every_detected_decision_gets_grounded_narratives_first_time(settings, hub):
+    """Regression: deterministic templates must pass narrative verification on the first attempt."""
+    from app.services.store import Store
+
+    store = Store(settings.scenarios_dir, settings.data_dir)
+    store.load(only=["shoot_vs_pass", "risky_through_ball", "counterattack", "defensive_pressure"])
+    settings.default_rollouts = 60
+    svc = AnalysisService(settings, store, hub)
+    checked = 0
+    for md in store.matches.values():
+        for dp in md.decisions:
+            a = await svc.wait((await svc.start(dp.decision_point_id, AnalyzeRequest())).analysis_id)
+            assert a.status == "verified", (dp.decision_point_id, a.workflow.errors)
+            assert a.workflow.explanation_retries == 0, (dp.decision_point_id, a.workflow.verification_issues)
+            assert sum(1 for s in a.workflow.steps if s.agent == "explanation_agent") == 1
+            assert not any("/" in i for i in a.workflow.verification_issues), a.workflow.verification_issues
+            assert len(a.narratives) == 6, dp.decision_point_id
+            checked += 1
+    assert checked >= 4

@@ -206,7 +206,8 @@ def verify_narrative(narrative: Narrative, evidence: list[EvidenceItem], roster:
             issues.append(f"Overclaiming language: '{phrase}'")
     for pid, p in roster.items():
         for nm in {p.name, p.short_name}:
-            if len(nm) > 3 and nm.lower() in low and pid not in allowed_player_ids:
+            # Whole-word match: "Quist" must not match inside "Thornquist".
+            if len(nm) > 3 and pid not in allowed_player_ids and re.search(rf"(?<![\w-]){re.escape(nm.lower())}(?![\w-])", low):
                 issues.append(f"Mentions {p.name}, who is not part of this decision")
     refs = {it.ref for it in evidence}
     unknown = [r for r in narrative.evidence_refs if r not in refs]
