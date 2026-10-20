@@ -197,10 +197,14 @@ class AgentRunner:
             step.model = label
             step.live_model = is_live
             try:
+                long_output = agent == "explanation_agent"
+                max_tokens = (self.settings.foundry_explanation_max_output_tokens if long_output
+                              else self.settings.foundry_max_output_tokens)
                 ag = Agent(client=client, name=agent, instructions=instructions, tools=tools,
                            middleware=[self._recorder(step)],
-                           default_options={"max_tokens": self.settings.foundry_max_output_tokens} if is_live else None)
-                timeout = self.settings.foundry_timeout_s if is_live else max(60.0, self.settings.simulation_time_budget_s * 3)
+                           default_options={"max_tokens": max_tokens} if is_live else None)
+                live_timeout = self.settings.foundry_explanation_timeout_s if long_output else self.settings.foundry_timeout_s
+                timeout = live_timeout if is_live else max(60.0, self.settings.simulation_time_budget_s * 3)
                 resp = await asyncio.wait_for(ag.run(prompt, options={"response_format": output_model}), timeout)
                 try:
                     value = resp.value
