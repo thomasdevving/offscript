@@ -32,6 +32,20 @@ flowchart LR
   OV & NAR --> WEB[Next.js app<br/>pitch, timeline, what-if, inspector]
   LIVE <--> WEB
   FOUNDRY[(Microsoft Foundry<br/>model deployment)] -. FoundryChatClient .- ORCH
+  DET --> MV
+  subgraph MV["Football Multiverse (apps/api/app/multiverse)"]
+    SES[Branch tree<br/>immutable snapshots, copy-on-write] --> PLAN
+    subgraph PLAN["Adversarial planning workflow"]
+      AA[Attacking Agent] --> DFA[Defending Agent] --> MSIM[Simulation Agent]
+      MSIM -. revise, max 3 rounds .-> AA
+      MSIM --> MVER[Verification Agent] --> MEXP[Explanation Agent] --> MVER
+    end
+    PLAN --> REAL[Realised transition<br/>new child snapshot]
+    REAL --> SES
+  end
+  MSIM --> CACHE[(Response-matrix cell cache)] --> MC
+  MV <--> WEB
+  FOUNDRY -. FoundryChatClient .- PLAN
 ```
 
 ## Components
@@ -50,8 +64,10 @@ flowchart LR
 | Orchestration | `apps/api/app/orchestration/workflow.py` | Agent Framework `WorkflowBuilder` graph, executors, tools, bounded retries, fault injection. |
 | Verification | `apps/api/app/verification` | Deterministic checks on analyses, evidence table, narrative grounding. |
 | Narratives | `apps/api/app/narratives/templates.py` | EN/NL deterministic narratives per viewer mode (policy mode and fallback). |
+| Defence model | `apps/api/app/simulation/defense.py` | Validated defensive strategies (press, cover lane, track runner, protect central, contain) that change defender targets, reactions and tackles in the engine. |
+| Multiverse | `apps/api/app/multiverse` | Branch tree service + persistence, cell evaluator/cache, transitions and successor snapshots, adversarial planning workflow, verification, narratives. See [multiverse.md](multiverse.md). |
 | Services | `apps/api/app/services` | Store, analysis jobs + cache, live replay sessions, overlays, recap, metrics, WebSocket hub. |
-| API | `apps/api/app/api` | REST (`/api/...`, OpenAPI at `/docs`) and WebSocket (`/ws/matches/{id}`). |
+| API | `apps/api/app/api` | REST (`/api/...`, `/api/multiverse/...`, OpenAPI at `/docs`) and WebSockets (`/ws/matches/{id}`, `/ws/multiverse/{session}`). |
 | Web | `apps/web` | Next.js 16 static export, Tailwind 4, zustand; SVG pitch; Vitest + Playwright. |
 | Infra | `infra/azure`, `infra/docker`, `azure.yaml`, `.github/workflows` | Bicep (Container Apps, SWA, ACR, App Insights, managed identity), Dockerfiles, CI/CD. |
 
@@ -70,12 +86,27 @@ flowchart LR
 6. Selecting an option re-runs one rollout from its seed (`/trajectories`) and animates it as a
    clearly labelled **simulated** continuation.
 
+## Data flow for one Multiverse step
+
+1. `POST /api/multiverse/sessions` freezes the decision's snapshot as the root node and adds the
+   observed continuation as a read-only `observed` node.
+2. `POST .../branches/{node}/actions` validates the user's action, then starts a job (202). The
+   adversarial workflow evaluates the response matrix (cells cached by snapshot digest, action,
+   strategy, budget, seed, horizon and simulator version), verifies it and writes narratives.
+3. One rollout of the selected action vs the defence's counter is replayed; the engine state after
+   the first action becomes a new immutable child snapshot and node. The parent is never mutated.
+4. The session is persisted to JSON; progress and completion are pushed over `/ws/multiverse/{id}`.
+5. `GET .../trajectory` returns the concatenated frames from the root for playback; `POST
+   /api/multiverse/compare` aligns two branches from their common ancestor.
+
 ## Correlation and observability
 
 Every analysis has a `correlation_id` that appears in the workflow state, structured JSON logs, the
 WebSocket progress messages and (when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set) OpenTelemetry
 traces via `azure-monitor-opentelemetry` plus Agent Framework instrumentation. In-process latency
-metrics (p50/p95) are exposed at `GET /api/metrics`.
+metrics (p50/p95) are exposed at `GET /api/metrics`, including `multiverse.planning` and
+`multiverse.branch_creation`. Each multiverse planning has its own `correlation_id`, agent steps and
+tool-call trace.
 
 ## Real-time design
 

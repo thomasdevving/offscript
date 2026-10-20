@@ -8,6 +8,10 @@ coordinate and explain, while deterministic tools do the mathematics.
 
 Source: `apps/api/app/orchestration/workflow.py`, `apps/api/app/agents/`.
 
+The **Football Multiverse** adds a second workflow with two adversarial agents (Attacking and
+Defending) that plan against each other; it is described [below](#football-multiverse-adversarial-planning)
+and in [multiverse.md](multiverse.md).
+
 ## Agents, tools and outputs
 
 | Agent | Responsibility | Tools (deterministic, validated arguments, `max_invocations` budget) | Structured output |
@@ -113,3 +117,26 @@ structured-output call to verify a deployment.
 | `simulation_timeout` | The first simulation run gets a 0.25 s budget | A partial, still-fair result (equal rollouts per option) is detected; the Simulation Agent re-runs with a preview budget |
 
 Fault-injected analyses are separate jobs: they never overwrite the main analysis, cache or overlays.
+
+## Football Multiverse: adversarial planning
+
+A second Agent Framework workflow (`apps/api/app/multiverse/workflow.py`) runs each branching step.
+It reuses the same runner (Foundry → labelled policy fallback), tool tracing middleware and
+deterministic verification, with two new agents that have **opposing objectives**:
+
+| Agent | Objective | Tools | Output |
+|---|---|---|---|
+| Attacking | Maximise modelled xG within the horizon; must keep the user's action | `get_match_state`, `get_available_actions` (with already-tried list), `get_planning_feedback` | `AttackPlan` |
+| Defending | Minimise it with feasible defensive strategies | `get_threat_assessment`, `get_defensive_options`, `validate_defensive_strategy`, `get_planning_feedback` | `DefensePlan` |
+| Simulation | Evaluate every (action, defence) pair with equal paired budgets; decide whether another round can change the answer | `evaluate_response_matrix` | `MatrixReport` |
+| Verification | 12 deterministic checks on the matrix, summary, user-action respect and transition replay; then narrative grounding | `run_multiverse_checks`, `verify_narratives` | `VerificationDecision` |
+| Explanation | Casual / analyst / broadcaster × EN/NL from the planning evidence table | `get_planning_evidence`, `check_narrative` | `ExplanationBundle` |
+
+Attack → Defence → Simulation repeats for at most 3 rounds (tabu list and a 0.2 pp improvement
+threshold stop oscillation); `max_iterations=40` bounds the graph. The agents choose *which* cells to
+evaluate and *which* action to realise; every number comes from the simulator. In manual mode the
+selected action is always the user's (`user_action_respected` check); in assisted mode the
+recommendation is stored on the node and never creates a branch until accepted; in autonomous mode
+the attacking agent's most robust option is played step by step. Recommendations are labelled
+"AI RECOMMENDED", agent-chosen branches "AI", user branches "USER", and the observed timeline
+"ACTUAL".

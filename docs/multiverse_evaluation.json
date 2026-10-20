@@ -1,0 +1,210 @@
+{
+  "generated_at": "2026-10-20 13:04:30",
+  "quick": false,
+  "rollouts_per_cell": 80,
+  "successor_samples": 8,
+  "decisions": 3,
+  "rows": [
+    {
+      "scenario": "shoot_vs_pass",
+      "decision": "demo-match-073-dp-001",
+      "clock_ms": 4367199,
+      "actual": "Shoot",
+      "A": {
+        "top": "Dribble towards goal",
+        "top_xg": 0.017188,
+        "options": 21,
+        "rollouts": 1680,
+        "latency_ms": 7680
+      },
+      "C": {
+        "robust": "Pass to Mbeki-Larsen",
+        "upside": "Dribble wide left",
+        "mean": "Pass to Mbeki-Larsen",
+        "robust_worst": 0.010417,
+        "robust_mean": 0.013334,
+        "upside_worst": 0.004167,
+        "upside_best": 0.01875,
+        "counter": "def-cover-H07",
+        "counter_effect_pp": -0.313,
+        "rounds": 3,
+        "actions": 4,
+        "strategies": 5,
+        "cells": 19,
+        "rollouts": 1520,
+        "latency_ms": 10094.3,
+        "verified": true,
+        "top_a_vs_baseline": 0.017188,
+        "top_a_vs_counter": 0.001563,
+        "top_a_optimism_gap": 0.015624999999999998,
+        "robust_differs_from_a": true,
+        "robust_minus_top_a_worst": 0.008853999999999999
+      },
+      "B": {
+        "rows": [
+          {
+            "action": "Dribble towards goal",
+            "first_order": 0.017188,
+            "second_order": 0.068815125,
+            "successors": 8
+          },
+          {
+            "action": "Pass to Mbeki-Larsen",
+            "first_order": 0.013542,
+            "second_order": 0.012890750000000001,
+            "successors": 8
+          }
+        ],
+        "ranking_flips": false,
+        "rollouts": 8840,
+        "latency_ms": 36877
+      }
+    },
+    {
+      "scenario": "risky_through_ball",
+      "decision": "demo-match-031-dp-001",
+      "clock_ms": 1867161,
+      "actual": "Pass to Saelens",
+      "A": {
+        "top": "Pass to El-Haddou",
+        "top_xg": 0.000521,
+        "options": 20,
+        "rollouts": 1600,
+        "latency_ms": 9463
+      },
+      "C": {
+        "robust": "Pass to El-Haddou",
+        "upside": "Pass to El-Haddou",
+        "mean": "Pass to El-Haddou",
+        "robust_worst": 0.0,
+        "robust_mean": 0.000781,
+        "upside_worst": 0.0,
+        "upside_best": 0.002083,
+        "counter": "def-press",
+        "counter_effect_pp": -0.052,
+        "rounds": 2,
+        "actions": 2,
+        "strategies": 4,
+        "cells": 8,
+        "rollouts": 640,
+        "latency_ms": 5631.6,
+        "verified": true,
+        "top_a_vs_baseline": 0.000521,
+        "top_a_vs_counter": 0.0,
+        "top_a_optimism_gap": 0.000521,
+        "robust_differs_from_a": false,
+        "robust_minus_top_a_worst": 0.0
+      },
+      "B": {
+        "rows": [
+          {
+            "action": "Pass to El-Haddou",
+            "first_order": 0.000521,
+            "second_order": 0.00332025,
+            "successors": 8
+          },
+          {
+            "action": "Through ball to Achterberg",
+            "first_order": 0.000521,
+            "second_order": 0.0009115,
+            "successors": 8
+          }
+        ],
+        "ranking_flips": false,
+        "rollouts": 14080,
+        "latency_ms": 69374
+      }
+    },
+    {
+      "scenario": "defensive_pressure",
+      "decision": "demo-match-012-dp-001",
+      "clock_ms": 713342,
+      "actual": "Dribble",
+      "A": {
+        "top": "Through ball to Thornquist",
+        "top_xg": 0.008854,
+        "options": 20,
+        "rollouts": 1600,
+        "latency_ms": 7377
+      },
+      "C": {
+        "robust": "Through ball to Thornquist",
+        "upside": "Through ball to Thornquist",
+        "mean": "Through ball to Thornquist",
+        "robust_worst": 0.006771,
+        "robust_mean": 0.008646,
+        "upside_worst": 0.006771,
+        "upside_best": 0.011458,
+        "counter": "def-press",
+        "counter_effect_pp": -0.208,
+        "rounds": 3,
+        "actions": 3,
+        "strategies": 5,
+        "cells": 14,
+        "rollouts": 1120,
+        "latency_ms": 6372.3,
+        "verified": true,
+        "top_a_vs_baseline": 0.008854,
+        "top_a_vs_counter": 0.006771,
+        "top_a_optimism_gap": 0.0020830000000000006,
+        "robust_differs_from_a": false,
+        "robust_minus_top_a_worst": 0.0
+      },
+      "B": {
+        "rows": [
+          {
+            "action": "Through ball to Thornquist",
+            "first_order": 0.008854,
+            "second_order": 0.011067625,
+            "successors": 8
+          },
+          {
+            "action": "Pass to Thornquist",
+            "first_order": 0.007292,
+            "second_order": 0.014063,
+            "successors": 8
+          }
+        ],
+        "ranking_flips": true,
+        "rollouts": 12840,
+        "latency_ms": 47232
+      }
+    }
+  ],
+  "summary": {
+    "robust_differs_from_single_decision": 1,
+    "mean_optimism_gap_top_a": 0.006076333333333333,
+    "mean_robust_minus_top_a_worst": 0.002951333333333333,
+    "second_order_ranking_flips": 1,
+    "mean_value_of_redeciding": 0.010525041666666667,
+    "verified_plannings": 6,
+    "plannings": 6,
+    "narratives_verified": 36,
+    "narratives": 36,
+    "live_model_calls": 0
+  },
+  "cost": {
+    "A_rollouts_mean": 1626.6666666666667,
+    "B_rollouts_mean": 11920.0,
+    "C_rollouts_mean": 1093.3333333333333,
+    "A_latency_ms_mean": 8173.333333333333,
+    "B_latency_ms_mean": 51161.0,
+    "C_latency_ms_p50": 6001.950000000001,
+    "C_latency_ms_max": 10094.3,
+    "C_rounds_mean": 2.6666666666666665,
+    "C_cells_mean": 17.333333333333332
+  },
+  "performance": {
+    "repeat_planning_cache_hits": 19,
+    "repeat_planning_cells": 19,
+    "repeat_planning_ms": 136,
+    "first_planning_ms": 10094.3,
+    "repeat_identical": true,
+    "fresh_process_identical": true,
+    "concurrent_plannings": 3,
+    "sequential_s": 22.12,
+    "concurrent_s": 27.51,
+    "peak_python_heap_mb_one_step": 2.1,
+    "session_json_kb_max": 164.4
+  }
+}

@@ -36,6 +36,12 @@ then `az login` and restart the API. Check with `curl -X POST localhost:8000/api
 
 Docker alternative: `docker compose up --build` (web on :3000, API on :8000).
 
+Football Multiverse settings (environment variables, all optional): `MULTIVERSE_CELL_ROLLOUTS` (80),
+`MULTIVERSE_MAX_CELL_ROLLOUTS` (200), `MULTIVERSE_MAX_ROUNDS` (3), `MULTIVERSE_MAX_DEPTH` (3),
+`MULTIVERSE_MAX_CHILDREN` (6), `MULTIVERSE_MAX_NODES` (40), `MULTIVERSE_MAX_SESSIONS` (200),
+`MULTIVERSE_TIMEOUT_S` (180). Sessions are written to `DATA_DIR/multiverse/`; in a container they
+last as long as the replica's file system (use an Azure Files mount to keep them across restarts).
+
 ## 2. Microsoft Foundry
 
 1. In the [Foundry portal](https://ai.azure.com) create (or reuse) a project and deploy a chat model
@@ -87,7 +93,7 @@ What the template creates:
 
 | Resource | Purpose | Cost driver |
 |---|---|---|
-| Container Apps environment + `parallel-api` (1 vCPU / 2 GiB, 1-2 replicas, HTTPS + WebSockets) | API, simulations, agents | `minReplicas=1` keeps the demo warm (~1 vCPU always on). Set `minReplicas=0` to scale to zero. |
+| Container Apps environment + `parallel-api` (1 vCPU / 2 GiB, 1 replica by default, HTTPS + WebSockets) | API, simulations, agents | `minReplicas=1` keeps the demo warm (~1 vCPU always on). Set `minReplicas=0` to scale to zero. Keep `maxReplicas=1`: analysis jobs and Multiverse sessions/jobs are held by one API process (memory + `data/multiverse/*.json`). |
 | Azure Container Registry (Basic) | API image | small fixed |
 | User-assigned managed identity | ACR pull; Foundry access without keys | free |
 | Log Analytics + Application Insights | logs, OpenTelemetry traces, metrics | ingestion volume (30-day retention) |

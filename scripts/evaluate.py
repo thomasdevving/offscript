@@ -36,7 +36,6 @@ from app.config import Settings  # noqa: E402
 from app.match_state.engine import MatchStateEngine  # noqa: E402
 from app.models.analysis import AnalyzeRequest  # noqa: E402
 from app.models.events import EventType  # noqa: E402
-from app.models.narrative import Narrative  # noqa: E402
 from app.models.simulation import SimulationConfig  # noqa: E402
 from app.services import metrics  # noqa: E402
 from app.services.analysis_service import AnalysisService  # noqa: E402

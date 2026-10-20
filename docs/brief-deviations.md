@@ -19,6 +19,18 @@ here so nothing is hidden.
 | Python 3.12+ | Pinned to 3.12 in Docker/CI; developed and tested on 3.13 | Both supported by every dependency. |
 | Azure Storage / Service Bus / databases (optional) | Not used | Not justified for the demo; in-memory store + disk cache. Documented as production next steps. |
 
+## Football Multiverse brief
+
+| Brief | Implementation | Reason |
+|---|---|---|
+| Replace the Strategy Agent with an Attacking Agent | Strategy Agent kept for the single-decision analysis; **Attacking Agent added** for the Multiverse workflow | The verified single-decision analysis (and its fault-recovery tests) stays unchanged; the adversarial workflow is a separate graph with its own agents. |
+| Value = P(goal within horizon) | Cells use **modelled expected goals within the horizon** (conditional Monte Carlo over shot states); binary P(goal) is still reported | Goals within 10 s are rare; binary P(goal) could not separate defensive strategies at affordable budgets. The conditional estimator targets the same quantity with lower variance (tested to agree). |
+| Branch = new timeline object | **Tree of nodes** with immutable snapshots, plus a read-only `observed` node for the canonical timeline | One data structure for rewind, fork, compare and limits; the observed node makes "actual vs simulated" comparable without copying the match. |
+| Defensive actions as agent-chosen player movements | Validated **strategies** (press, cover lane, track runner, protect central space, contain) applied as target/reaction/tackle changes inside the engine | Keeps defenders speed-bounded and reactive to the actual ball, and every strategy feasible (reach check); free-form movements could not be validated or simulated fairly. |
+| Continue after shots | Shots end the branch (no rebounds) | The engine has no rebound model; inventing one would be an unvalidated outcome. |
+| Optional 3D view | Not implemented | Time spent on correctness, tests and evaluation; the 2D pitch shows all modelled information. |
+| Agents "negotiate" until equilibrium | At most 3 rounds, tabu list, 0.2 pp improvement threshold; maximin/mean/upside computed deterministically | Guarantees termination and bounded cost; the answer is a property of the matrix, not of the agents' persuasion. |
+
 Rule discrepancies noticed while reading the official rules (follow the official rules):
 
 * The brief mentions only the Grand Prize and the Multi-Agent prize; the official rules list

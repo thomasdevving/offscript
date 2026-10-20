@@ -74,6 +74,29 @@ horizon with possession retained. At most 8 actions per rollout.
   examples. Trajectories are re-simulated from their seed on demand, which doubles as a
   reproducibility check (verified in the verification layer).
 
+## Multiverse extensions
+
+The Football Multiverse (see [multiverse.md](multiverse.md)) uses the same engine with three additions.
+
+* **Defensive strategies** (`simulation/defense.py`). A `DefenseRuntime` changes defender target
+  positions (press the carrier, cover a passing lane to a named teammate, track a runner, protect
+  central space, contain), multiplies defender reaction times on passes and dribbles (clipped to
+  0.55-1.4) and scales the tackle probability in dribble duels (contain 0.75×, press 1.15×). Every
+  strategy is validated (max 3 assignments; outfield defenders on the pitch; no duplicates; targets
+  must be attackers; each defender must reach its role within 2.5 s). Speed limits still hold (tested
+  for every strategy). The balanced baseline reproduces the original engine bit for bit (tested).
+* **Value per cell: modelled expected goals within the horizon.** Goals within 10 s are rare, so
+  binary P(goal) needs very large budgets to separate defences. Each rollout that ends in a shot
+  instead contributes its *conditional* goal probability, estimated with 24 independent draws of the
+  shot model from that shot state (a Rao-Blackwellised estimator of the same quantity, with lower
+  variance; tested to agree with binary P(goal)). Binary P(goal), P(shot), P(turnover) and first-action
+  success are still reported per cell.
+* **Successor states.** `run_first_action` replays only the first action of a chosen rollout (same
+  random streams as the full rollout) plus the control moment before the next decision. The engine
+  state is converted into a new immutable `MatchStateSnapshot` (positions clipped to the pitch,
+  velocities, carrier, possession, score, clocks). Re-replaying the same rollout gives the same child
+  state (checked by `transition_reproducible`).
+
 ## Synthetic match generation
 
 * **Scenario mode** (`/scenarios/<id>/scenario.json`, inspectable): authored starting positions in the

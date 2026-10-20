@@ -3,7 +3,7 @@
 //  * Log Analytics + workspace-based Application Insights (telemetry, OpenTelemetry traces)
 //  * Azure Container Registry (API image)
 //  * User-assigned managed identity (pulls images; authenticates to Microsoft Foundry - no keys)
-//  * Azure Container Apps environment + API container app (HTTPS + WebSockets, scale 1..2)
+//  * Azure Container Apps environment + API container app (HTTPS + WebSockets, single replica by default)
 //  * Azure Static Web App (Free) for the static Next.js export
 //  * Optional: "Azure AI User" role for the identity on an existing Foundry resource
 //
@@ -38,6 +38,9 @@ param foundryRoleDefinitionId string = '53ca6127-db72-4b80-b1b0-d745d6d5456d'
 
 @description('Keep one replica warm so judges never hit a cold start (costs ~1 vCPU-0.5 always on).')
 param minReplicas int = 1
+
+@description('Analysis jobs and Football Multiverse sessions/jobs live in one API process (memory + local disk), so the default is a single replica. Raise only after moving them to a shared store.')
+param maxReplicas int = 1
 
 var suffix = uniqueString(resourceGroup().id)
 var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
@@ -167,7 +170,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
       ]
       scale: {
         minReplicas: minReplicas
-        maxReplicas: 2
+        maxReplicas: maxReplicas
         rules: [ { name: 'http', http: { metadata: { concurrentRequests: '40' } } } ]
       }
     }

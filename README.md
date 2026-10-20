@@ -35,12 +35,26 @@ always labelled as one sampled continuation of a model, with its uncertainty.
 * **See the agents work**: a workflow inspector with every agent step, tool call, structured output,
   handoff and retry, plus a **recovery demo** that injects controlled faults.
 * **Match recap** (casual and analyst) grounded in event ids and verified analyses; EN/NL.
+* **Football Multiverse**: take the decision yourself. Click a teammate, a space or a dribble target;
+  an **attacking agent** and a **defending agent** plan against each other over a bounded response
+  matrix (paired Monte Carlo per action × defence), the chosen continuation becomes a new frozen state,
+  and you decide again. Rewind, fork sibling branches, let the agents recommend (assisted) or play it
+  out (autonomous), and compare two branches side by side. → [docs/multiverse.md](docs/multiverse.md)
 
 | Tactical analyst | What-if playback |
 |---|---|
 | ![Analyst mode](docs/images/analyst-mode.png) | ![Simulated alternative](docs/images/what-if-playback.png) |
 | **Broadcaster** | **Agent recovery** (rejected claim → regenerated) |
 | ![Broadcaster mode](docs/images/broadcaster-mode.png) | ![Agent recovery](docs/images/agent-recovery.png) |
+
+**Football Multiverse**: a user-chosen pass, the defending agent's best answer (cover the lane) and
+the decision tree with the canonical synthetic timeline kept apart.
+
+![Football Multiverse branch](docs/images/multiverse-branch.png)
+
+| Agent battle and response matrix | Split-screen branch comparison |
+|---|---|
+| ![Agent battle](docs/images/multiverse-agent-battle.png) | ![Branch comparison](docs/images/multiverse-compare.png) |
 
 ## Quick start
 
@@ -61,7 +75,9 @@ npm run dev:web
 ```
 
 Open http://localhost:3000, keep **"73' - The decision that changed the attack"**, press ▶ (2× is a
-good speed). Or run everything with Docker: `docker compose up --build`.
+good speed). For the Multiverse, open the **Multiverse** tab (or "Explore in the Multiverse" on an
+analysis), choose the 72:47 decision, pick *Pass to player* and click a highlighted teammate. Or run
+everything with Docker: `docker compose up --build`.
 
 **Live Microsoft Foundry model** (optional): set `FOUNDRY_PROJECT_ENDPOINT` and `FOUNDRY_MODEL` in
 `.env` (see [.env.example](.env.example)), run `az login`, restart the API, then
@@ -107,10 +123,13 @@ flowchart LR
 | Controlled faults recovered (invalid candidate, contradictory claim, model outage, simulation timeout) | **12/12** |
 | Reproducibility (re-analysis, trajectory replay, scenario regeneration) | bit-identical |
 | End-to-end analysis, 3 options × 200 rollouts, policy agents | ~2.6 s p50 |
+| Multiverse: single-decision value optimistic vs the defence's best counter | **0.61 pp** mean; robust choice differs in **1/3** decisions |
+| Multiverse plannings verified / narratives grounded | **6/6** / **36/36**; repeated planning served 19/19 cells from cache |
 
 Full method and numbers: [docs/evaluation.md](docs/evaluation.md) · generated tables:
-[docs/evaluation_results.md](docs/evaluation_results.md). Tests: 64 backend (pytest), 17 frontend
-unit (Vitest), 2 end-to-end (Playwright, real browser + real backend).
+[docs/evaluation_results.md](docs/evaluation_results.md). Multiverse (single-decision vs branching vs
+adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Tests: 77 backend
+(pytest), 33 frontend unit (Vitest), 3 end-to-end (Playwright, real browser + real backend).
 
 ## Microsoft technologies
 
@@ -124,7 +143,7 @@ unit (Vitest), 2 end-to-end (Playwright, real browser + real backend).
 
 ```
 apps/api        FastAPI backend: simulation, synthetic data, match state, detection, agents,
-                orchestration, verification, narratives, services, API (+ tests)
+                orchestration, verification, narratives, multiverse, services, API (+ tests)
 apps/web        Next.js 16 static app: pitch, timeline, analysis panel, inspector (+ Vitest, Playwright)
 packages/contracts  OpenAPI schema + generated TypeScript types (single source: Pydantic models)
 scenarios/      Inspectable scenario definitions (positions, script, seed, labels)
@@ -135,7 +154,7 @@ docs/           architecture, simulator, multi-agent system, evaluation, deploym
 
 ## Documentation
 
-[Architecture](docs/architecture.md) · [Simulator](docs/simulator.md) ·
+[Architecture](docs/architecture.md) · [Football Multiverse](docs/multiverse.md) · [Simulator](docs/simulator.md) ·
 [Multi-agent system](docs/multi-agent-system.md) · [Evaluation](docs/evaluation.md) ·
 [Deployment](docs/deployment.md) · [Limitations](docs/limitations.md) ·
 [Hackathon submission](docs/hackathon-submission.md) · [Demo script](docs/demo-script.md) ·

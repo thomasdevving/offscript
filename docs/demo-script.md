@@ -26,3 +26,14 @@ the running system - do not overlay numbers in editing.
 3. Record the sequence above in one take; cut only dead time.
 4. Separate take for the recovery demo (it starts a new, clearly labelled analysis).
 5. Upload to YouTube/Vimeo as public/unlisted-but-public, English title and description.
+
+## Optional Football Multiverse segment (replaces 1:08-1:30 if preferred)
+
+| Time | Screen | Voice-over |
+|---|---|---|
+| 0:00-0:08 | Click **Explore in the Multiverse**; the decision tree shows the frozen decision and the actual shot (ACTUAL). | "Now I take the decision myself." |
+| 0:08-0:18 | *Pass to player* → click Mbeki-Larsen → "feasible" → *Simulate this branch*; the ghost node shows the agents planning. | "An attacking agent and a defending agent plan against each other on the simulator." |
+| 0:18-0:30 | The branch plays; orange arrow "cover lane"; narrative: the defence's best answer lowers the modelled chance from 1.4% to 1.0%. Switch to Tactical analyst: rounds and the response matrix. | "The defence's best answer is to cover the lane. Every cell is paired Monte Carlo; nothing is invented by a model." |
+| 0:30-0:40 | Rewind, pick a dribble, then *Compare with* → split screen plays both branches in sync. | "Rewind, branch again, compare. Every decision creates another game." |
+
+Numbers in this segment depend on the run; read them from the screen, do not script them.

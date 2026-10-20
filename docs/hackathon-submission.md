@@ -11,7 +11,10 @@ AI agents built on Microsoft Agent Framework detect the moment, propose feasible
 run hundreds of paired Monte Carlo simulations from the exact frozen game state, verify every
 number and claim, and explain the trade-offs for fans, analysts and broadcasters in English and
 Dutch. Viewers can watch a simulated continuation of the option the player did not take - always
-labelled as a model estimate, with uncertainty. *Every decision creates another game.*
+labelled as a model estimate, with uncertainty. In the **Football Multiverse** they can take the
+decision themselves: an attacking agent and a defending agent plan against each other, the chosen
+continuation becomes a new game state, and the viewer decides again, rewinds, forks and compares
+branches. *Every decision creates another game.*
 
 ## Problem
 
@@ -31,6 +34,10 @@ out, and an honest account of uncertainty - in seconds, in a form a broadcast ca
 4. **Verify**: deterministic checks on every probability, interval, comparison and claim.
 5. **Explain & render**: three functionally different viewer modes, EN/NL narratives, timestamped
    machine-readable overlay instructions, what-if animation, evidence panel, match recap.
+6. **Branch (Football Multiverse)**: user-chosen actions (click a teammate, a space or a dribble
+   target), adversarial Attacking vs Defending agents over a bounded response matrix, a realised
+   successor state per step, a decision tree with rewind/fork, manual/assisted/autonomous modes and a
+   synchronised split-screen comparison. See [multiverse.md](multiverse.md).
 
 ## Microsoft technologies actually used
 
@@ -38,7 +45,7 @@ out, and an honest account of uncertainty - in seconds, in a form a broadcast ca
 |---|---|---|
 | **Microsoft Agent Framework** (`agent-framework-core` 1.22) | `Agent` per specialist, `@tool` with invocation budgets, function middleware for tool-call tracing, structured outputs, `WorkflowBuilder` with switch-case edges, executors, bounded self-loops, workflow state | Implemented and tested (CI) |
 | **Microsoft Foundry** (`agent-framework-foundry` `FoundryChatClient`, Azure Identity) | Live model for all agents when `FOUNDRY_PROJECT_ENDPOINT`/`FOUNDRY_MODEL` are set; managed identity in Azure; diagnostics endpoint; optional live test | Implemented; **not exercised live in the build environment** (no credentials) - see deployment checklist |
-| **Azure Container Apps** | API (HTTPS + WebSockets), managed identity, scale 1-2 | Bicep + deploy workflow; deployment pending credentials |
+| **Azure Container Apps** | API (HTTPS + WebSockets), managed identity, single replica by default | Bicep + deploy workflow; deployment pending credentials |
 | **Azure Static Web Apps** | Static Next.js export | Bicep + deploy workflow; deployment pending |
 | **Azure Container Registry** | API image via `az acr build` | Bicep |
 | **Azure Monitor / Application Insights** (OpenTelemetry) | Traces, logs, Agent Framework instrumentation when the connection string is set | Implemented; enabled by configuration |
@@ -60,6 +67,12 @@ Update the "Status" column once the deployment exists; do not claim more than is
   allow-listed tools; every number is a computed, evidence-referenced field.
 * **Verification as an agent with teeth**: a deterministic layer the Verification Agent cannot
   override; narrative claims are checked number by number; failures route back to the right agent.
+* **Adversarial multi-agent planning**: two agents with opposing objectives revise against a
+  simulated response matrix for up to three rounds; robust (maximin), expected and upside choices are
+  computed, not asserted; 12 deterministic checks (including replaying the realised transition)
+  guard every branch.
+* **Branching without corruption**: immutable, digest-checked snapshots, copy-on-write nodes,
+  idempotent requests, persisted sessions; the canonical synthetic timeline is never changed.
 * **Real-time path**: per-event state updates in microseconds; analyses run asynchronously with
   live progress pushed to the UI; overlays are scheduled by priority and expire on match events.
 
@@ -79,7 +92,8 @@ Update the "Status" column once the deployment exists; do not claim more than is
 See [evaluation.md](evaluation.md) (measured on synthetic data; internal consistency, not real-world
 validity): 24/24 detected decisions verified; 240/240 numeric and 432/432 narrative corruptions
 caught with 0/144 false positives; 12/12 controlled faults recovered; bit-identical reproducibility;
-~2.6 s p50 end-to-end analysis in policy mode.
+~2.6 s p50 end-to-end analysis in policy mode. Multiverse: single-decision vs branching vs adversarial
+comparison, cost and cache measurements in [multiverse_evaluation.md](multiverse_evaluation.md).
 
 ## Limitations
 

@@ -31,6 +31,34 @@ agents, 200 rollouts per option).
 Latency with a live Foundry model adds model round-trips (up to 6 agent calls per analysis, each
 bounded by `FOUNDRY_TIMEOUT_S`); it was not measured in this environment.
 
+## Football Multiverse
+
+`python scripts/evaluate_multiverse.py` (≈10 minutes; `--quick` ≈2 minutes) compares, on every
+labelled decision, (A) single-decision ranking against a balanced defence, (B) branching
+(second-order value when the attacker re-decides at the next decision) and (C) the adversarial
+planning, and measures cost, latency, cache hit rate, concurrency, memory, determinism, verification
+and narrative grounding. Results: [multiverse_evaluation.md](multiverse_evaluation.md).
+
+Latest run (80 paired simulations per cell, 8 successor samples, the 3 labelled decisions the
+detector finds, policy-mode agents):
+
+| Property | Result |
+|---|---|
+| Adversarial "most robust" option differs from the single-decision pick | **1/3** (73': A prefers *Dribble towards goal*, 1.72% vs a balanced defence, but only 0.16% against the defence's best counter; C picks *Pass to Mbeki-Larsen*, worst case 1.04%) |
+| Mean optimism of the single-decision value (vs balanced − vs best counter) | **0.61 pp** of modelled xG |
+| Top-2 single-decision options re-ordered when the attacker re-decides at the next decision | **1/3** |
+| Plannings passing all 12 deterministic checks / narratives passing grounding | **6/6** / **36/36** |
+| Rollouts per decision: A / B (top-2 branching) / C (adversarial) | 1,627 / 11,920 / 1,093 |
+| Adversarial planning latency p50 / max (policy mode) | 6.0 / 10.1 s |
+| Repeated planning on the same state: cells from cache, latency | 19/19, 0.14 s (vs 10.1 s) |
+| Same planning in a fresh service (empty cache) | identical matrix |
+| 3 plannings at concurrency 1 vs 4 | 22.1 s vs 27.5 s (CPU-bound in one process: concurrency buys responsiveness, not throughput) |
+| Peak Python heap per branching step / largest session file | 2.1 MB / 164 KB |
+
+Latencies were measured on the development laptop while other test processes were running, so they
+are upper bounds for an idle machine. B's second-order value restarts the 10 s horizon at the
+successor state; it is a ranking signal, not an additive gain.
+
 ## Method
 
 1. **Detection**: each scenario has a labelled decision event (`labels` in its JSON). The detector
@@ -56,9 +84,10 @@ bounded by `FOUNDRY_TIMEOUT_S`); it was not measured in this environment.
 | Suite | Command | Scope |
 |---|---|---|
 | Backend (pytest) | `cd apps/api && pytest -q` | geometry, schemas, state engine (dedupe/reorder/replay), simulator properties (speed bounds, reproducibility, defender reaction, monotonic pressure effects), Monte Carlo (Wilson, CRN, convergence, time budget, cancellation), validation, detection, verification, full agent workflow + every recovery path + bounded retries + non-overridable verification, cache labelling, API and WebSocket |
+| Backend Multiverse (pytest) | `cd apps/api && pytest -q tests/test_multiverse.py tests/test_multiverse_api.py` | defensive strategy validation (every error code), baseline defence = original engine, cover-lane effect, conditional shot estimator vs binary goals, cell cache, deterministic transitions that never mutate the parent, rollout selection kinds, branching/rewind/fork/compare/persistence, invalid actions rejected (not rewritten), assisted/autonomous/limits, cancellation, tampered matrix rejected, speed bounds under every strategy, full REST flow |
 | Optional live Foundry | `pytest -m foundry` | runs the workflow against the configured deployment (skipped without credentials) |
-| Frontend unit (Vitest) | `npm run test -w apps/web` | overlay scheduling/expiry/priority, frame interpolation, i18n parity, viewer-mode rendering, workflow inspector, chart, pitch |
-| End-to-end (Playwright) | `npm run e2e` | real Chromium + real backend: the acceptance flow (play → detect → verified analysis → modes → what-if → inspector → recovery → overlay JSON → Dutch → recap → scenario switch) and keyboard navigation |
+| Frontend unit (Vitest) | `npm run test -w apps/web` | overlay scheduling/expiry/priority, frame interpolation, i18n parity, viewer-mode rendering, workflow inspector, chart, pitch; Multiverse decision tree (kinds, selection, pending node), agent battle + response matrix (from a real planning fixture), failed verification never shown as verified, action composer in manual/assisted/autonomous modes, observed node read-only, split-screen comparison |
+| End-to-end (Playwright) | `npm run e2e` | real Chromium + real backend: the acceptance flow (play → detect → verified analysis → modes → what-if → inspector → recovery → overlay JSON → Dutch → recap → scenario switch) and keyboard navigation; the Multiverse flow (decision → user pass → adversarial planning → branch → second decision → rewind → sibling dribble → compare → agents/verification inspected → canonical match unchanged) |
 
 Bugs found by these suites during development (and fixed) included: retry loops that did not
 terminate because workflow state was copied between supersteps; players snapped onto the ball (a

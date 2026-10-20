@@ -24,6 +24,16 @@
 * **Detection is heuristic.** Recall on the four labelled scenario decisions is 3/4 (the counter-attack
   dribble is missed at the default threshold); analysts can request analysis of any on-ball action.
 
+* **Football Multiverse.** Defensive strategies are modelled as changed defender targets, reaction
+  times and tackle probabilities, not as learned team behaviour. The response matrix covers only
+  the options and strategies the agents propose (at most 3 rounds), so "most robust" means robust
+  against those responses under the model. Successor states keep positions and velocities but not
+  body orientation, fatigue or player intent; rebounds are still not modelled, so shots end a branch.
+  Each branch realises **one** sampled continuation (representative, high-upside, defensive-success or
+  random); the probabilities, not the shown sample, are the result. Values are modelled expected
+  goals within the horizon (conditional Monte Carlo), not calibrated xG. Sessions are persisted as
+  local JSON files (single replica). No 3D view.
+
 ## Engineering / status
 
 * **Microsoft Foundry live path not exercised in this build environment.** The integration is
