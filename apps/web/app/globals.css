@@ -1,14 +1,54 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #05080f;
-  --color-panel: #0a101d;
-  --color-line: #1c2638;
-  --color-muted: #94a3b8;
+  /* Brand: the logo's forest-to-leaf greens. "leaf" = primary / simulated, "sage" = frozen decision state. */
+  --color-ink: #040906;
+  --color-panel: #08120c;
+  --color-line: #18281e;
+  --color-leaf-50: #f2f8ef;
+  --color-leaf-100: #e1efda;
+  --color-leaf-200: #c6e1b8;
+  --color-leaf-300: #a3cf91;
+  --color-leaf-400: #82bb74;
+  --color-leaf-500: #5f9c5e;
+  --color-leaf-600: #4a8150;
+  --color-leaf-700: #3a6742;
+  --color-leaf-800: #2b4f33;
+  --color-leaf-900: #1e3a26;
+  --color-leaf-950: #0f2216;
+  --color-sage-50: #f7faf0;
+  --color-sage-100: #eef4df;
+  --color-sage-200: #dde9c2;
+  --color-sage-300: #c9dca2;
+  --color-sage-400: #b2cb80;
+  --color-sage-500: #98b562;
+  --color-sage-600: #7a964a;
+  --color-sage-700: #5e753a;
+  --color-sage-800: #46572d;
+  --color-sage-900: #334024;
+  --color-sage-950: #1b2313;
+  /* Neutral grays with a hint of green instead of Tailwind's blue-tinted slate. */
+  --color-slate-50: #f6f8f6;
+  --color-slate-100: #eef2ee;
+  --color-slate-200: #dde4de;
+  --color-slate-300: #c3cdc5;
+  --color-slate-400: #95a398;
+  --color-slate-500: #6a786d;
+  --color-slate-600: #4c594f;
+  --color-slate-700: #37423a;
+  --color-slate-800: #232b25;
+  --color-slate-900: #131a15;
+  --color-slate-950: #070c09;
+  --color-muted: #95a398;
+  --color-frozen: #cfe2b4;
+  --color-sim: #8fca7c;
+  --color-real: #f8fafc;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
   --animate-pop: pop 0.35s ease-out;
   --animate-slide: slide 0.35s ease-out;
+  --animate-flow: flow 1.2s linear infinite;
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes pop {
     0% { transform: scale(0.85); opacity: 0; }
@@ -16,6 +56,13 @@
   }
   @keyframes slide {
     0% { transform: translateY(12px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes flow {
+    to { stroke-dashoffset: -8; }
+  }
+  @keyframes rise {
+    0% { transform: translateY(6px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
   }
 }
@@ -27,25 +74,89 @@ html, body {
 }
 
 body {
-  background-image: radial-gradient(1200px 600px at 50% -10%, rgba(59, 130, 246, 0.12), transparent 60%),
-    radial-gradient(800px 500px at 100% 0%, rgba(167, 139, 250, 0.08), transparent 60%);
+  background-image:
+    radial-gradient(1100px 560px at 25% -14%, rgba(95, 156, 94, 0.16), transparent 62%),
+    radial-gradient(900px 480px at 95% -5%, rgba(207, 226, 180, 0.07), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
   background-attachment: fixed;
+  font-feature-settings: "cv11", "ss01";
+}
+
+@layer components {
+  /* Quiet glass surface: one consistent container style instead of many bordered boxes. */
+  .glass {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    backdrop-filter: blur(14px);
+  }
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    font-size: 10.5px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+  }
+  .tab {
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab:hover { color: #f8fafc; }
+  .tab[aria-selected="true"], .tab[aria-checked="true"], .tab[aria-pressed="true"] {
+    background: rgba(255, 255, 255, 0.09);
+    color: #f8fafc;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: rgba(255, 255, 255, 0.11); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: #4a8150; color: white; }
+  .btn-primary:hover { background: #d4ee8f; }
+  .num { font-variant-numeric: tabular-nums; }
 }
 
 input[type="range"].timeline {
   appearance: none;
-  height: 4px;
+  height: 3px;
   border-radius: 999px;
-  background: #1e293b;
-  accent-color: #60a5fa;
+  background: rgba(255, 255, 255, 0.1);
+  accent-color: #8fca7c;
 }
 input[type="range"].timeline::-webkit-slider-thumb {
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border-radius: 999px;
   background: #f8fafc;
-  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 4px rgba(130, 187, 116, 0.28);
   cursor: pointer;
 }
 input[type="range"].timeline::-moz-range-thumb {
@@ -53,11 +164,15 @@ input[type="range"].timeline::-moz-range-thumb {
   height: 12px;
   border-radius: 999px;
   background: #f8fafc;
-  border: 2px solid #3b82f6;
+  border: none;
 }
 
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
 :focus-visible {
-  outline: 2px solid #60a5fa;
+  outline: 2px solid #8fca7c;
   outline-offset: 2px;
 }
 

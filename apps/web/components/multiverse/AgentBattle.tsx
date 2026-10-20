@@ -35,9 +35,9 @@ export function ResponseMatrix({ p }: { p: MultiversePlanning }) {
         <tbody>
           {actions.map((a) => (
             <tr key={a.action.action_id}>
-              <td className={`pr-1 font-semibold ${s?.selected_action_id === a.action.action_id ? "text-blue-300" : "text-slate-200"}`}>
+              <td className={`pr-1 font-semibold ${s?.selected_action_id === a.action.action_id ? "text-leaf-300" : "text-slate-200"}`}>
                 {a.action.label.replace(" (actual)", "")}
-                <span className="ml-1 rounded bg-slate-800 px-1 text-[8px] uppercase text-slate-400">{a.source === "user" ? "user" : a.source === "actual" ? "actual" : "AI"}</span>
+                <span className="ml-1 rounded bg-white/[0.06] px-1 text-[8px] uppercase text-slate-400">{a.source === "user" ? "user" : a.source === "actual" ? "actual" : "AI"}</span>
               </td>
               {strategies.map((sid) => {
                 const c = p.matrix.find((x) => x.action_id === a.action.action_id && x.strategy_id === sid);
@@ -71,11 +71,11 @@ export default function AgentBattle({ p }: { p: MultiversePlanning }) {
           const dfn = p.defense_proposals.filter((d) => d.round === r.round);
           const revision = p.steps.find((st) => st.agent === "attacking_agent" && st.attempt === r.round)?.notes.find((n) => n.startsWith("Revision"));
           return (
-            <li key={r.round} className="rounded-lg border border-line bg-slate-950/50 p-2 text-[11px]">
+            <li key={r.round} className="rounded-xl bg-white/[0.03] p-2 text-[11px]">
               <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Round {r.round}</div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <div className="font-semibold text-sky-300">Attacking agent</div>
+                  <div className="font-semibold text-leaf-300">Attacking agent</div>
                   {atk.length ? atk.map((a) => <div key={a.proposal_id} className="text-slate-200">+ {a.action.label.replace(" (actual)", "")}</div>)
                     : <div className="text-slate-500">kept plan</div>}
                   {revision && <div className="mt-0.5 text-amber-200">{revision.replace("Revision: ", "↻ ")}</div>}
@@ -94,10 +94,10 @@ export default function AgentBattle({ p }: { p: MultiversePlanning }) {
       <ResponseMatrix p={p} />
       {s && (
         <div className="grid grid-cols-2 gap-1.5 text-[11px]" data-testid="strategy-summary">
-          <div className="rounded bg-slate-900 p-1.5"><div className="text-slate-500">Most robust</div><div className="font-semibold text-white">{lab(s.most_robust_action_id)}</div></div>
-          <div className="rounded bg-slate-900 p-1.5"><div className="text-slate-500">Highest upside</div><div className="font-semibold text-white">{lab(s.highest_upside_action_id)}</div></div>
-          <div className="rounded bg-slate-900 p-1.5"><div className="text-slate-500">Best expected</div><div className="font-semibold text-white">{lab(s.best_expected_action_id)}</div></div>
-          <div className="rounded bg-slate-900 p-1.5"><div className="text-slate-500">Defence&apos;s counter</div>
+          <div className="rounded bg-white/[0.04] p-1.5"><div className="text-slate-500">Most robust</div><div className="font-semibold text-white">{lab(s.most_robust_action_id)}</div></div>
+          <div className="rounded bg-white/[0.04] p-1.5"><div className="text-slate-500">Highest upside</div><div className="font-semibold text-white">{lab(s.highest_upside_action_id)}</div></div>
+          <div className="rounded bg-white/[0.04] p-1.5"><div className="text-slate-500">Best expected</div><div className="font-semibold text-white">{lab(s.best_expected_action_id)}</div></div>
+          <div className="rounded bg-white/[0.04] p-1.5"><div className="text-slate-500">Defence&apos;s counter</div>
             <div className="font-semibold text-orange-200">{s.defensive_counter_id === "def-balanced" ? "Balanced shape" :
               p.defense_proposals.find((d) => d.strategy.strategy_id === s.defensive_counter_id)?.strategy.label}</div>
             <div className="font-mono text-slate-400">{s.counter_effect_pp >= 0 ? "+" : ""}{s.counter_effect_pp.toFixed(1)} pp</div></div>
@@ -107,9 +107,9 @@ export default function AgentBattle({ p }: { p: MultiversePlanning }) {
         <span className={`rounded px-1.5 py-0.5 font-semibold ${p.verification_status === "verified" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`} data-testid="mv-verification">
           {p.verification_status === "verified" ? "✓ verified" : p.verification_status} ({p.verification_checks.filter((c) => c.passed).length}/{p.verification_checks.length} checks)
         </span>
-        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">{p.cells_computed} simulated · {p.cache_hits} cached</span>
-        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">{p.live_model_calls ? `${p.live_model_calls} live model calls` : "deterministic planner"}</span>
-        {p.duration_ms && <span className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">{(p.duration_ms / 1000).toFixed(1)} s</span>}
+        <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{p.cells_computed} simulated · {p.cache_hits} cached</span>
+        <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{p.live_model_calls ? `${p.live_model_calls} live model calls` : "deterministic planner"}</span>
+        {p.duration_ms && <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{(p.duration_ms / 1000).toFixed(1)} s</span>}
         {p.degraded && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-300">degraded</span>}
       </div>
     </section>
@@ -120,7 +120,7 @@ export function PlanningSteps({ p }: { p: MultiversePlanning }) {
   return (
     <ol className="space-y-1 text-[10px]" data-testid="mv-steps">
       {p.steps.map((st) => (
-        <li key={st.step_id} className="rounded border border-line bg-slate-950/50 px-2 py-1">
+        <li key={st.step_id} className="rounded-lg bg-white/[0.03] px-2 py-1">
           <div className="flex gap-2">
             <span className="font-semibold text-white">{st.agent.replace("_agent", "").replace("_", " ")}</span>
             <span className="text-slate-400">#{st.attempt} {st.task}</span>
@@ -131,7 +131,7 @@ export function PlanningSteps({ p }: { p: MultiversePlanning }) {
         </li>
       ))}
       {p.verification_checks.length > 0 && (
-        <li className="rounded border border-line bg-slate-950/50 px-2 py-1">
+        <li className="rounded-lg bg-white/[0.03] px-2 py-1">
           {p.verification_checks.map((c) => (
             <div key={String(c.check_id)} className={c.passed ? "text-emerald-300" : "text-red-300"}>{c.passed ? "✓" : "✗"} {String(c.name)}</div>
           ))}

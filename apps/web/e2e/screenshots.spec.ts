@@ -33,6 +33,7 @@ test("capture product screenshots", async ({ page }) => {
   await page.screenshot({ path: `${OUT}/broadcaster-mode.png` });
 
   await page.getByRole("radio", { name: "Tactical analyst" }).click();
+  await page.getByTestId("rail-tab-agents").click();
   await page.getByTestId("fault-contradictory_claim").click();
   await expect(page.getByTestId("workflow-status")).toContainText("completed · verified");
   const inspector = page.getByTestId("workflow-inspector");

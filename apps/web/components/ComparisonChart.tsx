@@ -34,7 +34,7 @@ export default function ComparisonChart(props: {
         const r = res.get(c.action_id)!;
         const est = r[metric];
         const y = i * rowH + 4;
-        const color = c.action_id === props.selected ? "#3b82f6" : c.is_actual ? "#e2e8f0" : "#a78bfa";
+        const color = c.action_id === props.selected ? "#d4ee8f" : c.is_actual ? "#e2e8f0" : "#cfe2b4";
         return (
           <g key={c.action_id}>
             <text x={labelW - 6} y={y + 12} fontSize={9} textAnchor="end" fill="#cbd5e1">

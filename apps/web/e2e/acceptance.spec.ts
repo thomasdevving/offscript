@@ -40,7 +40,8 @@ test("shoot-or-pass end to end", async ({ page }) => {
   await page.getByTestId("back-to-match").click();
   await expect(page.getByTestId("view-banner")).toContainText("Observed synthetic timeline");
 
-  // Agent workflow inspector shows the real steps and tool calls.
+  // Agent workflow inspector shows the real steps and tool calls (Agents tab of the decision rail).
+  await page.getByTestId("rail-tab-agents").click();
   const steps = page.getByTestId("workflow-steps");
   await expect(steps).toContainText("Decision Agent");
   await expect(steps).toContainText("Strategy Agent");

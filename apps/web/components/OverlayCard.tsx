@@ -19,10 +19,10 @@ export default function OverlayCard({ overlay }: { overlay: Overlay }) {
     return (
       <div className="pointer-events-none absolute inset-x-4 bottom-4 z-20" role="status" aria-live="polite" data-testid="overlay">
         <div className="animate-slide flex items-stretch overflow-hidden rounded-lg shadow-2xl">
-          <div className="flex items-center bg-blue-600 px-3 text-xs font-black uppercase tracking-widest text-white">PARALLEL</div>
+          <div className="flex items-center bg-leaf-600 px-3 text-xs font-black uppercase tracking-widest text-white">PARALLEL</div>
           <div className="flex-1 bg-slate-950/95 px-4 py-2">
             <div className="text-sm font-extrabold uppercase tracking-wide text-white">{overlay.headline}</div>
-            <div className="text-sm text-blue-100">{overlay.caption ?? overlay.narrative}</div>
+            <div className="text-sm text-leaf-100">{overlay.caption ?? overlay.narrative}</div>
           </div>
           <div className="flex items-center gap-3 bg-slate-900/95 px-3">
             {overlay.data_fields.slice(0, 2).map((f) => (
@@ -38,8 +38,8 @@ export default function OverlayCard({ overlay }: { overlay: Overlay }) {
   }
   return (
     <div className="pointer-events-none absolute bottom-4 right-4 z-20 max-w-sm" role="status" aria-live="polite" data-testid="overlay">
-      <div className="animate-slide rounded-xl border border-blue-400/40 bg-slate-950/90 p-3 shadow-2xl backdrop-blur">
-        <div className="text-xs font-bold uppercase tracking-widest text-blue-300">{overlay.headline}</div>
+      <div className="animate-slide rounded-xl border border-leaf-400/40 bg-slate-950/90 p-3 shadow-2xl backdrop-blur">
+        <div className="text-xs font-bold uppercase tracking-widest text-leaf-300">{overlay.headline}</div>
         <p className="mt-1 text-sm leading-snug text-slate-100">{overlay.narrative}</p>
         <div className="mt-2 flex gap-3">
           {overlay.data_fields.map((f) => (

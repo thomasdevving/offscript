@@ -66,8 +66,8 @@ function Markings() {
 }
 
 function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }) {
-  const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#3b82f6" : a.kind === "defense" ? "#f97316"
-    : a.kind === "recommended" ? "#34d399" : "#a78bfa";
+  const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#d4ee8f" : a.kind === "defense" ? "#f97316"
+    : a.kind === "recommended" ? "#34d399" : "#cfe2b4";
   const dash = a.kind === "actual" ? "1.2 0.8" : a.kind === "alternative" ? "0.6 0.6" : a.kind === "defense" ? "0.9 0.5" : undefined;
   const [x1, y1] = a.from;
   const [x2, y2] = a.to;
@@ -109,7 +109,7 @@ export default function Pitch(p: Props) {
   const away = p.match.away;
   const teamOf = new Map(p.match.players.map((pl) => [pl.player_id, pl]));
   const frame = p.frame;
-  const tintStroke = p.tint === "simulated" ? "#3b82f6" : p.tint === "snapshot" ? "#a78bfa" : "transparent";
+  const tintStroke = p.tint === "simulated" ? "#d4ee8f" : p.tint === "snapshot" ? "#cfe2b4" : "transparent";
   return (
     <svg viewBox={`-3 -3 ${L + 6} ${W + 6}`} className={`block h-auto w-full select-none ${p.onPitchClick ? "cursor-crosshair" : ""}`}
       role="img" aria-label={p.ariaLabel}
@@ -126,15 +126,15 @@ export default function Pitch(p: Props) {
       }}>
       <defs>
         <pattern id="stripes" width={10.5} height={W} patternUnits="userSpaceOnUse">
-          <rect width={5.25} height={W} fill="#0d4232" />
-          <rect x={5.25} width={5.25} height={W} fill="#0b3a2c" />
+          <rect width={5.25} height={W} fill="#164730" />
+          <rect x={5.25} width={5.25} height={W} fill="#123f2a" />
         </pattern>
         <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
           <stop offset="60%" stopColor="rgba(0,0,0,0)" />
           <stop offset="100%" stopColor="rgba(0,0,0,0.45)" />
         </radialGradient>
       </defs>
-      <rect x={-3} y={-3} width={L + 6} height={W + 6} fill="#08291f" rx={1.5} />
+      <rect x={-3} y={-3} width={L + 6} height={W + 6} fill="#0a2419" rx={1.5} />
       <rect x={0} y={0} width={L} height={W} fill="url(#stripes)" />
       <rect x={0} y={0} width={L} height={W} fill="url(#vignette)" />
       <rect x={-2.6} y={-2.6} width={L + 5.2} height={W + 5.2} rx={1.4} fill="none" stroke={tintStroke} strokeWidth={0.5} />
@@ -153,7 +153,7 @@ export default function Pitch(p: Props) {
           strokeWidth={0.3} strokeDasharray="0.6 0.6" />
       )}
       {p.trail && p.trail.length > 1 && (
-        <polyline points={p.trail.map((q) => q.join(",")).join(" ")} fill="none" stroke="#60a5fa" strokeWidth={0.4}
+        <polyline points={p.trail.map((q) => q.join(",")).join(" ")} fill="none" stroke="#8fca7c" strokeWidth={0.4}
           strokeLinecap="round" opacity={0.9} />
       )}
       <g opacity={p.dimmed ? 0.55 : 1}>

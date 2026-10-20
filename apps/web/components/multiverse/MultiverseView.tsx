@@ -55,7 +55,7 @@ function Stage() {
     if (path && path.frames.length > 1) return interpolate(path.frames as unknown as TrackingFrame[], st.playT);
     return snap ? snapFrame(snap) : null;
   }, [path, st.playT, snap]);
-  if (!match || !node) return <div className="flex aspect-[111/74] items-center justify-center rounded-xl bg-panel text-slate-400">Loading…</div>;
+  if (!match || !node) return <div className="flex aspect-[111/74] animate-pulse items-center justify-center rounded-xl bg-white/[0.03] text-sm text-slate-500">Loading…</div>;
 
   const atEnd = !path || st.playT >= path.duration_ms - 1;
   const arrows: Arrow[] = [];
@@ -99,12 +99,13 @@ function Stage() {
   const simulated = node.kind === "simulated" || (path?.simulated ?? false);
   return (
     <div className="relative">
-      <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
-        <span className={`rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${node.kind === "observed" ? "border border-white/20 bg-slate-900/80 text-slate-100" : simulated ? "bg-blue-600/90 text-white" : "bg-violet-600/90 text-white"}`} data-testid="mv-banner">
+      <div className="absolute right-3 top-3 z-10 flex max-w-[65%] flex-col items-end gap-1.5">
+        <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${node.kind === "observed" ? "bg-slate-950/80 text-slate-100 ring-1 ring-white/20" : simulated ? "bg-leaf-600/90 text-white shadow-lg shadow-leaf-900/50" : "bg-sage-600/90 text-white shadow-lg shadow-sage-900/50"}`} data-testid="mv-banner">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
           {node.kind === "observed" ? "Canonical synthetic timeline" : node.kind === "root" ? "Frozen decision state" : `Simulated branch · depth ${node.depth}`}
         </span>
         {node.transition && node.kind !== "observed" && (
-          <span className="rounded-md bg-slate-950/80 px-2 py-1 text-xs text-blue-200">{node.transition.sample_kind.replace("_", " ")} sample · rollout #{node.transition.rollout_index} · not a certainty</span>
+          <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] text-leaf-200 backdrop-blur">{node.transition.sample_kind.replace("_", " ")} sample · rollout #{node.transition.rollout_index} · not a certainty</span>
         )}
       </div>
       <Pitch match={match} frame={frame} arrows={arrows} highlightId={snap?.ball.possessor_id ?? null}
@@ -121,15 +122,15 @@ function PlayBar() {
   const path = st.path;
   if (!path || path.duration_ms <= 0) return null;
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-line bg-panel px-3 py-2">
+    <div className="glass flex items-center gap-3 px-3 py-2">
       <button type="button" onClick={() => mv.setPlay({ playing: !st.playing, playT: st.playT >= path.duration_ms ? 0 : st.playT })}
-        className="h-8 w-8 rounded-md bg-blue-600 text-sm font-bold text-white" aria-label={st.playing ? "Pause" : "Play branch"}>{st.playing ? "❚❚" : "▶"}</button>
-      <button type="button" onClick={() => mv.setPlay({ playT: 0, playing: true })} className="h-8 w-8 rounded-md bg-slate-800 text-sm" aria-label="Replay branch from the decision">↺</button>
+        className="h-10 w-10 rounded-full bg-white text-sm font-bold text-slate-950 shadow-lg shadow-leaf-900/40 hover:bg-leaf-100" aria-label={st.playing ? "Pause" : "Play branch"}>{st.playing ? "❚❚" : "▶"}</button>
+      <button type="button" onClick={() => mv.setPlay({ playT: 0, playing: true })} className="h-9 w-9 rounded-full text-sm text-slate-300 hover:bg-white/10" aria-label="Replay branch from the decision">↺</button>
       <div className="relative flex-1">
         <input type="range" min={0} max={path.duration_ms} step={50} value={st.playT} aria-label="Scrub branch"
           onChange={(e) => mv.setPlay({ playT: Number(e.target.value), playing: false })} className="timeline w-full" />
         {path.boundaries.map((b) => (
-          <span key={b.node_id} className="absolute -top-1 h-3 w-0.5 bg-violet-400" style={{ left: `${(b.t_ms / path.duration_ms) * 100}%` }} title={b.label} />
+          <span key={b.node_id} className="absolute top-[3px] h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-sage-400 ring-2 ring-ink" style={{ left: `${(b.t_ms / path.duration_ms) * 100}%` }} title={b.label} />
         ))}
       </div>
       <span className="font-mono text-xs text-slate-300">+{(st.playT / 1000).toFixed(1)}s</span>
@@ -150,19 +151,23 @@ export default function MultiverseView() {
 
   if (!st.session) {
     return (
-      <div className="mx-auto max-w-2xl space-y-3 p-6" data-testid="mv-start">
-        <h1 className="text-2xl font-black text-white">Football Multiverse</h1>
-        <p className="text-sm text-slate-300">Pick a decision from the current match, then explore different futures: choose actions, let attacking and
+      <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-10" data-testid="mv-start">
+        <div className="eyebrow text-sage-300">Football Multiverse</div>
+        <h1 className="text-4xl font-black tracking-tight text-white">Every decision creates <span className="bg-gradient-to-r from-leaf-400 to-sage-400 bg-clip-text text-transparent">another game</span>.</h1>
+        <p className="max-w-2xl text-[15px] leading-relaxed text-slate-400">Pick a decision from the current match, then explore different futures: choose actions, let attacking and
           defending agents compete, rewind, fork and compare. Every branch is a simulation under an explicit model of a synthetic match.</p>
-        <ul className="space-y-1">
+        <ul className="grid gap-2 sm:grid-cols-2">
           {app.decisions.map((d) => (
             <li key={d.decision_point_id}>
               <button type="button" disabled={st.starting} onClick={() => void mv.open(d.decision_point_id, d.match_id)} data-testid="mv-open-decision"
-                className="flex w-full items-center gap-3 rounded-lg border border-line bg-panel px-3 py-2 text-left hover:border-blue-400/60">
-                <span className="font-mono text-xs text-blue-300">{clock(d.match_clock_ms)}</span>
-                <span className="font-semibold text-white">{d.actor_name}</span>
+                className="glass group flex w-full flex-col gap-1 px-4 py-3 text-left transition hover:bg-white/[0.06] disabled:opacity-50">
+                <span className="flex items-center gap-2">
+                  <span className="num rounded-md bg-sage-500/15 px-1.5 py-0.5 font-mono text-xs text-sage-200">{clock(d.match_clock_ms)}</span>
+                  <span className="font-bold text-white">{d.actor_name}</span>
+                  <span className="ml-auto text-xs text-slate-500 group-hover:text-leaf-300">Enter →</span>
+                </span>
                 <span className="text-xs text-slate-400">{d.actual_action.label.replace(" (actual)", "")} → {d.actual_outcome.replace(/_/g, " ").toLowerCase()}</span>
-                {decision?.decision_point_id === d.decision_point_id && <span className="ml-auto text-[10px] text-blue-300">selected</span>}
+                {decision?.decision_point_id === d.decision_point_id && <span className="ml-auto text-[10px] text-leaf-300">selected</span>}
               </button>
             </li>
           ))}
@@ -173,62 +178,55 @@ export default function MultiverseView() {
   }
 
   return (
-    <div className="grid flex-1 gap-3 p-3 xl:grid-cols-[340px_minmax(0,1fr)_440px]" data-testid="multiverse-view">
-      <aside className="order-3 min-w-0 space-y-3 xl:order-1">
-        <section className="rounded-xl border border-line bg-panel p-3">
-          <div className="mb-2 flex items-center gap-2">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Multiverse timeline</h2>
-            <button type="button" onClick={() => void mv.newSession()} className="ml-auto rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-700">New session</button>
-            <button type="button" onClick={() => mv.close()} className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300 hover:bg-slate-700">Close</button>
+    <div className="mx-auto grid w-full max-w-[1760px] flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]" data-testid="multiverse-view">
+      <section className="flex min-w-0 flex-col gap-3">
+        <div className="flex flex-wrap items-baseline gap-x-3 px-1">
+          <h1 className="text-2xl font-black tracking-tight text-white">Football Multiverse</h1>
+          <p className="text-sm text-slate-400">{node ? `${clock(node.match_clock_ms)} · ${node.label}${node.outcome_label ? ` → ${node.outcome_label.replace(/_/g, " ").toLowerCase()}` : ""}` : ""}</p>
+        </div>
+        <div className="mx-auto w-full max-w-[max(520px,calc((100vh-470px)*1.5))] overflow-hidden rounded-2xl bg-white/[0.02] p-1.5 shadow-2xl shadow-black/60 ring-1 ring-white/[0.06]"><Stage /></div>
+        <PlayBar />
+        {st.error && <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert">{st.error}</p>}
+        <section className="glass p-3" aria-label="Multiverse map">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h2 className="eyebrow">Multiverse map</h2>
+            <span className="hidden text-[10px] text-slate-500 md:inline">dashed white = canonical synthetic timeline (never changed) · amber = branch ended · % = modelled xG vs the defence&apos;s best counter</span>
+            <div className="ml-auto flex gap-1">
+              <button type="button" onClick={() => void mv.newSession()} className="btn px-2 py-1 text-[11px]">New session</button>
+              <button type="button" onClick={() => mv.close()} className="btn px-2 py-1 text-[11px]">Close</button>
+            </div>
           </div>
           <DecisionTree />
-          <p className="mt-2 text-[10px] text-slate-500">White dashed = canonical synthetic timeline (never changed). Blue = selected. Amber = terminal outcome. % = modelled expected goals vs the defence&apos;s best counter.</p>
-        </section>
-        {node && (
-          <section className="space-y-2 rounded-xl border border-line bg-panel p-3 text-xs">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Branch controls</h2>
-            <div className="flex flex-wrap gap-1.5">
-              <button type="button" disabled={!node.parent_node_id} onClick={() => void mv.rewind()} data-testid="rewind"
-                className="rounded bg-slate-800 px-2 py-1 font-semibold hover:bg-slate-700 disabled:opacity-40">⟲ Rewind to decision</button>
-              <button type="button" disabled={!node.parent_node_id} onClick={() => node.parent_node_id && void mv.select(node.parent_node_id)} data-testid="fork"
-                className="rounded bg-slate-800 px-2 py-1 font-semibold hover:bg-slate-700 disabled:opacity-40">⑂ Create another branch</button>
-              <button type="button" onClick={() => void mv.select(st.session!.root_node_id)} className="rounded bg-slate-800 px-2 py-1 font-semibold hover:bg-slate-700">Root decision</button>
-            </div>
-            {node.kind !== "root" && (
-              <div className="space-y-1">
-                <div className="text-slate-400">Compare this branch with:</div>
-                <div className="flex flex-wrap gap-1">
+          {node && (
+            <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-white/5 pt-2 text-xs">
+              <button type="button" disabled={!node.parent_node_id} onClick={() => void mv.rewind()} data-testid="rewind" className="btn py-1">⟲ Rewind to decision</button>
+              <button type="button" disabled={!node.parent_node_id} onClick={() => node.parent_node_id && void mv.select(node.parent_node_id)} data-testid="fork" className="btn py-1">⑂ Create another branch</button>
+              <button type="button" onClick={() => void mv.select(st.session!.root_node_id)} className="btn py-1">Root decision</button>
+              {node.kind !== "root" && (
+                <div className="ml-auto flex flex-wrap items-center gap-1">
+                  <span className="text-slate-500">Compare with</span>
                   {[...siblings, ...(st.tree?.nodes.filter((n) => n.kind === "observed" && n.node_id !== node.node_id && !siblings.includes(n)) ?? [])]
                     .slice(0, 6).map((n) => (
                       <button key={n.node_id} type="button" onClick={() => void mv.openCompare(node.node_id, n.node_id, app.lang)} data-testid="compare-with"
-                        className="rounded border border-line px-2 py-0.5 hover:border-blue-400">{n.kind === "observed" ? "Actual" : n.label}</button>
+                        className="btn border border-white/10 bg-transparent py-1">{n.kind === "observed" ? "Actual" : n.label}</button>
                     ))}
                 </div>
-              </div>
-            )}
-          </section>
-        )}
-      </aside>
-      <section className="order-1 min-w-0 space-y-3 xl:order-2">
-        <div className="flex flex-wrap items-baseline gap-x-3">
-          <h1 className="text-xl font-black text-white">Football Multiverse</h1>
-          <p className="text-sm text-slate-400">{node ? `${clock(node.match_clock_ms)} · ${node.label}${node.outcome_label ? ` → ${node.outcome_label.replace(/_/g, " ")}` : ""}` : ""}</p>
-        </div>
-        <div className="overflow-hidden rounded-2xl border border-line bg-panel p-2"><Stage /></div>
-        <PlayBar />
-        {st.error && <p className="rounded bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert">{st.error}</p>}
-        <p className="text-[11px] text-slate-500">Branches are modelled futures of a synthetic match: each shows one sampled continuation, with probabilities from paired Monte Carlo simulation. Rewinding restores the exact stored state; nothing is re-simulated.</p>
+              )}
+            </div>
+          )}
+        </section>
+        <p className="px-1 text-[11px] text-slate-600">Branches are modelled futures of a synthetic match: each shows one sampled continuation, with probabilities from paired Monte Carlo simulation. Rewinding restores the exact stored state; nothing is re-simulated.</p>
       </section>
-      <aside className="order-2 min-w-0 space-y-3 xl:order-3">
-        <section className="rounded-xl border border-line bg-panel p-3">
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-400">Decision intelligence</h2>
+      <aside className="min-w-0 space-y-3 lg:sticky lg:top-[62px] lg:max-h-[calc(100vh-78px)] lg:overflow-y-auto lg:pr-1">
+        <section className="glass p-3">
+          <h2 className="eyebrow mb-3">Your decision</h2>
           <ActionComposer />
         </section>
         {shownPlanning && (
-          <section className="space-y-3 rounded-xl border border-line bg-panel p-3">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">{planning ? "Attack vs defence (this step)" : "Agent recommendation"}</h2>
+          <section className="glass space-y-3 p-3">
+            <h2 className="eyebrow">{planning ? "Attack vs defence (this step)" : "Agent recommendation"}</h2>
             {narrative && (
-              <article className="rounded-lg border border-line bg-slate-950/50 p-2" data-testid="mv-narrative">
+              <article className="rounded-xl bg-white/[0.03] p-2" data-testid="mv-narrative">
                 <h3 className="text-sm font-bold text-white">{narrative.headline}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-slate-200">{app.mode === "broadcaster" ? narrative.caption ?? narrative.body : narrative.body}</p>
                 {app.mode === "analyst" && <ul className="mt-1 list-disc pl-4 text-[11px] text-slate-300">{narrative.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>}
@@ -240,7 +238,7 @@ export default function MultiverseView() {
               <AgentBattle p={shownPlanning} />
             )}
             {app.mode !== "casual" && (
-              <details className="rounded-lg border border-line bg-slate-950/40 p-2 text-xs" data-testid="mv-inspector">
+              <details className="rounded-xl bg-white/[0.03] p-2 text-xs" data-testid="mv-inspector">
                 <summary className="cursor-pointer font-semibold text-slate-200">Agent workflow inspector</summary>
                 <div className="mt-2"><PlanningSteps p={shownPlanning} /></div>
               </details>
@@ -248,8 +246,8 @@ export default function MultiverseView() {
           </section>
         )}
         {(st.live.length > 0 && st.job && ["pending", "running"].includes(st.job.status)) && (
-          <section className="rounded-xl border border-blue-500/30 bg-blue-950/30 p-3 text-[11px] text-blue-100" aria-live="polite" data-testid="mv-live">
-            <h2 className="mb-1 font-bold uppercase tracking-widest text-blue-300">Live agent activity</h2>
+          <section className="glass p-3 text-[11px] text-leaf-100 ring-1 ring-leaf-400/20" aria-live="polite" data-testid="mv-live">
+            <h2 className="mb-1 font-bold uppercase tracking-widest text-leaf-300">Live agent activity</h2>
             <ol className="max-h-48 space-y-0.5 overflow-y-auto">{st.live.slice(-12).map((l, i) => <li key={i}>{l.text}</li>)}</ol>
           </section>
         )}

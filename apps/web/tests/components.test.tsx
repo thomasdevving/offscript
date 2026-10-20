@@ -82,6 +82,28 @@ describe("AnalysisPanel", () => {
     expect(inspector).toHaveTextContent("get_decision_context");
   });
 
+  it("draws one branch per option and adds 95% whiskers only for analysts", () => {
+    const { unmount } = render(<AnalysisPanel />);
+    expect(screen.getAllByTestId(/^option-/)).toHaveLength(2);
+    expect(screen.queryAllByTitle("95% interval")).toHaveLength(0);
+    unmount();
+    useApp.setState({ mode: "analyst" });
+    render(<AnalysisPanel />);
+    expect(screen.getAllByTitle("95% interval")).toHaveLength(2);
+  });
+
+  it("rail tabs switch between story, evidence and agents", () => {
+    render(<AnalysisPanel />);
+    expect(screen.getByTestId("narrative")).toBeVisible();
+    expect(screen.getByTestId("recovery-panel")).not.toBeVisible();
+    fireEvent.click(screen.getByTestId("rail-tab-agents"));
+    expect(screen.getByTestId("rail-tab-agents")).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("recovery-panel")).toBeVisible();
+    expect(screen.getByTestId("narrative")).not.toBeVisible();
+    fireEvent.click(screen.getByTestId("rail-tab-evidence"));
+    expect(screen.getByTestId("evidence-panel")).toBeVisible();
+  });
+
   it("shows a prompt when no decision is selected", () => {
     useApp.setState({ selectedDecisionId: null });
     render(<AnalysisPanel />);

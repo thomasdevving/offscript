@@ -15,7 +15,7 @@ here so nothing is hidden.
 | Detector + agent selects decisions | Plus **manual analysis** of any on-ball action from the event feed | Detector recall is honestly < 100%; analysts can still analyse any moment. |
 | Option labels like "Pass right" | Labels from the generator ("Pass to Mbeki-Larsen", "Through ball to ...", "Dribble wide right") plus **through-ball** candidates | A pass into space ahead of a runner is a distinct, important football option (and offside-bounded runners otherwise could never receive beyond the line). |
 | Demo scenario story fixed in advance | Starting positions and build-up of the 73' scenario are authored (with choreographed off-ball runs); the observed shot outcome and every counterfactual come from the engine | Required to create a real "teammate in space" situation; no analysis result is scripted. Documented in `limitations.md`. |
-| Static Web Apps frontend | Next.js **static export** (`output: "export"`) | No server code needed; deploys to SWA/any static host; secrets stay in the API. |
+| Static Web Apps frontend | Next.js **static export** (`output: "export"`) on an **Azure Storage static website** | No server code needed; secrets stay in the API. Static Web Apps is not available in the regions the deployment subscription allows (an "allowed regions" policy), while a storage static website works in every region, costs cents and stays up while the API scales to zero. |
 | Python 3.12+ | Pinned to 3.12 in Docker/CI; developed and tested on 3.13 | Both supported by every dependency. |
 | Azure Storage / Service Bus / databases (optional) | Not used | Not justified for the demo; in-memory store + disk cache. Documented as production next steps. |
 

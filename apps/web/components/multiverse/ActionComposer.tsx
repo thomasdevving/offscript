@@ -27,12 +27,12 @@ export default function ActionComposer() {
   if (!node) return null;
   if (node.status !== "decision" || node.kind === "observed") {
     return (
-      <div className="rounded-lg border border-line bg-slate-950/50 p-3 text-sm text-slate-300" data-testid="no-decision">
+      <div className="rounded-xl bg-white/[0.03] p-3 text-sm text-slate-300" data-testid="no-decision">
         {node.kind === "observed" ? "This is the canonical synthetic timeline: it cannot be changed. Rewind to the decision to branch." :
           node.status === "terminal" ? `This branch ended: ${node.outcome_label.replace(/_/g, " ")}. Rewind or pick another node.` :
             node.status === "depth_limit" ? "Maximum branch depth reached for this session." : `No decision available (${node.status}).`}
         {node.parent_node_id && (
-          <button type="button" onClick={() => void mv.rewind()} className="mt-2 block rounded bg-slate-800 px-2 py-1 text-xs font-semibold hover:bg-slate-700">
+          <button type="button" onClick={() => void mv.rewind()} className="mt-2 block rounded bg-white/[0.06] px-2 py-1 text-xs font-semibold hover:bg-white/10">
             ⟲ Rewind to decision
           </button>
         )}
@@ -42,14 +42,14 @@ export default function ActionComposer() {
   const tool = (t: ComposerType, label: string, testId: string) => (
     <button type="button" onClick={() => mv.setComposer(s.composer.type === t ? null : t)} aria-pressed={s.composer.type === t}
       data-testid={testId}
-      className={`rounded-md px-2 py-1.5 text-xs font-semibold ${s.composer.type === t ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-200 hover:bg-slate-700"}`}>
+      className={`rounded-md px-2 py-1.5 text-xs font-semibold ${s.composer.type === t ? "bg-leaf-600 text-white" : "bg-white/[0.06] text-slate-200 hover:bg-white/10"}`}>
       {label}
     </button>
   );
   const v = s.composer.validation;
   return (
     <section className="space-y-2" aria-label="Choose an action" data-testid="action-composer">
-      <div role="radiogroup" aria-label="Interaction mode" className="flex rounded-lg bg-slate-900 p-0.5">
+      <div role="radiogroup" aria-label="Interaction mode" className="flex rounded-lg bg-white/[0.04] p-0.5">
         {MODES.map((m) => (
           <button key={m.v} type="button" role="radio" aria-checked={s.interaction === m.v} title={m.hint}
             onClick={() => mv.setInteraction(m.v)} data-testid={`mode-${m.v}`}
@@ -62,7 +62,7 @@ export default function ActionComposer() {
 
       {s.interaction === "autonomous" ? (
         <button type="button" disabled={busy} onClick={() => void mv.autoPlay(3)} data-testid="autoplay"
-          className="w-full rounded-lg bg-blue-600 py-2 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50">
+          className="w-full rounded-lg bg-leaf-600 py-2 text-sm font-bold text-white hover:bg-leaf-500 disabled:opacity-50">
           ▶ Let the agents play it out
         </button>
       ) : (
@@ -82,7 +82,7 @@ export default function ActionComposer() {
             {opts?.actual && (
               <li>
                 <button type="button" onClick={() => mv.chooseCandidate(opts.actual!.action_id)}
-                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === opts.actual.action_id ? "bg-blue-600/25" : "hover:bg-slate-800"}`}>
+                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === opts.actual.action_id ? "bg-leaf-600/25" : "hover:bg-white/[0.06]"}`}>
                   <span className="rounded bg-slate-200 px-1 text-[9px] font-bold text-slate-900">ACTUAL</span>
                   <span className="text-white">{opts.actual.label.replace(" (actual)", "")}</span>
                 </button>
@@ -91,7 +91,7 @@ export default function ActionComposer() {
             {opts?.options.map((o) => (
               <li key={o.action_id}>
                 <button type="button" onClick={() => mv.chooseCandidate(o.action_id)} data-testid="option"
-                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === o.action_id ? "bg-blue-600/25" : "hover:bg-slate-800"}`}>
+                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === o.action_id ? "bg-leaf-600/25" : "hover:bg-white/[0.06]"}`}>
                   {o.action_id === recId && <span className="rounded bg-emerald-400 px-1 text-[9px] font-bold text-emerald-950">AI RECOMMENDED</span>}
                   <span className="text-slate-100">{o.label}</span>
                   <span className="ml-auto font-mono text-[10px] text-slate-500">
@@ -109,7 +109,7 @@ export default function ActionComposer() {
             </div>
           )}
           <button type="button" disabled={!v?.ok || busy} onClick={() => void mv.submit()} data-testid="submit-action"
-            className="w-full rounded-lg bg-blue-600 py-2 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-40">
+            className="w-full rounded-lg bg-leaf-600 py-2 text-sm font-bold text-white hover:bg-leaf-500 disabled:opacity-40">
             {busy ? "Agents planning…" : "Simulate this branch"}
           </button>
           {s.interaction === "assisted" && (
@@ -132,14 +132,14 @@ export default function ActionComposer() {
       <label className="flex items-center gap-2 text-[11px] text-slate-400">
         Continuation shown:
         <select value={s.sampleKind} onChange={(e) => mv.setSampleKind(e.target.value as SampleKind)}
-          className="rounded border border-line bg-slate-900 px-1 py-0.5 text-slate-200" data-testid="sample-kind">
+          className="rounded border border-white/10 bg-white/[0.04] px-1 py-0.5 text-slate-200" data-testid="sample-kind">
           {SAMPLES.map((x) => <option key={x.v} value={x.v}>{x.label}</option>)}
         </select>
       </label>
       {busy && (
-        <div className="flex items-center gap-2 text-xs text-blue-200" aria-live="polite">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-blue-400" /> {s.job?.progress[s.job.progress.length - 1] ?? "Starting…"}
-          <button type="button" onClick={() => void mv.cancel()} className="ml-auto rounded bg-slate-800 px-2 py-0.5">Cancel</button>
+        <div className="flex items-center gap-2 text-xs text-leaf-200" aria-live="polite">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-leaf-400" /> {s.job?.progress[s.job.progress.length - 1] ?? "Starting…"}
+          <button type="button" onClick={() => void mv.cancel()} className="ml-auto rounded bg-white/[0.06] px-2 py-0.5">Cancel</button>
         </div>
       )}
     </section>

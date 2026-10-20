@@ -85,6 +85,16 @@ const en = {
   policy: "Deterministic planner",
   sampleOutcome: "Show sample",
   keyboard: "Keyboard: Space play/pause, arrows jump between decisions, 1-3 viewer modes",
+  story: "Story",
+  agents: "Agents",
+  matchCentre: "Match centre",
+  feed: "Feed",
+  moments: "Key moments",
+  futures: "Parallel futures",
+  futuresHint: "Each branch starts from the same frozen moment. Length = modelled chance of a goal within the horizon.",
+  warmingTitle: "Warming up the match engine",
+  warmingBody: "The analysis service is starting: it generates the synthetic matches and loads the simulator. This takes a few seconds the first time.",
+  pickDecision: "Pick a decision to explore",
 };
 
 type Dict = typeof en;
@@ -174,6 +184,16 @@ const nl: Dict = {
   policy: "Deterministische planner",
   sampleOutcome: "Toon voorbeeld",
   keyboard: "Toetsen: spatie afspelen/pauze, pijlen springen tussen beslissingen, 1-3 kijkmodi",
+  story: "Verhaal",
+  agents: "Agents",
+  matchCentre: "Wedstrijdcentrum",
+  feed: "Feed",
+  moments: "Sleutelmomenten",
+  futures: "Parallelle toekomsten",
+  futuresHint: "Elke tak start vanuit hetzelfde bevroren moment. Lengte = gemodelleerde kans op een doelpunt binnen de horizon.",
+  warmingTitle: "De wedstrijdmotor warmt op",
+  warmingBody: "De analysedienst start: hij genereert de synthetische wedstrijden en laadt de simulator. De eerste keer duurt dit enkele seconden.",
+  pickDecision: "Kies een beslissing om te verkennen",
 };
 
 export const dictionaries: Record<Language, Dict> = { en, nl };

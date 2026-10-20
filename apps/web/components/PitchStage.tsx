@@ -7,6 +7,7 @@ import { clock, cleanLabel, pct } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { activeOverlay } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
+import { ScoreBug } from "./MatchIntel";
 import OverlayCard from "./OverlayCard";
 import Pitch, { type Arrow, type Ring } from "./Pitch";
 
@@ -114,26 +115,28 @@ export default function PitchStage() {
     overlay = s.overlays.find((o) => o.analysis_id === analysis.analysis_id && o.viewer_mode === "broadcaster" && o.language === s.lang) ?? null;
 
   if (!match) {
-    return <div className="flex aspect-[111/74] w-full items-center justify-center rounded-xl border border-line bg-panel text-muted">Loading match...</div>;
+    return <div className="flex aspect-[111/74] w-full animate-pulse items-center justify-center rounded-xl bg-white/[0.03] text-sm text-slate-500">Loading match…</div>;
   }
 
   const banner =
-    s.view === "simulated" ? { text: L.simulated, cls: "bg-blue-600/90 text-white" }
-      : s.view === "snapshot" ? { text: `${L.frozen} · ${decision ? clock(decision.match_clock_ms) : ""}`, cls: "bg-violet-600/90 text-white" }
-        : { text: L.observed, cls: "bg-slate-900/80 text-slate-200 border border-white/10" };
+    s.view === "simulated" ? { text: L.simulated, cls: "bg-leaf-600/90 text-white shadow-lg shadow-leaf-900/50" }
+      : s.view === "snapshot" ? { text: `${L.frozen} · ${decision ? clock(decision.match_clock_ms) : ""}`, cls: "bg-sage-600/90 text-white shadow-lg shadow-sage-900/50" }
+        : { text: L.observed, cls: "bg-slate-950/80 text-slate-300 ring-1 ring-white/10" };
 
   const traceLabel = traj ? `${cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")} · rollout #${traj.rollout_index} · ${traj.outcome}` : "";
 
   return (
     <div className="relative">
-      <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-2">
-        <span className={`rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${banner.cls}`} data-testid="view-banner">
+      <div className="absolute left-3 top-3 z-10"><ScoreBug /></div>
+      <div className="absolute bottom-3 right-3 z-10 flex max-w-[60%] flex-col items-end gap-1.5 sm:bottom-auto sm:top-3">
+        <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${banner.cls}`} data-testid="view-banner">
+          <span className={`h-1.5 w-1.5 rounded-full ${s.view === "observed" ? "bg-emerald-400" : "bg-white"} ${s.view !== "snapshot" ? "animate-pulse" : ""}`} />
           {banner.text}
         </span>
-        {s.view === "simulated" && <span className="rounded-md bg-slate-950/80 px-2 py-1 text-xs text-blue-200">{L.oneSample}</span>}
+        {s.view === "simulated" && <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-right text-[11px] text-leaf-200 backdrop-blur">{L.oneSample}</span>}
       </div>
       {s.view === "simulated" && traj && (
-        <div className="absolute bottom-3 left-3 z-10 rounded-md bg-slate-950/80 px-2 py-1 font-mono text-xs text-blue-200" data-testid="trace-label">{traceLabel}</div>
+        <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-slate-950/80 px-2 py-1 font-mono text-[11px] text-leaf-200 backdrop-blur" data-testid="trace-label">{traceLabel}</div>
       )}
       <Pitch
         match={match}

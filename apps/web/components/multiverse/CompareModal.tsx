@@ -38,7 +38,7 @@ export default function CompareModal() {
     const observed = m?.kind === "observed";
     return (
       <div className="min-w-0 space-y-2">
-        <div className={`rounded px-2 py-1 text-xs font-bold uppercase tracking-wider ${observed ? "bg-slate-200 text-slate-900" : "bg-blue-600 text-white"}`}>
+        <div className={`rounded px-2 py-1 text-xs font-bold uppercase tracking-wider ${observed ? "bg-slate-200 text-slate-900" : "bg-leaf-600 text-white"}`}>
           {which.toUpperCase()} · {observed ? "Canonical synthetic timeline" : "Simulated branch"}
         </div>
         {match && <Pitch match={match} frame={frame} tint={observed ? "observed" : "simulated"} ariaLabel={`Branch ${which}`} />}
@@ -46,15 +46,15 @@ export default function CompareModal() {
           {steps?.map((s) => (
             <li key={s.node_id}>
               {s.action_label} <span className="text-slate-500">({s.action_source}{s.strategy_label ? ` vs ${s.strategy_label}` : ""})</span> → {(s.terminal_outcome ?? s.first_outcome ?? "").replace(/_/g, " ")}
-              {s.p_goal_vs_counter != null && <span className="font-mono text-blue-300"> · {pct(s.p_goal_vs_counter, lang)}</span>}
+              {s.p_goal_vs_counter != null && <span className="font-mono text-leaf-300"> · {pct(s.p_goal_vs_counter, lang)}</span>}
             </li>
           ))}
         </ol>
         {m && (
           <div className="grid grid-cols-3 gap-1 text-center text-[11px]">
-            <div className="rounded bg-slate-900 p-1"><div className="font-mono text-white">{String(m.final_outcome).replace(/_/g, " ")}</div><div className="text-slate-500">outcome</div></div>
-            <div className="rounded bg-slate-900 p-1"><div className="font-mono text-white">{String(m.elapsed_s)} s</div><div className="text-slate-500">elapsed</div></div>
-            <div className="rounded bg-slate-900 p-1"><div className="font-mono text-white">{String(m.shots)} / {String(m.turnovers)}</div><div className="text-slate-500">shots / turnovers</div></div>
+            <div className="rounded bg-white/[0.04] p-1"><div className="font-mono text-white">{String(m.final_outcome).replace(/_/g, " ")}</div><div className="text-slate-500">outcome</div></div>
+            <div className="rounded bg-white/[0.04] p-1"><div className="font-mono text-white">{String(m.elapsed_s)} s</div><div className="text-slate-500">elapsed</div></div>
+            <div className="rounded bg-white/[0.04] p-1"><div className="font-mono text-white">{String(m.shots)} / {String(m.turnovers)}</div><div className="text-slate-500">shots / turnovers</div></div>
           </div>
         )}
       </div>
@@ -67,15 +67,15 @@ export default function CompareModal() {
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-extrabold text-white">Branch comparison</h2>
           <span className="text-xs text-slate-400">both start from the same frozen decision state</span>
-          <button type="button" onClick={() => mv.setCompare({ open: false, playing: false })} className="ml-auto rounded bg-slate-800 px-3 py-1 text-xs">Close</button>
+          <button type="button" onClick={() => mv.setCompare({ open: false, playing: false })} className="ml-auto rounded bg-white/[0.06] px-3 py-1 text-xs">Close</button>
         </div>
         {c.loading && <p className="text-sm text-slate-400">Loading…</p>}
         <div className="grid gap-3 md:grid-cols-2">{panel("a")}{panel("b")}</div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => mv.setCompare({ playing: !c.playing, t: c.t >= duration ? 0 : c.t })} className="h-8 w-8 rounded bg-blue-600 font-bold text-white" aria-label="Play both">{c.playing ? "❚❚" : "▶"}</button>
-          <button type="button" onClick={() => mv.setCompare({ t: 0, playing: true })} className="h-8 w-8 rounded bg-slate-800" aria-label="Restart both">↺</button>
+          <button type="button" onClick={() => mv.setCompare({ playing: !c.playing, t: c.t >= duration ? 0 : c.t })} className="h-8 w-8 rounded bg-leaf-600 font-bold text-white" aria-label="Play both">{c.playing ? "❚❚" : "▶"}</button>
+          <button type="button" onClick={() => mv.setCompare({ t: 0, playing: true })} className="h-8 w-8 rounded bg-white/[0.06]" aria-label="Restart both">↺</button>
           {[0.5, 1, 2].map((v) => (
-            <button key={v} type="button" onClick={() => mv.setCompare({ speed: v })} className={`h-7 rounded px-2 text-xs ${c.speed === v ? "bg-slate-200 text-slate-900" : "bg-slate-800"}`}>{v}×</button>
+            <button key={v} type="button" onClick={() => mv.setCompare({ speed: v })} className={`h-7 rounded px-2 text-xs ${c.speed === v ? "bg-slate-200 text-slate-900" : "bg-white/[0.06]"}`}>{v}×</button>
           ))}
           <input type="range" min={0} max={duration} step={50} value={c.t} onChange={(e) => mv.setCompare({ t: Number(e.target.value), playing: false })} className="timeline flex-1" aria-label="Synchronised time" />
           <span className="font-mono text-xs text-slate-300">+{(c.t / 1000).toFixed(1)}s</span>

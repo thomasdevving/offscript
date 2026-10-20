@@ -137,7 +137,7 @@ adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Te
 |---|---|
 | Microsoft Agent Framework | Agents, tools with budgets, middleware tracing, structured outputs, workflow graph, shared state |
 | Microsoft Foundry | `FoundryChatClient` with Entra ID / managed identity; diagnostics endpoint; optional live test (requires your Foundry project - not exercised in the build environment) |
-| Azure Container Apps, Static Web Apps, Container Registry, Application Insights | Bicep templates (`infra/azure`), `azure.yaml` (azd), OIDC deploy workflow - see [deployment](docs/deployment.md) |
+| Azure Container Apps (scale to zero), Container Registry, Storage static website, Application Insights | Bicep templates (`infra/azure`), one-command deploy (`scripts/deploy_azure.sh`), OIDC deploy workflow - see [deployment](docs/deployment.md) |
 
 ## Repository
 
