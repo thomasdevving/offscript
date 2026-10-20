@@ -22,7 +22,8 @@ export class ApiError extends Error {
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { "content-type": "application/json", ...(init?.headers || {}) },
+    // Only requests with a body declare JSON: plain GETs stay "simple" cross-origin requests (no preflight).
+    headers: { ...(init?.body ? { "content-type": "application/json" } : {}), ...(init?.headers || {}) },
   });
   if (!res.ok) {
     let detail = res.statusText;

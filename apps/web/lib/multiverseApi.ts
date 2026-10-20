@@ -19,7 +19,7 @@ export class MvError extends Error {
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, { ...init, headers: { "content-type": "application/json" } });
+  const res = await fetch(`${API_BASE}${path}`, { ...init, headers: init?.body ? { "content-type": "application/json" } : {} });
   if (!res.ok) {
     let code = String(res.status);
     let msg = res.statusText;

@@ -3,13 +3,9 @@ name: API image
 # Builds the API container and publishes it to GitHub Container Registry. Azure Container Apps pulls
 # it from there, so no Azure registry (and no Azure build service) is needed.
 on:
+  # Every commit on main gets an immutable image tag, so deployments never depend on a moving :latest.
   push:
     branches: [main]
-    paths:
-      - "apps/api/**"
-      - "scenarios/**"
-      - "infra/docker/api.Dockerfile"
-      - ".github/workflows/image.yml"
   workflow_dispatch:
 
 permissions:

@@ -178,11 +178,8 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
         targetPort: apiPort
         transport: 'auto'
         allowInsecure: false
-        corsPolicy: {
-          allowedOrigins: [ webOrigin ]
-          allowedMethods: [ 'GET', 'POST' ]
-          allowedHeaders: [ '*' ]
-        }
+        // CORS is handled by the API itself (CORS_ORIGINS): the ingress-level policy rejected
+        // preflights carrying content-type on this environment type.
       }
       registries: createRegistry ? [
         { server: acr!.properties.loginServer, identity: identity.id }
