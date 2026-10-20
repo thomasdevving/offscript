@@ -84,6 +84,7 @@ export interface AppState {
   recapOpen: boolean;
   recapLoading: boolean;
   inspectorOpen: boolean;
+  appView: "live" | "multiverse";
 }
 
 const initialPlayback: Playback = {
@@ -128,6 +129,7 @@ export const useApp = create<AppState>(() => ({
   recapOpen: false,
   recapLoading: false,
   inspectorOpen: true,
+  appView: "live",
 }));
 
 const set = useApp.setState;
@@ -232,6 +234,9 @@ export const actions = {
       const fromUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("scenario") : null;
       const first = scenarios.find((x) => x.scenario_id === fromUrl) ?? scenarios[0];
       if (first) await actions.selectScenario(first.scenario_id);
+      if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "multiverse") {
+        set({ appView: "multiverse" });
+      }
     } catch (e) {
       set({ healthError: (e as Error).message });
       setTimeout(() => void actions.init(), 3000);
@@ -397,6 +402,19 @@ export const actions = {
     set({ autoAnalyze: v });
     actions.control({ type: "auto_analyze", value: v });
   },
+  setView(v: "live" | "multiverse"): void {
+    if (v === "multiverse") actions.control({ type: "pause" });
+    set({ appView: v });
+    try {
+      const url = new URL(window.location.href);
+      if (v === "multiverse") url.searchParams.set("view", "multiverse");
+      else url.searchParams.delete("view");
+      window.history.replaceState(null, "", url.toString());
+    } catch {
+      /* non-browser */
+    }
+  },
+
   toggleInspector(): void {
     set({ inspectorOpen: !get().inspectorOpen });
   },

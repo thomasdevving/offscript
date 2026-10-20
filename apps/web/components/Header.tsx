@@ -41,7 +41,16 @@ export default function Header() {
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line bg-ink/90 px-4 py-2.5 backdrop-blur">
       <Logo />
-      <span className="hidden text-xs text-slate-400 lg:inline">{L.tagline}</span>
+      <span className="hidden text-xs text-slate-400 2xl:inline">{L.tagline}</span>
+      <div role="tablist" aria-label="View" className="flex rounded-lg bg-slate-900 p-0.5" data-testid="view-tabs">
+        {(["live", "multiverse"] as const).map((v) => (
+          <button key={v} type="button" role="tab" aria-selected={s.appView === v} onClick={() => actions.setView(v)}
+            data-testid={`tab-${v}`}
+            className={`rounded-md px-3 py-1 text-xs font-bold ${s.appView === v ? "bg-blue-600 text-white" : "text-slate-300 hover:text-white"}`}>
+            {v === "live" ? (s.lang === "en" ? "Live match" : "Live wedstrijd") : "Multiverse"}
+          </button>
+        ))}
+      </div>
       <label className="flex items-center gap-2 text-xs text-slate-400">
         <span className="sr-only md:not-sr-only">{L.scenario}</span>
         <select value={s.scenarioId ?? ""} onChange={(e) => void actions.selectScenario(e.target.value)} data-testid="scenario-select"

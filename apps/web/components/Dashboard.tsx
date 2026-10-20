@@ -10,12 +10,14 @@ import { DecisionList, EventFeed, Scoreboard, StatsPanel } from "./MatchIntel";
 import PitchStage from "./PitchStage";
 import PlaybackControls, { WhatIfControls } from "./PlaybackControls";
 import RecapDrawer from "./RecapDrawer";
+import MultiverseView from "./multiverse/MultiverseView";
 
 function useKeyboard() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+      if (useApp.getState().appView !== "live") return;
       if (e.key === " ") {
         e.preventDefault();
         actions.togglePlay();
@@ -52,6 +54,7 @@ export default function Dashboard() {
   const lang = useApp((s) => s.lang);
   const healthError = useApp((s) => s.healthError);
   const scenario = useApp((s) => s.scenarios.find((x) => x.scenario_id === s.scenarioId));
+  const appView = useApp((s) => s.appView);
   const L = t(lang);
   useEffect(() => {
     void actions.init();
@@ -73,6 +76,7 @@ export default function Dashboard() {
           API unreachable ({healthError}). Retrying… Start the backend with <code>uvicorn app.main:app</code>.
         </div>
       )}
+      {appView === "multiverse" ? <MultiverseView /> : (
       <main className="grid flex-1 gap-3 p-3 xl:grid-cols-[300px_minmax(0,1fr)_430px]">
         <aside className="order-3 flex min-w-0 flex-col gap-3 xl:order-1" aria-label={L.stats}>
           <Scoreboard />
@@ -102,6 +106,7 @@ export default function Dashboard() {
           <AnalysisPanel />
         </aside>
       </main>
+      )}
       <RecapDrawer />
     </div>
   );

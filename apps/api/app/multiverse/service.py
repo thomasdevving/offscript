@@ -544,12 +544,12 @@ class MultiverseService:
         an, bn = (" -> ".join(s.action_label or "?" for s in steps_a), " -> ".join(s.action_label or "?" for s in steps_b))
         if lang == "nl":
             expl = (f"Beide takken starten bij {name.get(common, 'dezelfde beslissing')} met dezelfde bevroren toestand. "
-                    f"Tak A ({an}) eindigt na {ma['elapsed_s']} s met {ma['final_outcome']}; tak B ({bn}) na "
-                    f"{mb['elapsed_s']} s met {mb['final_outcome']}. ")
+                    f"Tak A ({an}): na {ma['elapsed_s']} s {_ending(ma['final_outcome'], 'nl')}; tak B ({bn}): na "
+                    f"{mb['elapsed_s']} s {_ending(mb['final_outcome'], 'nl')}. ")
         else:
             expl = (f"Both branches start from {name.get(common, 'the same decision')} with the same frozen state. "
-                    f"Branch A ({an}) ends after {ma['elapsed_s']} s with {ma['final_outcome']}; branch B ({bn}) after "
-                    f"{mb['elapsed_s']} s with {mb['final_outcome']}. ")
+                    f"Branch A ({an}): after {ma['elapsed_s']} s {_ending(ma['final_outcome'], 'en')}; branch B ({bn}): "
+                    f"after {mb['elapsed_s']} s {_ending(mb['final_outcome'], 'en')}. ")
         va, vb = ma["first_step_xg_vs_counter"], mb["first_step_xg_vs_counter"]
         if va is not None and vb is not None:
             if lang == "nl":
@@ -566,6 +566,22 @@ class MultiverseService:
 
     def recommendation(self, s: MultiverseSession, node: BranchNode) -> MultiversePlanning | None:
         return s.plannings.get(node.recommendation_planning_id) if node.recommendation_planning_id else None
+
+
+_ENDINGS = {
+    "en": {"decision": "it reaches a new decision", "depth_limit": "it reaches the branch depth limit",
+           "goal": "the shot goes in", "saved": "the goalkeeper saves", "blocked": "the shot is blocked",
+           "off_target": "the shot misses", "turnover": "the defence wins the ball", "out_of_play": "the ball goes out"},
+    "nl": {"decision": "volgt een nieuwe beslissing", "depth_limit": "is de maximale takdiepte bereikt",
+           "goal": "gaat het schot erin", "saved": "redt de keeper", "blocked": "wordt het schot geblokt",
+           "off_target": "gaat het schot naast", "turnover": "wint de verdediging de bal", "out_of_play": "gaat de bal uit"},
+}
+
+
+def _ending(outcome: str, lang: str) -> str:
+    """Readable phrase for a branch's final outcome (observed outcomes are event names like SHOT_BLOCKED)."""
+    key = str(outcome).lower().removeprefix("shot_")
+    return _ENDINGS["nl" if lang == "nl" else "en"].get(key, key.replace("_", " "))
 
 
 def dumps_tree(tree: dict) -> str:

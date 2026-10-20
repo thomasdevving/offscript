@@ -5,6 +5,7 @@ import type { ActionResult, CounterfactualAnalysis, DecisionPoint, Language, Nar
 import { useEffect, useState } from "react";
 import { clock, cleanLabel, pct, signedPp } from "@/lib/format";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";
+import { mv } from "@/lib/mvStore";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
 import ComparisonChart from "./ComparisonChart";
 import RecoveryPanel from "./RecoveryPanel";
@@ -322,6 +323,11 @@ export default function AnalysisPanel() {
           </article>
         )}
         {a && a.status === "verified" && <Evidence a={a} d={d} />}
+        <button type="button" data-testid="explore-multiverse"
+          onClick={() => { actions.setView("multiverse"); void mv.open(d.decision_point_id, d.match_id); }}
+          className="w-full rounded-lg border border-blue-400/50 bg-blue-600/10 py-2 text-sm font-bold text-blue-100 hover:bg-blue-600/25">
+          {s.lang === "en" ? "Explore this decision in the Multiverse →" : "Verken deze beslissing in het Multiverse →"}
+        </button>
       </section>
       <WorkflowInspector />
       {a && !running && <RecoveryPanel />}

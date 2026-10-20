@@ -39,3 +39,35 @@ test("capture product screenshots", async ({ page }) => {
   await inspector.scrollIntoViewIfNeeded();
   await inspector.screenshot({ path: `${OUT}/agent-recovery.png` });
 });
+
+test("capture multiverse screenshots", async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.goto("/?scenario=shoot_vs_pass&view=multiverse");
+  await page.getByTestId("mv-open-decision").first().click();
+  await expect(page.getByTestId("tree-node-observed")).toBeVisible();
+  await page.getByTestId("tool-pass").click();
+  await page.getByTestId("player-H07").dispatchEvent("click");
+  await expect(page.getByTestId("validation")).toContainText("feasible");
+  await page.getByTestId("submit-action").click();
+  await expect(page.getByTestId("tree-node-simulated")).toHaveCount(1, { timeout: 120_000 });
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: `${OUT}/multiverse-branch.png` });
+
+  await page.getByRole("radio", { name: "Tactical analyst" }).click();
+  const battle = page.getByTestId("agent-battle");
+  await battle.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+  await battle.screenshot({ path: `${OUT}/multiverse-agent-battle.png` });
+
+  await page.getByRole("radio", { name: "Casual fan" }).click();
+  await page.getByTestId("tree-node-root").click();
+  await page.getByTestId("option").filter({ hasText: "Dribble" }).first().click();
+  await expect(page.getByTestId("validation")).toContainText("feasible");
+  await page.getByTestId("submit-action").click();
+  await expect(page.getByTestId("tree-node-simulated")).toHaveCount(2, { timeout: 120_000 });
+  await page.getByTestId("compare-with").first().click();
+  await expect(page.getByTestId("compare-explanation")).toBeVisible();
+  await page.getByRole("button", { name: "Play both" }).click();
+  await page.waitForTimeout(1500);
+  await page.getByTestId("compare-modal").locator("> div").screenshot({ path: `${OUT}/multiverse-compare.png` });
+});

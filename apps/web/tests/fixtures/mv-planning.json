@@ -1,0 +1,1728 @@
+{
+ "planning_id": "plan-346464d28eaa",
+ "node_id": "mv-b7cd05d846e4~root",
+ "snapshot_id": "demo-match-073-snap-0002",
+ "correlation_id": "corr-090922cbc601",
+ "state_version": 24,
+ "updated_at": "2026-10-20T10:49:01.000228+00:00",
+ "max_rounds": 3,
+ "user_action_id": "demo-match-073-snap-0002-u-pass-H07",
+ "mode": "manual",
+ "status": "completed",
+ "rounds": [
+  {
+   "round": 1,
+   "attack_proposal_ids": [
+    "demo-match-073-snap-0002-u-pass-H07",
+    "demo-match-073-snap-0002-dribble-+70"
+   ],
+   "defense_proposal_ids": [
+    "def-press",
+    "def-cover-H07",
+    "def-central"
+   ],
+   "new_cells": 8,
+   "best_robust_action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "best_robust_value": 0.010417,
+   "note": "New strategies appeared this round; another planning round may change the best response."
+  },
+  {
+   "round": 2,
+   "attack_proposal_ids": [
+    "demo-match-073-snap-0002-u-pass-H07",
+    "demo-match-073-snap-0002-through-H08"
+   ],
+   "defense_proposal_ids": [
+    "def-press",
+    "def-cover-H07",
+    "def-central",
+    "def-cover-H08"
+   ],
+   "new_cells": 6,
+   "best_robust_action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "best_robust_value": 0.010417,
+   "note": "New strategies appeared this round; another planning round may change the best response."
+  },
+  {
+   "round": 3,
+   "attack_proposal_ids": [
+    "demo-match-073-snap-0002-u-pass-H07",
+    "demo-match-073-snap-0002-dribble--70"
+   ],
+   "defense_proposal_ids": [
+    "def-press",
+    "def-cover-H07",
+    "def-central",
+    "def-cover-H08"
+   ],
+   "new_cells": 5,
+   "best_robust_action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "best_robust_value": 0.010417,
+   "note": "Maximum planning rounds reached."
+  }
+ ],
+ "attack_proposals": [
+  {
+   "proposal_id": "atk-7ad688a4f390",
+   "round": 1,
+   "action": {
+    "action_id": "demo-match-073-snap-0002-u-pass-H07",
+    "action_type": "pass",
+    "actor_id": "H10",
+    "target_player_id": "H07",
+    "target_x": 11.8,
+    "target_y": 20.5,
+    "initial_state_id": "demo-match-073-snap-0002",
+    "is_actual": false,
+    "label": "Pass to Mbeki-Larsen",
+    "source": "agent",
+    "features": {}
+   },
+   "source": "user",
+   "rationale": "Selected by the user; never replaced by an agent.",
+   "follow_up": ""
+  },
+  {
+   "proposal_id": "atk-5c726b1f59c6",
+   "round": 1,
+   "action": {
+    "action_id": "demo-match-073-snap-0002-dribble-+70",
+    "action_type": "dribble",
+    "actor_id": "H10",
+    "target_player_id": null,
+    "target_x": 21.07,
+    "target_y": 29.19,
+    "initial_state_id": "demo-match-073-snap-0002",
+    "is_actual": false,
+    "label": "Dribble wide right",
+    "source": "generator",
+    "features": {
+     "dribble_length_m": 8.0,
+     "success_estimate": 0.7251,
+     "duels_expected": 1.0,
+     "target_zone_value": 0.0412,
+     "heuristic_value": 0.0299
+    }
+   },
+   "source": "attacking_agent",
+   "rationale": "Dribble wide right: a different kind of threat to stretch the defence.",
+   "follow_up": ""
+  },
+  {
+   "proposal_id": "atk-1da36fa3454c",
+   "round": 2,
+   "action": {
+    "action_id": "demo-match-073-snap-0002-through-H08",
+    "action_type": "pass",
+    "actor_id": "H10",
+    "target_player_id": "H08",
+    "target_x": 26.06,
+    "target_y": 31.43,
+    "initial_state_id": "demo-match-073-snap-0002",
+    "is_actual": false,
+    "label": "Through ball to Ferreira-Holm",
+    "source": "generator",
+    "features": {
+     "pass_length_m": 6.45,
+     "completion_estimate": 0.8796,
+     "lane_best_defender_margin_s": -0.313,
+     "receiver_zone_value": 0.026,
+     "forward_gain_m": -3.26,
+     "receiver_distance_to_goal_m": 26.18,
+     "through_ball": 1.0,
+     "heuristic_value": 0.0228
+    }
+   },
+   "source": "attacking_agent",
+   "rationale": "Dribble wide right is neutralised by 'Double press on the ball' (worst case 0.003); switching to Through ball to Ferreira-Holm, which that counter does not target.",
+   "follow_up": ""
+  },
+  {
+   "proposal_id": "atk-569e9207976a",
+   "round": 3,
+   "action": {
+    "action_id": "demo-match-073-snap-0002-dribble--70",
+    "action_type": "dribble",
+    "actor_id": "H10",
+    "target_player_id": null,
+    "target_x": 19.11,
+    "target_y": 44.1,
+    "initial_state_id": "demo-match-073-snap-0002",
+    "is_actual": false,
+    "label": "Dribble wide left",
+    "source": "generator",
+    "features": {
+     "dribble_length_m": 8.0,
+     "success_estimate": 0.4761,
+     "duels_expected": 2.0,
+     "target_zone_value": 0.0398,
+     "heuristic_value": 0.0189
+    }
+   },
+   "source": "attacking_agent",
+   "rationale": "Through ball to Ferreira-Holm is neutralised by 'Cover lane to Mbeki-Larsen' (worst case 0.005); switching to Dribble wide left, which that counter does not target.",
+   "follow_up": ""
+  }
+ ],
+ "defense_proposals": [
+  {
+   "proposal_id": "def-ffb919ca144f",
+   "round": 1,
+   "strategy": {
+    "strategy_id": "def-press",
+    "style": "press",
+    "label": "Double press on the ball",
+    "assignments": [
+     {
+      "defender_id": "A06",
+      "role": "press",
+      "target_player_id": null,
+      "target_x": null,
+      "target_y": null
+     },
+     {
+      "defender_id": "A08",
+      "role": "press",
+      "target_player_id": null,
+      "target_x": null,
+      "target_y": null
+     }
+    ],
+    "description": "The two closest defenders attack the ball carrier."
+   },
+   "source": "defending_agent",
+   "rationale": "Double press on the ball against Dribble wide right (danger 0.030).",
+   "targets_action_id": "demo-match-073-snap-0002-dribble-+70"
+  },
+  {
+   "proposal_id": "def-059862ee661c",
+   "round": 1,
+   "strategy": {
+    "strategy_id": "def-cover-H07",
+    "style": "cover_lane",
+    "label": "Cover lane to Mbeki-Larsen",
+    "assignments": [
+     {
+      "defender_id": "A03",
+      "role": "cover_lane",
+      "target_player_id": "H07",
+      "target_x": null,
+      "target_y": null
+     }
+    ],
+    "description": "Achterberg steps into the passing lane towards Mbeki-Larsen."
+   },
+   "source": "defending_agent",
+   "rationale": "Cover lane to Mbeki-Larsen against Pass to Mbeki-Larsen (danger 0.000).",
+   "targets_action_id": "demo-match-073-snap-0002-u-pass-H07"
+  },
+  {
+   "proposal_id": "def-dae5c5d1b42d",
+   "round": 1,
+   "strategy": {
+    "strategy_id": "def-central",
+    "style": "protect_central",
+    "label": "Protect central space",
+    "assignments": [],
+    "description": "The block narrows towards the middle and drops slightly."
+   },
+   "source": "defending_agent",
+   "rationale": "Protect the central corridor in front of goal.",
+   "targets_action_id": null
+  },
+  {
+   "proposal_id": "def-5b3ba7f396ed",
+   "round": 2,
+   "strategy": {
+    "strategy_id": "def-cover-H08",
+    "style": "cover_lane",
+    "label": "Cover lane to Ferreira-Holm",
+    "assignments": [
+     {
+      "defender_id": "A06",
+      "role": "cover_lane",
+      "target_player_id": "H08",
+      "target_x": null,
+      "target_y": null
+     }
+    ],
+    "description": "Varga steps into the passing lane towards Ferreira-Holm."
+   },
+   "source": "defending_agent",
+   "rationale": "Cover lane to Ferreira-Holm against Through ball to Ferreira-Holm (danger 0.023).",
+   "targets_action_id": "demo-match-073-snap-0002-through-H08"
+  }
+ ],
+ "matrix": [
+  {
+   "action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "strategy_id": "def-balanced",
+   "xg": 0.013542,
+   "xg_ci95_low": 0.00815,
+   "xg_ci95_high": 0.018934,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.75,
+    "ci95_low": 0.645151,
+    "ci95_high": 0.831939,
+    "successes": 60,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.25,
+    "ci95_low": 0.168061,
+    "ci95_high": 0.354849,
+    "successes": 20,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.775,
+    "ci95_low": 0.67213,
+    "ci95_high": 0.852669,
+    "successes": 62,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "strategy_id": "def-press",
+   "xg": 0.013542,
+   "xg_ci95_low": 0.00815,
+   "xg_ci95_high": 0.018934,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.75,
+    "ci95_low": 0.645151,
+    "ci95_high": 0.831939,
+    "successes": 60,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.25,
+    "ci95_low": 0.168061,
+    "ci95_high": 0.354849,
+    "successes": 20,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.775,
+    "ci95_low": 0.67213,
+    "ci95_high": 0.852669,
+    "successes": 62,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "strategy_id": "def-cover-H07",
+   "xg": 0.010417,
+   "xg_ci95_low": 0.005709,
+   "xg_ci95_high": 0.015124,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.675,
+    "ci95_low": 0.566403,
+    "ci95_high": 0.76756,
+    "successes": 54,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.325,
+    "ci95_low": 0.23244,
+    "ci95_high": 0.433597,
+    "successes": 26,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.675,
+    "ci95_low": 0.566403,
+    "ci95_high": 0.76756,
+    "successes": 54,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "strategy_id": "def-central",
+   "xg": 0.015625,
+   "xg_ci95_low": 0.009928,
+   "xg_ci95_high": 0.021322,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.775,
+    "ci95_low": 0.67213,
+    "ci95_high": 0.852669,
+    "successes": 62,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.225,
+    "ci95_low": 0.147331,
+    "ci95_high": 0.32787,
+    "successes": 18,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.775,
+    "ci95_low": 0.67213,
+    "ci95_high": 0.852669,
+    "successes": 62,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble-+70",
+   "strategy_id": "def-balanced",
+   "xg": 0.004167,
+   "xg_ci95_low": 0.00141,
+   "xg_ci95_high": 0.006923,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.5,
+    "ci95_low": 0.392972,
+    "ci95_high": 0.607028,
+    "successes": 40,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.4125,
+    "ci95_low": 0.311057,
+    "ci95_high": 0.521962,
+    "successes": 33,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.5625,
+    "ci95_low": 0.453409,
+    "ci95_high": 0.665863,
+    "successes": 45,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble-+70",
+   "strategy_id": "def-press",
+   "xg": 0.002604,
+   "xg_ci95_low": 0.00038,
+   "xg_ci95_high": 0.004828,
+   "p_goal": {
+    "value": 0.0125,
+    "ci95_low": 0.00221,
+    "ci95_high": 0.067464,
+    "successes": 1,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.3625,
+    "ci95_low": 0.265706,
+    "ci95_high": 0.471894,
+    "successes": 29,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.525,
+    "ci95_low": 0.416955,
+    "ci95_high": 0.630755,
+    "successes": 42,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.55,
+    "ci95_low": 0.441193,
+    "ci95_high": 0.654225,
+    "successes": 44,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble-+70",
+   "strategy_id": "def-cover-H07",
+   "xg": 0.005208,
+   "xg_ci95_low": 0.00184,
+   "xg_ci95_high": 0.008576,
+   "p_goal": {
+    "value": 0.0125,
+    "ci95_low": 0.00221,
+    "ci95_high": 0.067464,
+    "successes": 1,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.3875,
+    "ci95_low": 0.288244,
+    "ci95_high": 0.497065,
+    "successes": 31,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.4625,
+    "ci95_low": 0.357478,
+    "ci95_high": 0.570958,
+    "successes": 37,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.6,
+    "ci95_low": 0.490453,
+    "ci95_high": 0.700383,
+    "successes": 48,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble-+70",
+   "strategy_id": "def-central",
+   "xg": 0.021354,
+   "xg_ci95_low": 0.013668,
+   "xg_ci95_high": 0.029041,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.725,
+    "ci95_low": 0.618557,
+    "ci95_high": 0.810824,
+    "successes": 58,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.275,
+    "ci95_low": 0.189176,
+    "ci95_high": 0.381443,
+    "successes": 22,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.55,
+    "ci95_low": 0.441193,
+    "ci95_high": 0.654225,
+    "successes": 44,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 1
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-u-pass-H07",
+   "strategy_id": "def-cover-H08",
+   "xg": 0.013542,
+   "xg_ci95_low": 0.00815,
+   "xg_ci95_high": 0.018934,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.75,
+    "ci95_low": 0.645151,
+    "ci95_high": 0.831939,
+    "successes": 60,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.25,
+    "ci95_low": 0.168061,
+    "ci95_high": 0.354849,
+    "successes": 20,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.775,
+    "ci95_low": 0.67213,
+    "ci95_high": 0.852669,
+    "successes": 62,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-through-H08",
+   "strategy_id": "def-balanced",
+   "xg": 0.007812,
+   "xg_ci95_low": 0.00276,
+   "xg_ci95_high": 0.012865,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.5875,
+    "ci95_low": 0.478038,
+    "ci95_high": 0.688943,
+    "successes": 47,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.35,
+    "ci95_low": 0.254544,
+    "ci95_high": 0.459202,
+    "successes": 28,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.975,
+    "ci95_low": 0.913354,
+    "ci95_high": 0.993117,
+    "successes": 78,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-through-H08",
+   "strategy_id": "def-press",
+   "xg": 0.006771,
+   "xg_ci95_low": 0.002306,
+   "xg_ci95_high": 0.011235,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.4875,
+    "ci95_low": 0.381077,
+    "ci95_high": 0.595069,
+    "successes": 39,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.425,
+    "ci95_low": 0.322564,
+    "ci95_high": 0.534309,
+    "successes": 34,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.9625,
+    "ci95_low": 0.895451,
+    "ci95_high": 0.987166,
+    "successes": 77,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-through-H08",
+   "strategy_id": "def-cover-H07",
+   "xg": 0.004687,
+   "xg_ci95_low": 0.001131,
+   "xg_ci95_high": 0.008244,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.2875,
+    "ci95_low": 0.199868,
+    "ci95_high": 0.394606,
+    "successes": 23,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.45,
+    "ci95_low": 0.345775,
+    "ci95_high": 0.558807,
+    "successes": 36,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.975,
+    "ci95_low": 0.913354,
+    "ci95_high": 0.993117,
+    "successes": 78,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-through-H08",
+   "strategy_id": "def-central",
+   "xg": 0.015104,
+   "xg_ci95_low": 0.010021,
+   "xg_ci95_high": 0.020188,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.7625,
+    "ci95_low": 0.65859,
+    "ci95_high": 0.842354,
+    "successes": 61,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.175,
+    "ci95_low": 0.107205,
+    "ci95_high": 0.272577,
+    "successes": 14,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.9625,
+    "ci95_low": 0.895451,
+    "ci95_high": 0.987166,
+    "successes": 77,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-through-H08",
+   "strategy_id": "def-cover-H08",
+   "xg": 0.007812,
+   "xg_ci95_low": 0.003943,
+   "xg_ci95_high": 0.011682,
+   "p_goal": {
+    "value": 0.025,
+    "ci95_low": 0.006883,
+    "ci95_high": 0.086646,
+    "successes": 2,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.625,
+    "ci95_low": 0.515485,
+    "ci95_high": 0.72306,
+    "successes": 50,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.325,
+    "ci95_low": 0.23244,
+    "ci95_high": 0.433597,
+    "successes": 26,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.9625,
+    "ci95_low": 0.895451,
+    "ci95_high": 0.987166,
+    "successes": 77,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 2
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble--70",
+   "strategy_id": "def-balanced",
+   "xg": 0.006771,
+   "xg_ci95_low": 0.003083,
+   "xg_ci95_high": 0.010459,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.5,
+    "ci95_low": 0.392972,
+    "ci95_high": 0.607028,
+    "successes": 40,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.4375,
+    "ci95_low": 0.334137,
+    "ci95_high": 0.546591,
+    "successes": 35,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.4625,
+    "ci95_low": 0.357478,
+    "ci95_high": 0.570958,
+    "successes": 37,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 3
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble--70",
+   "strategy_id": "def-press",
+   "xg": 0.004167,
+   "xg_ci95_low": 0.001051,
+   "xg_ci95_high": 0.007283,
+   "p_goal": {
+    "value": 0.0125,
+    "ci95_low": 0.00221,
+    "ci95_high": 0.067464,
+    "successes": 1,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.3125,
+    "ci95_low": 0.221503,
+    "ci95_high": 0.42068,
+    "successes": 25,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.6,
+    "ci95_low": 0.490453,
+    "ci95_high": 0.700383,
+    "successes": 48,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.4875,
+    "ci95_low": 0.381077,
+    "ci95_high": 0.595069,
+    "successes": 39,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 3
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble--70",
+   "strategy_id": "def-cover-H07",
+   "xg": 0.005729,
+   "xg_ci95_low": 0.002247,
+   "xg_ci95_high": 0.009211,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.5,
+    "ci95_low": 0.392972,
+    "ci95_high": 0.607028,
+    "successes": 40,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.45,
+    "ci95_low": 0.345775,
+    "ci95_high": 0.558807,
+    "successes": 36,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.4625,
+    "ci95_low": 0.357478,
+    "ci95_high": 0.570958,
+    "successes": 37,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 3
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble--70",
+   "strategy_id": "def-central",
+   "xg": 0.01875,
+   "xg_ci95_low": 0.011501,
+   "xg_ci95_high": 0.025999,
+   "p_goal": {
+    "value": 0.0125,
+    "ci95_low": 0.00221,
+    "ci95_high": 0.067464,
+    "successes": 1,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.7,
+    "ci95_low": 0.592316,
+    "ci95_high": 0.789356,
+    "successes": 56,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.2875,
+    "ci95_low": 0.199868,
+    "ci95_high": 0.394606,
+    "successes": 23,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.3875,
+    "ci95_low": 0.288244,
+    "ci95_high": 0.497065,
+    "successes": 31,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 3
+  },
+  {
+   "action_id": "demo-match-073-snap-0002-dribble--70",
+   "strategy_id": "def-cover-H08",
+   "xg": 0.00625,
+   "xg_ci95_low": 0.002662,
+   "xg_ci95_high": 0.009838,
+   "p_goal": {
+    "value": 0.0,
+    "ci95_low": 0.0,
+    "ci95_high": 0.04582,
+    "successes": 0,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_shot": {
+    "value": 0.625,
+    "ci95_low": 0.515485,
+    "ci95_high": 0.72306,
+    "successes": 50,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_turnover": {
+    "value": 0.325,
+    "ci95_low": 0.23244,
+    "ci95_high": 0.433597,
+    "successes": 26,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "p_first_action_success": {
+    "value": 0.525,
+    "ci95_low": 0.416955,
+    "ci95_high": 0.630755,
+    "successes": 42,
+    "trials": 80,
+    "method": "wilson"
+   },
+   "n_rollouts": 80,
+   "cached": false,
+   "round": 3
+  }
+ ],
+ "rollouts_per_cell": 80,
+ "summary": {
+  "best_expected_action_id": "demo-match-073-snap-0002-u-pass-H07",
+  "most_robust_action_id": "demo-match-073-snap-0002-u-pass-H07",
+  "highest_upside_action_id": "demo-match-073-snap-0002-dribble--70",
+  "selected_action_id": "demo-match-073-snap-0002-u-pass-H07",
+  "defensive_counter_id": "def-cover-H07",
+  "selected_value_vs_counter": 0.010417,
+  "selected_value_vs_baseline": 0.013542,
+  "counter_effect_pp": -0.313,
+  "per_action": {
+   "demo-match-073-snap-0002-u-pass-H07": {
+    "worst": 0.010417,
+    "best": 0.015625,
+    "mean": 0.013334
+   },
+   "demo-match-073-snap-0002-dribble--70": {
+    "worst": 0.004167,
+    "best": 0.01875,
+    "mean": 0.008333
+   }
+  }
+ },
+ "termination_reason": "Maximum planning rounds reached.",
+ "verification_status": "verified",
+ "verification_checks": [
+  {
+   "check_id": "same_snapshot",
+   "name": "Every attacking option starts from the node's frozen snapshot",
+   "passed": true,
+   "details": "demo-match-073-snap-0002",
+   "severity": "error"
+  },
+  {
+   "check_id": "actions_valid",
+   "name": "Every attacking option is feasible",
+   "passed": true,
+   "details": "2 valid",
+   "severity": "error"
+  },
+  {
+   "check_id": "strategies_valid",
+   "name": "Every defensive response is valid and physically reachable",
+   "passed": true,
+   "details": "4 valid + balanced baseline",
+   "severity": "error"
+  },
+  {
+   "check_id": "matrix_complete",
+   "name": "Every option was simulated against every response",
+   "passed": true,
+   "details": "2 x 5 cells",
+   "severity": "error"
+  },
+  {
+   "check_id": "equal_budget",
+   "name": "Equal rollouts per cell and one seed schedule (common random numbers)",
+   "passed": true,
+   "details": "rollouts=[80], seeds=[7300]",
+   "severity": "error"
+  },
+  {
+   "check_id": "values_consistent",
+   "name": "Values, intervals and rollout records agree",
+   "passed": true,
+   "details": "all consistent",
+   "severity": "error"
+  },
+  {
+   "check_id": "summary_consistent",
+   "name": "Best / robust / upside / counter recomputed from the matrix",
+   "passed": true,
+   "details": "counter=def-cover-H07",
+   "severity": "error"
+  },
+  {
+   "check_id": "user_action_respected",
+   "name": "The user's action was evaluated and realised unchanged",
+   "passed": true,
+   "details": "Pass to Mbeki-Larsen",
+   "severity": "error"
+  },
+  {
+   "check_id": "rounds_bounded",
+   "name": "Planning rounds within the configured limit",
+   "passed": true,
+   "details": "3/3",
+   "severity": "error"
+  },
+  {
+   "check_id": "parent_immutable",
+   "name": "The parent snapshot is unchanged",
+   "passed": true,
+   "details": "657ee39838bf73d3",
+   "severity": "error"
+  },
+  {
+   "check_id": "transition_reproducible",
+   "name": "The realised continuation replays identically from its seed",
+   "passed": true,
+   "details": "rollout 18: completed",
+   "severity": "error"
+  },
+  {
+   "check_id": "successor_valid",
+   "name": "Successor state is valid (in bounds, later, possession consistent)",
+   "passed": true,
+   "details": "t+1889 ms, possessor H07",
+   "severity": "error"
+  }
+ ],
+ "narratives": [
+  {
+   "narrative_id": "nar-ea9df5478ca5",
+   "analysis_id": "plan-346464d28eaa",
+   "audience": "casual",
+   "language": "en",
+   "headline": "Attack vs defence",
+   "body": "Castellane: Pass to Mbeki-Larsen. The defending agent's best answer was 'Cover lane to Mbeki-Larsen', which lowered the modelled expected goals within 10 seconds from 1.4% to 1.0%. After seeing the response matrix, the attacking agent changed its plan and added Dribble wide left. In the continuation shown, the pass reached its target. This is one modelled future under our simulation model, not what would have happened.",
+   "bullets": [],
+   "caption": null,
+   "evidence_refs": [
+    "summary.selected_vs_counter",
+    "summary.selected_vs_baseline",
+    "mv.rollouts",
+    "mv.horizon_s",
+    "mv.rounds"
+   ],
+   "verification_status": "verified",
+   "verification_notes": [],
+   "generated_by": "policy-template",
+   "is_live_model_output": false,
+   "created_at": "2026-10-20T10:49:00.989829+00:00"
+  },
+  {
+   "narrative_id": "nar-099a50c3a0a1",
+   "analysis_id": "plan-346464d28eaa",
+   "audience": "analyst",
+   "language": "en",
+   "headline": "73' adversarial plan: 2 options x 5 defensive responses, 3 round(s)",
+   "body": "Every option was simulated against every defensive response from the same frozen snapshot with 80 paired rollouts per cell over 10 s. Value: modelled expected goals within the horizon (each simulated shot scored by its conditional goal probability).",
+   "bullets": [
+    "Pass to Mbeki-Larsen: worst 1.0%, mean 1.3%, best 1.6%",
+    "Dribble wide left: worst 0.4%, mean 0.8%, best 1.9%",
+    "Most robust against the defensive responses: Pass to Mbeki-Larsen; highest upside: Dribble wide left.",
+    "Counter effect on the selected action: -0.3 pp.",
+    "Uncertainty: 95% intervals per cell cover Monte Carlo sampling only; the football model is a simplified, uncalibrated synthetic model; the frozen state omits body orientation, fatigue and communication."
+   ],
+   "caption": null,
+   "evidence_refs": [
+    "summary.selected_vs_counter",
+    "summary.selected_vs_baseline",
+    "mv.rollouts",
+    "mv.horizon_s",
+    "mv.rounds",
+    "actions.a1.worst",
+    "actions.a2.worst"
+   ],
+   "verification_status": "verified",
+   "verification_notes": [],
+   "generated_by": "policy-template",
+   "is_live_model_output": false,
+   "created_at": "2026-10-20T10:49:00.989850+00:00"
+  },
+  {
+   "narrative_id": "nar-685f90806ad8",
+   "analysis_id": "plan-346464d28eaa",
+   "audience": "broadcaster",
+   "language": "en",
+   "headline": "ATTACK VS DEFENCE",
+   "body": "Expected goals within 10 s, simulation model.",
+   "bullets": [],
+   "caption": "Model: Pass to Mbeki-Larsen 1.0% vs best defence (Cover lane to Mbeki-Larsen)",
+   "evidence_refs": [
+    "summary.selected_vs_counter",
+    "summary.selected_vs_baseline",
+    "mv.rollouts",
+    "mv.horizon_s",
+    "mv.rounds"
+   ],
+   "verification_status": "verified",
+   "verification_notes": [],
+   "generated_by": "policy-template",
+   "is_live_model_output": false,
+   "created_at": "2026-10-20T10:49:00.989864+00:00"
+  }
+ ],
+ "steps": [
+  {
+   "step_id": "step-d51100701ff3",
+   "agent": "attacking_agent",
+   "task": "Round 1: attacking proposals",
+   "attempt": 1,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:50.777932+00:00",
+   "finished_at": "2026-10-20T10:48:50.883579+00:00",
+   "duration_ms": 105.59,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-f8805b8b9823",
+     "tool_name": "get_available_actions",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 82.21,
+     "started_at": "2026-10-20T10:48:50.800460+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "defending_agent",
+   "handoff_reason": "2 attacking options",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-4258ac56e904",
+   "agent": "defending_agent",
+   "task": "Round 1: defensive responses",
+   "attempt": 1,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:50.885957+00:00",
+   "finished_at": "2026-10-20T10:48:50.889898+00:00",
+   "duration_ms": 3.91,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-81d6644c380c",
+     "tool_name": "get_defensive_options",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.87,
+     "started_at": "2026-10-20T10:48:50.888278+00:00"
+    },
+    {
+     "call_id": "tool-c684d1895504",
+     "tool_name": "get_threat_assessment",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 1.32,
+     "started_at": "2026-10-20T10:48:50.888155+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "simulation_agent",
+   "handoff_reason": "3 defensive responses",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-c41e0f8d993f",
+   "agent": "simulation_agent",
+   "task": "Round 1: response matrix",
+   "attempt": 1,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:50.891741+00:00",
+   "finished_at": "2026-10-20T10:48:54.839933+00:00",
+   "duration_ms": 3948.11,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-af480b2a2586",
+     "tool_name": "evaluate_response_matrix",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 3944.21,
+     "started_at": "2026-10-20T10:48:50.894416+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "attacking_agent",
+   "handoff_reason": "New strategies appeared this round; another planning round may change the best response.",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-9c063651e63c",
+   "agent": "attacking_agent",
+   "task": "Round 2: attacking proposals",
+   "attempt": 2,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:54.841917+00:00",
+   "finished_at": "2026-10-20T10:48:54.845954+00:00",
+   "duration_ms": 4.0,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-e7ab9bb2a937",
+     "tool_name": "get_available_actions",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 1.04,
+     "started_at": "2026-10-20T10:48:54.843574+00:00"
+    },
+    {
+     "call_id": "tool-13e6ad26f7fe",
+     "tool_name": "get_planning_feedback",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 1.59,
+     "started_at": "2026-10-20T10:48:54.843746+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "defending_agent",
+   "handoff_reason": "2 attacking options",
+   "error": null,
+   "notes": [
+    "Revision: Dribble wide right is neutralised by 'Double press on the ball' (worst case 0.003); switching to Through ball to Ferreira-Holm, which that counter does not target."
+   ]
+  },
+  {
+   "step_id": "step-9b58c7beb3bd",
+   "agent": "defending_agent",
+   "task": "Round 2: defensive responses",
+   "attempt": 2,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:54.848300+00:00",
+   "finished_at": "2026-10-20T10:48:54.853804+00:00",
+   "duration_ms": 5.45,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-1183eb9f292d",
+     "tool_name": "get_planning_feedback",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 1.76,
+     "started_at": "2026-10-20T10:48:54.850776+00:00"
+    },
+    {
+     "call_id": "tool-3ecca669266e",
+     "tool_name": "get_threat_assessment",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 2.48,
+     "started_at": "2026-10-20T10:48:54.850565+00:00"
+    },
+    {
+     "call_id": "tool-27e6c9d33867",
+     "tool_name": "get_defensive_options",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 2.56,
+     "started_at": "2026-10-20T10:48:54.850690+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "simulation_agent",
+   "handoff_reason": "3 defensive responses",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-6500a3f10714",
+   "agent": "simulation_agent",
+   "task": "Round 2: response matrix",
+   "attempt": 2,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:54.855026+00:00",
+   "finished_at": "2026-10-20T10:48:58.549556+00:00",
+   "duration_ms": 3694.5,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-0b43132376c7",
+     "tool_name": "evaluate_response_matrix",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 3692.82,
+     "started_at": "2026-10-20T10:48:54.856096+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "attacking_agent",
+   "handoff_reason": "New strategies appeared this round; another planning round may change the best response.",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-b4cf0a458e74",
+   "agent": "attacking_agent",
+   "task": "Round 3: attacking proposals",
+   "attempt": 3,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:58.551143+00:00",
+   "finished_at": "2026-10-20T10:48:58.554462+00:00",
+   "duration_ms": 3.29,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-82a3e9cabb94",
+     "tool_name": "get_available_actions",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.94,
+     "started_at": "2026-10-20T10:48:58.552687+00:00"
+    },
+    {
+     "call_id": "tool-b7b49c3989a7",
+     "tool_name": "get_planning_feedback",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.96,
+     "started_at": "2026-10-20T10:48:58.553041+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "defending_agent",
+   "handoff_reason": "2 attacking options",
+   "error": null,
+   "notes": [
+    "Revision: Through ball to Ferreira-Holm is neutralised by 'Cover lane to Mbeki-Larsen' (worst case 0.005); switching to Dribble wide left, which that counter does not target."
+   ]
+  },
+  {
+   "step_id": "step-d73e840e6ba4",
+   "agent": "defending_agent",
+   "task": "Round 3: defensive responses",
+   "attempt": 3,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:58.556452+00:00",
+   "finished_at": "2026-10-20T10:48:58.561181+00:00",
+   "duration_ms": 4.7,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-bcad4adf1481",
+     "tool_name": "get_threat_assessment",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.75,
+     "started_at": "2026-10-20T10:48:58.558730+00:00"
+    },
+    {
+     "call_id": "tool-5b830d9a05f8",
+     "tool_name": "get_planning_feedback",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.59,
+     "started_at": "2026-10-20T10:48:58.559064+00:00"
+    },
+    {
+     "call_id": "tool-7f60a3e80912",
+     "tool_name": "get_defensive_options",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 1.71,
+     "started_at": "2026-10-20T10:48:58.558943+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "simulation_agent",
+   "handoff_reason": "3 defensive responses",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-f99bf520c963",
+   "agent": "simulation_agent",
+   "task": "Round 3: response matrix",
+   "attempt": 3,
+   "status": "completed",
+   "started_at": "2026-10-20T10:48:58.562473+00:00",
+   "finished_at": "2026-10-20T10:49:00.969721+00:00",
+   "duration_ms": 2407.22,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-9a2593b2a32b",
+     "tool_name": "evaluate_response_matrix",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 2405.49,
+     "started_at": "2026-10-20T10:48:58.563638+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "verification_agent",
+   "handoff_reason": "Maximum planning rounds reached.",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-de8316211474",
+   "agent": "verification_agent",
+   "task": "Verify analysis",
+   "attempt": 1,
+   "status": "completed",
+   "started_at": "2026-10-20T10:49:00.977609+00:00",
+   "finished_at": "2026-10-20T10:49:00.985159+00:00",
+   "duration_ms": 7.51,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-78d51b5881fc",
+     "tool_name": "run_multiverse_checks",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 5.66,
+     "started_at": "2026-10-20T10:49:00.979031+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "explanation_agent",
+   "handoff_reason": "planning verified",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-be37b2ab48c5",
+   "agent": "explanation_agent",
+   "task": "Explain the tactical trade-off",
+   "attempt": 1,
+   "status": "completed",
+   "started_at": "2026-10-20T10:49:00.986619+00:00",
+   "finished_at": "2026-10-20T10:49:00.989788+00:00",
+   "duration_ms": 3.11,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-1f6a4d032af9",
+     "tool_name": "get_planning_evidence",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 0.96,
+     "started_at": "2026-10-20T10:49:00.987985+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "verification_agent",
+   "handoff_reason": "6 narratives",
+   "error": null,
+   "notes": []
+  },
+  {
+   "step_id": "step-76f15a0ef368",
+   "agent": "verification_agent",
+   "task": "Verify narratives",
+   "attempt": 2,
+   "status": "completed",
+   "started_at": "2026-10-20T10:49:00.991327+00:00",
+   "finished_at": "2026-10-20T10:49:01.000161+00:00",
+   "duration_ms": 8.8,
+   "model": "policy",
+   "live_model": false,
+   "tool_calls": [
+    {
+     "call_id": "tool-aff21c4acc49",
+     "tool_name": "verify_narratives",
+     "arguments": {},
+     "result_summary": {},
+     "status": "ok",
+     "duration_ms": 6.82,
+     "started_at": "2026-10-20T10:49:00.992660+00:00"
+    }
+   ],
+   "output": {},
+   "handoff_to": "publisher",
+   "handoff_reason": "narratives checked",
+   "error": null,
+   "notes": []
+  }
+ ],
+ "handoffs": [
+  {
+   "from_agent": "attacking_agent",
+   "to_agent": "defending_agent",
+   "reason": "2 attacking options",
+   "at": "2026-10-20T10:48:50.883731+00:00"
+  },
+  {
+   "from_agent": "defending_agent",
+   "to_agent": "simulation_agent",
+   "reason": "3 defensive responses",
+   "at": "2026-10-20T10:48:50.890003+00:00"
+  },
+  {
+   "from_agent": "simulation_agent",
+   "to_agent": "attacking_agent",
+   "reason": "New strategies appeared this round; another planning round may change the best response.",
+   "at": "2026-10-20T10:48:54.840110+00:00"
+  },
+  {
+   "from_agent": "attacking_agent",
+   "to_agent": "defending_agent",
+   "reason": "2 attacking options",
+   "at": "2026-10-20T10:48:54.846062+00:00"
+  },
+  {
+   "from_agent": "defending_agent",
+   "to_agent": "simulation_agent",
+   "reason": "3 defensive responses",
+   "at": "2026-10-20T10:48:54.853894+00:00"
+  },
+  {
+   "from_agent": "simulation_agent",
+   "to_agent": "attacking_agent",
+   "reason": "New strategies appeared this round; another planning round may change the best response.",
+   "at": "2026-10-20T10:48:58.549640+00:00"
+  },
+  {
+   "from_agent": "attacking_agent",
+   "to_agent": "defending_agent",
+   "reason": "2 attacking options",
+   "at": "2026-10-20T10:48:58.554547+00:00"
+  },
+  {
+   "from_agent": "defending_agent",
+   "to_agent": "simulation_agent",
+   "reason": "3 defensive responses",
+   "at": "2026-10-20T10:48:58.561247+00:00"
+  },
+  {
+   "from_agent": "simulation_agent",
+   "to_agent": "verification_agent",
+   "reason": "Maximum planning rounds reached.",
+   "at": "2026-10-20T10:49:00.976125+00:00"
+  },
+  {
+   "from_agent": "verification_agent",
+   "to_agent": "explanation_agent",
+   "reason": "planning verified",
+   "at": "2026-10-20T10:49:00.985191+00:00"
+  },
+  {
+   "from_agent": "explanation_agent",
+   "to_agent": "verification_agent",
+   "reason": "6 narratives",
+   "at": "2026-10-20T10:49:00.989911+00:00"
+  },
+  {
+   "from_agent": "verification_agent",
+   "to_agent": "publisher",
+   "reason": "narratives checked",
+   "at": "2026-10-20T10:49:01.000209+00:00"
+  }
+ ],
+ "errors": [],
+ "degraded": false,
+ "live_model_calls": 0,
+ "duration_ms": 10227.4,
+ "cache_hits": 0,
+ "cells_computed": 19
+}

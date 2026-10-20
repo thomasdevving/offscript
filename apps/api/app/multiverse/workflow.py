@@ -272,7 +272,7 @@ def attacking_policy(turn: PolicyTurn) -> PolicyDecision:
     pick = next((c for c in untried if not any(t and t in c["label"] for t in covered_targets)), untried[0])
     new = [cid for cid in keep if cid != weakest] + [pick["candidate_id"]]
     reason = (f"{rows[weakest]['label']} is neutralised by '{rows[weakest]['strongest_counter_label']}' "
-              f"(worst case {rows[weakest]['worst_case_xg']:.3f}); switching to {pick['label']}, which that counter "
+              f"(worst case {100 * rows[weakest]['worst_case_xg']:.1f}%); switching to {pick['label']}, which that counter "
               "does not target.")
     return PolicyDecision(final={"proposals": [{"candidate_id": cid, "rationale": "Kept." if cid != pick["candidate_id"]
                                                 else reason} for cid in new], "revised": True, "revision_reason": reason})

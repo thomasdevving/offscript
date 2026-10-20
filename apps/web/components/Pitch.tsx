@@ -8,7 +8,7 @@ export interface Arrow {
   id: string;
   from: [number, number];
   to: [number, number];
-  kind: "actual" | "selected" | "alternative";
+  kind: "actual" | "selected" | "alternative" | "defense" | "recommended";
   label: string;
   rank?: number;
 }
@@ -31,6 +31,10 @@ interface Props {
   dimmed?: boolean;
   tint?: "observed" | "simulated" | "snapshot";
   onArrowClick?: (id: string) => void;
+  onPlayerClick?: (playerId: string) => void;
+  onPitchClick?: (x: number, y: number) => void;
+  selectableIds?: string[];
+  marker?: { x: number; y: number; ok: boolean } | null;
   ariaLabel: string;
   children?: ReactNode;
 }
@@ -62,8 +66,9 @@ function Markings() {
 }
 
 function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }) {
-  const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#3b82f6" : "#a78bfa";
-  const dash = a.kind === "actual" ? "1.2 0.8" : a.kind === "alternative" ? "0.6 0.6" : undefined;
+  const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#3b82f6" : a.kind === "defense" ? "#f97316"
+    : a.kind === "recommended" ? "#34d399" : "#a78bfa";
+  const dash = a.kind === "actual" ? "1.2 0.8" : a.kind === "alternative" ? "0.6 0.6" : a.kind === "defense" ? "0.9 0.5" : undefined;
   const [x1, y1] = a.from;
   const [x2, y2] = a.to;
   const ang = Math.atan2(y2 - y1, x2 - x1);
@@ -106,7 +111,19 @@ export default function Pitch(p: Props) {
   const frame = p.frame;
   const tintStroke = p.tint === "simulated" ? "#3b82f6" : p.tint === "snapshot" ? "#a78bfa" : "transparent";
   return (
-    <svg viewBox={`-3 -3 ${L + 6} ${W + 6}`} className="block h-auto w-full select-none" role="img" aria-label={p.ariaLabel}>
+    <svg viewBox={`-3 -3 ${L + 6} ${W + 6}`} className={`block h-auto w-full select-none ${p.onPitchClick ? "cursor-crosshair" : ""}`}
+      role="img" aria-label={p.ariaLabel}
+      onClick={(e) => {
+        if (!p.onPitchClick) return;
+        const svg = e.currentTarget;
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const m = svg.getScreenCTM();
+        if (!m) return;
+        const loc = pt.matrixTransform(m.inverse());
+        if (loc.x >= 0 && loc.x <= L && loc.y >= 0 && loc.y <= W) p.onPitchClick(loc.x, loc.y);
+      }}>
       <defs>
         <pattern id="stripes" width={10.5} height={W} patternUnits="userSpaceOnUse">
           <rect width={5.25} height={W} fill="#0d4232" />
@@ -147,8 +164,16 @@ export default function Pitch(p: Props) {
             const isHome = pl.team_id === home.team_id;
             const fill = isHome ? home.color_primary : away.color_primary;
             const hl = id === p.highlightId || id === frame.possessor_id;
+            const selectable = p.selectableIds?.includes(id);
             return (
-              <g key={id} transform={`translate(${x},${y})`}>
+              <g key={id} transform={`translate(${x},${y})`}
+                {...(selectable ? {
+                  role: "button", tabIndex: 0, "aria-label": `Select ${pl.name ?? id}`, className: "cursor-pointer",
+                  "data-testid": `player-${id}`,
+                  onClick: (ev: React.MouseEvent) => { ev.stopPropagation(); p.onPlayerClick?.(id); },
+                  onKeyDown: (ev: React.KeyboardEvent) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); p.onPlayerClick?.(id); } },
+                } : {})}>
+                {selectable && <circle r={2.1} fill="rgba(52,211,153,0.12)" stroke="#34d399" strokeWidth={0.18} strokeDasharray="0.5 0.4" />}
                 {hl && <circle r={2.2} fill="none" stroke="#f8fafc" strokeWidth={0.22} opacity={0.9} />}
                 <circle r={1.25} fill={fill} stroke={pl.role === "GK" ? "#f8fafc" : "#020617"} strokeWidth={0.22} />
                 <text y={0.42} fontSize={1.15} textAnchor="middle" fontWeight={700} fill={isHome ? "#04263b" : "#2a1704"}>
@@ -167,6 +192,12 @@ export default function Pitch(p: Props) {
         )}
       </g>
       {p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} />)}
+      {p.marker && (
+        <g transform={`translate(${p.marker.x},${p.marker.y})`} pointerEvents="none">
+          <circle r={1.6} fill="none" stroke={p.marker.ok ? "#34d399" : "#ef4444"} strokeWidth={0.35} />
+          <path d="M -1 -1 L 1 1 M -1 1 L 1 -1" stroke={p.marker.ok ? "#34d399" : "#ef4444"} strokeWidth={0.3} />
+        </g>
+      )}
       {p.children}
     </svg>
   );
