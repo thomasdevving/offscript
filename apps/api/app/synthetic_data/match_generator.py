@@ -198,17 +198,18 @@ class MatchGenerator:
                      overrides: dict[int, np.ndarray] | None = None) -> None:
         s = self.state
         targets = np.array([targets_tpl[p.player_id] for p in s.profiles], dtype=float)
+        speeds = s.vmax * 0.55
         for i, t in (overrides or {}).items():
             targets[i] = t
-        speeds = s.vmax * 0.55
+            speeds[i] = s.vmax[i] * 0.9
+            # Make sure the restart taker can actually get there (no teleporting).
+            duration = max(duration, 0.2 + float(np.linalg.norm(t - s.pos[i])) / speeds[i] + 0.3)
         dist = float(np.linalg.norm(ball_to - s.ball))
         motion = Motion(s.t, duration, s.pos.copy(), s.vel.copy(), np.full(s.n, 0.2), targets, speeds,
                         BallPath("flight", s.ball.copy(), ball_to.copy(), v0=max(dist / duration, 0.01), decel=0.0,
                                  total_dist=dist))
         self.engine._commit(s, motion)
         s.ball = ball_to.copy()
-        for i, t in (overrides or {}).items():
-            s.pos[i] = t
         s.vel[:] = 0.0
 
     def _turnover(self, new_carrier: int, t: float, pos, reason: str) -> None:
@@ -288,7 +289,7 @@ class MatchGenerator:
         motion = Motion(s.t, dur, s.pos.copy(), s.vel.copy(), np.full(s.n, 0.2), targets, speeds,
                         BallPath("static", pt.copy(), pt.copy()))
         self.engine._commit(s, motion)
-        s.pos[k] = pt
+        pt = s.pos[k].copy()
         if s.is_att[k]:
             s.carrier = k
             s.ball = pt.copy()

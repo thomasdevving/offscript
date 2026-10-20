@@ -49,6 +49,21 @@ def build_recap(md: MatchData, analyses: list[CounterfactualAnalysis], language:
                              outcome.event_id], kind="goal" if outcome.event_type == EventType.GOAL else "shot"))
         ref_events += [e.event_id, outcome.event_id]
 
+    analysed = {a.decision_point_id for a in analyses if a.status == "verified"}
+    for dp in md.decisions:
+        if dp.decision_point_id in analysed:
+            continue
+        trig = ", ".join(t.value.lower().replace("_", " ") for t in dp.triggers[:2])
+        outcome = dp.actual_outcome.lower().replace("_", " ")
+        text = (f"Key decision: {short.get(dp.actor_id, '?')} - {dp.actual_action.label.replace(' (actual)', '')} "
+                f"({outcome}; {trig})." if L == "en" else
+                f"Sleutelmoment: {short.get(dp.actor_id, '?')} - {dp.actual_action.label.replace(' (actual)', '')} "
+                f"({outcome}; {trig}).")
+        key.append(RecapItem(text=text, match_clock=format_clock(dp.match_clock_ms), event_ids=[dp.event_id],
+                             kind="decision"))
+        ref_events.append(dp.event_id)
+    key.sort(key=lambda k: k.match_clock or "")
+
     insights: list[RecapItem] = []
     ref_an: list[str] = []
     for a in analyses:

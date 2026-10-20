@@ -372,6 +372,23 @@ def goalkeeper_target(ball: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------------------------------
 
 
+def defender_arrival_times(state: EngineState, deff: np.ndarray, react: np.ndarray, pts: np.ndarray) -> np.ndarray:
+    """Earliest time each defender can touch each point (shape (len(deff), *pts.shape[:-1])).
+
+    Momentum for the reaction delay, then a straight run at max speed minus a stretching reach.
+    A defender who is already (almost) in the ball's path needs only a fraction of his reaction
+    delay: he does not have to start running, just put a foot in.
+    """
+    lead = (1,) * (pts.ndim - 1)
+    shape = (len(deff),) + lead
+    reach = np.where(state.is_gk[deff], GK_REACH, DEF_REACH).reshape(shape)
+    r = react[deff].reshape(shape)
+    p_react = state.pos[deff] + state.vel[deff] * react[deff][:, None]
+    dist = np.linalg.norm(pts[None, ...] - p_react.reshape(shape + (2,)), axis=-1)
+    eff_react = r * np.clip(dist / (reach + 1.0), 0.3, 1.0)
+    return eff_react + np.maximum(0.0, dist - reach) / state.vmax[deff].reshape(shape)
+
+
 def interception_probability(margin: np.ndarray) -> np.ndarray:
     """P(defender wins the ball) given his best time margin over the ball (s).
 
@@ -499,10 +516,7 @@ class Engine:
         pts = s[None, None, :] + fr[None, :, None] * (ends - s[None, :])[:, None, :]
         t_ball = flight_times(fr[None, :] * L[:, None], v0[:, None], PASS_DECEL)
         deff = state.def_idx()
-        reach = np.where(state.is_gk[deff], GK_REACH, DEF_REACH)
-        p_react = state.pos[deff] + state.vel[deff] * react[deff][:, None]
-        dist = np.linalg.norm(pts[None, :, :, :] - p_react[:, None, None, :], axis=3)
-        t_def = react[deff][:, None, None] + np.maximum(0.0, dist - reach[:, None, None]) / state.vmax[deff][:, None, None]
+        t_def = defender_arrival_times(state, deff, react, pts)
         margin = t_ball[None, :, :] - t_def
         pr = state.pos[receivers] + state.vel[receivers] * 0.12
         t_recv = 0.12 + np.maximum(0.0, np.linalg.norm(ends - pr, axis=1) - 0.5) / state.vmax[receivers]
@@ -540,10 +554,7 @@ class Engine:
         pts = s[None, :] + fr[:, None] * (end - s)[None, :]
         t_ball = flight_times(fr * length, v0, PASS_DECEL)
         deff = state.def_idx()
-        reach = np.where(state.is_gk[deff], GK_REACH, DEF_REACH)
-        p_react = state.pos[deff] + state.vel[deff] * react[deff][:, None]
-        dist = np.linalg.norm(pts[None, :, :] - p_react[:, None, :], axis=2)
-        t_def = react[deff][:, None] + np.maximum(0.0, dist - reach[:, None]) / state.vmax[deff][:, None]
+        t_def = defender_arrival_times(state, deff, react, pts)
         margin = t_ball[None, :] - t_def
         if receiver is not None:
             t_recv = float(time_to_point(state, np.array([receiver]), end, np.array([0.12]), 0.5)[0])
@@ -649,8 +660,8 @@ class Engine:
             motion = Motion(state.t, t_i, state.pos.copy(), state.vel.copy(), react, targets, speeds,
                             BallPath("flight", s, pt, v0=v0, decel=PASS_DECEL, total_dist=float(np.linalg.norm(pt - s))))
             self._commit(state, motion)
-            state.pos[winner] = pt
-            state.ball = pt.copy()
+            # The ball is won within reach; players are never moved discontinuously.
+            state.ball = state.pos[winner].copy()
             events.append({"type": "PASS_FAILED", "players": [state.profiles[passer].player_id], "pos": pt.copy(),
                            "detail": {"reason": "intercepted"}})
             events.append({"type": "INTERCEPTION", "players": [state.profiles[winner].player_id], "pos": pt.copy()})
@@ -671,8 +682,7 @@ class Engine:
             motion = Motion(state.t, duration, state.pos.copy(), state.vel.copy(), react, targets, speeds,
                             BallPath("flight", s, end, v0=v0, decel=PASS_DECEL, total_dist=length))
             self._commit(state, motion)
-            state.pos[receiver] = end
-            state.ball = end.copy()
+            state.ball = state.pos[receiver].copy()
             press = pressure_count(state, receiver, 2.5)
             p_mis = (0.03 + 0.06 * press) * (1.3 - state.profiles[receiver].technique)
             if forced != "complete" and u_ctrl < p_mis:
@@ -724,8 +734,7 @@ class Engine:
         motion = Motion(state.t, dur, state.pos.copy(), state.vel.copy(), react, targets, speeds,
                         BallPath("flight", s, rest, v0=v0, decel=PASS_DECEL, total_dist=total))
         self._commit(state, motion)
-        state.pos[winner] = rest
-        state.ball = rest.copy()
+        state.ball = state.pos[winner].copy()
         if state.is_att[winner]:
             events.append({"type": "PASS_COMPLETED", "players": [state.profiles[passer].player_id,
                            state.profiles[winner].player_id], "pos": rest.copy(), "detail": {"reason": "loose_won"}})
@@ -929,10 +938,9 @@ class Engine:
         motion = Motion(state.t, dur, state.pos.copy(), state.vel.copy(), react, targets, speeds,
                         BallPath("attached", s, stop_pt, carrier=carrier))
         self._commit(state, motion)
-        state.pos[carrier] = stop_pt
-        state.ball = stop_pt.copy()
+        state.ball = state.pos[carrier].copy()
         if outcome == "tackled":
-            state.pos[tackler] = stop_pt + g.unit(g.ATTACK_GOAL - stop_pt) * 0.6
+            state.ball = state.pos[tackler].copy()
             events.append({"type": "TACKLE", "players": [state.profiles[tackler].player_id, cid], "pos": stop_pt.copy()})
             events.append({"type": "DRIBBLE_FAILED", "players": [cid], "pos": stop_pt.copy()})
             return PhaseResult("dribble", "tackled", dur, turnover_to=tackler, events=events)
