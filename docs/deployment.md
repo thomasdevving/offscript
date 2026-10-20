@@ -42,81 +42,81 @@ Football Multiverse settings (environment variables, all optional): `MULTIVERSE_
 `MULTIVERSE_TIMEOUT_S` (180). Sessions are written to `DATA_DIR/multiverse/`; in a container they
 last as long as the replica's file system (use an Azure Files mount to keep them across restarts).
 
-## 2. Microsoft Foundry
+## 2. Azure in one command (infrastructure + API + web + Microsoft Foundry)
 
-1. In the [Foundry portal](https://ai.azure.com) create (or reuse) a project and deploy a chat model
-   that supports tool calling and structured outputs (e.g. a GPT-4.1-mini/GPT-4o-mini class model;
-   cost-efficient models are enough - prompts are small and bounded).
-2. Copy the **project endpoint** and the **deployment name**.
-3. Grant the identity that runs the API the **Azure AI User** role on the Foundry resource (the
-   Bicep template does this for the API's managed identity when `foundryAccountResourceId` is set).
-
-## 3. Azure (Container Apps + Static Web Apps)
-
-### Option A - Azure Developer CLI
+Prerequisites: Azure CLI signed in to the subscription you want to use (`az login`, then
+`az account set --subscription "<name>"`), Node.js 22+. No Docker needed: GitHub Actions
+(`.github/workflows/image.yml`) builds the API image on every push to `main` and publishes it to
+GitHub Container Registry (`ghcr.io/thomasdevving/parallel-api`, public), which Container Apps pulls.
 
 ```bash
-azd auth login
-azd env new parallel
-azd env set FOUNDRY_PROJECT_ENDPOINT "<endpoint>"      # optional
-azd env set FOUNDRY_MODEL "<deployment>"               # optional
-azd up
+scripts/deploy_azure.sh
 ```
 
-`azure.yaml` maps service `api` (container app built from `infra/docker/api.Dockerfile`) and service
-`web` (static export in `apps/web/out`). The template outputs `NEXT_PUBLIC_API_BASE_URL`, which the
-web build needs; if your azd version does not pass it to the build, run
-`NEXT_PUBLIC_API_BASE_URL=<apiUrl> npm run build -w apps/web` and `azd deploy web`.
+| Setting (environment variable) | Default | Meaning |
+|---|---|---|
+| `RESOURCE_GROUP` | `parallel-rg` | resource group to create or update |
+| `LOCATION` | `germanywestcentral` | region for every resource (pick one your subscription policy allows) |
+| `CREATE_FOUNDRY` | `true` | create a Microsoft Foundry account + project + `gpt-4.1-mini` deployment; `false` = labelled policy planner |
+| `MIN_REPLICAS` | `0` | `0` scales the API to zero when idle (cold start), `1` keeps it warm (always billed) |
+| `API_IMAGE` | `ghcr.io/thomasdevving/parallel-api:latest` | API container image |
+| `ONLY_WEB` | `false` | `true` only rebuilds and re-uploads the web app |
 
-### Option B - Azure CLI
+The script is idempotent: after the image workflow has run, run it again to roll out a new revision
+(it re-pulls `:latest`) and re-upload the web app. It also works unchanged in **Azure Cloud Shell**
+(shell.azure.com), which helps when an organisation blocks Azure CLI sign-in on personal devices.
 
-```bash
-RG=parallel-rg; LOC=westeurope
-az group create -n $RG -l $LOC
-az deployment group create -g $RG -f infra/azure/main.bicep \
-  -p foundryProjectEndpoint="<endpoint>" foundryModel="<deployment>" \
-     foundryAccountResourceId="/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.CognitiveServices/accounts/<name>"
-# outputs: apiUrl, webUrl, acrName, containerAppName, staticWebAppName
+What it does: create the resource group → deploy `infra/azure/main.bicep` with the API image and a
+fresh revision suffix → build the static web app with the API URL baked in → enable the Storage
+static website and upload `apps/web/out` → smoke-test `/api/health`.
 
-ACR=$(az deployment group show -g $RG -n main --query properties.outputs.acrName.value -o tsv)
-az acr build -r $ACR -t parallel-api:v1 -f infra/docker/api.Dockerfile .
-az containerapp update -g $RG -n parallel-api --image $ACR.azurecr.io/parallel-api:v1
-
-API=$(az deployment group show -g $RG -n main --query properties.outputs.apiUrl.value -o tsv)
-NEXT_PUBLIC_API_BASE_URL=$API npm run build -w apps/web
-SWA=$(az deployment group show -g $RG -n main --query properties.outputs.staticWebAppName.value -o tsv)
-TOKEN=$(az staticwebapp secrets list -n $SWA -g $RG --query properties.apiKey -o tsv)
-npx @azure/static-web-apps-cli deploy apps/web/out --deployment-token $TOKEN --env production
-```
+Why GitHub Container Registry: some subscriptions (Azure for Students among them) do not allow ACR
+Tasks, the cloud build service, and an Azure Container Registry is the only fixed monthly cost of
+the stack. The template can still create one (`createRegistry=true`) for organisations that prefer it.
 
 What the template creates:
 
-| Resource | Purpose | Cost driver |
+| Resource | Purpose | Cost |
 |---|---|---|
-| Container Apps environment + `parallel-api` (1 vCPU / 2 GiB, 1 replica by default, HTTPS + WebSockets) | API, simulations, agents | `minReplicas=1` keeps the demo warm (~1 vCPU always on). Set `minReplicas=0` to scale to zero. Keep `maxReplicas=1`: analysis jobs and Multiverse sessions/jobs are held by one API process (memory + `data/multiverse/*.json`). |
-| Azure Container Registry (Basic) | API image | small fixed |
-| User-assigned managed identity | ACR pull; Foundry access without keys | free |
-| Log Analytics + Application Insights | logs, OpenTelemetry traces, metrics | ingestion volume (30-day retention) |
-| Static Web App (Free) | static frontend | free tier |
-| Role assignment on Foundry account (optional) | Azure AI User | free |
+| Container Apps environment + `parallel-api` (1 vCPU / 2 GiB, 0-1 replicas, HTTPS + WebSockets) | API, simulations, agents | scale to zero by default: nothing while idle, then per second of use (monthly free grant covers light demo traffic) |
+| (GitHub Container Registry) | API image, built by GitHub Actions | free for public images |
+| Storage account static website | the static web app (always on, so the "warming up" screen shows instantly) | cents per month |
+| Microsoft Foundry: AI Services account, project `parallel`, `gpt-4.1-mini` (GlobalStandard, 50K TPM) | live model for all agents | pay per token, roughly a cent per analysis |
+| User-assigned managed identity + Azure AI User role | keyless Foundry access | free |
+| Log Analytics + Application Insights | logs, OpenTelemetry traces, metrics | free up to 5 GB/month ingestion |
 
-Model cost: one analysis makes at most 6 agent calls (plus bounded retries); each agent has a tool
-budget, a timeout and small prompts. Analyses are cached by snapshot + configuration + model
-deployment, so replays cost nothing.
+Keep `maxReplicas=1`: analysis jobs and Multiverse sessions/jobs live in one API process (memory +
+`data/multiverse/*.json`). With scale to zero, a sleeping API loses Multiverse sessions; the static
+site and analyses regenerate on demand.
+
+**Cold start.** With `MIN_REPLICAS=0` the first request after idle wakes the container: Azure holds
+the request while the API starts (image start + synthetic match generation, typically 20-40 s). The
+web app shows a "Warming up the match engine" screen during that time and continues automatically.
+
+**Microsoft Foundry without the script.** To use an existing Foundry project instead, deploy the
+template with `createFoundry=false foundryProjectEndpoint=<endpoint> foundryModel=<deployment>
+foundryAccountResourceId=<account resource id>`; the template grants the API's managed identity the
+Azure AI User role on that account. Model cost: one analysis makes at most 6 agent calls (plus
+bounded retries); analyses are cached by snapshot + configuration + model deployment, so replays
+cost nothing.
+
+`azd up` also works for the infrastructure and the API (`azure.yaml`, remote image build); the web
+app is uploaded by the script.
 
 ### GitHub Actions
 
 * `ci.yml` (push/PR): ruff + pytest, OpenAPI/TypeScript contract drift check, typecheck, Vitest,
   Next build, Playwright end-to-end against the real stack.
-* `deploy.yml` (manual): OIDC login, `az acr build`, `az containerapp update`, smoke test, static
-  build with the API URL and Static Web Apps upload. Configure secrets `AZURE_CLIENT_ID`,
-  `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_STATIC_WEB_APPS_API_TOKEN` and variables
-  `ACR_NAME`, `CONTAINER_APP_NAME`, `RESOURCE_GROUP`.
+* `deploy.yml` (manual, for setups with an Azure registry and OIDC): `az acr build`, `az containerapp update`, smoke test, static
+  build with the API URL and upload to the Storage static website. Configure secrets
+  `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` and variables `ACR_NAME`,
+  `CONTAINER_APP_NAME`, `RESOURCE_GROUP`, `WEB_STORAGE_ACCOUNT` (the workflow identity needs
+  Storage Blob Data Contributor on that account).
 
-## 4. Judge access checklist
+## 3. Judge access checklist
 
 * [ ] `GET <apiUrl>/api/health` returns `"status": "ok"` and the expected `agent_mode`.
 * [ ] `POST <apiUrl>/api/diagnostics/foundry` returns `"live": true` (if Foundry is configured).
 * [ ] `<webUrl>` loads, shows "Live", and the 73' scenario plays and analyses.
-* [ ] CORS: `CORS_ORIGINS` contains the Static Web App URL (set by the template).
+* [ ] CORS: `CORS_ORIGINS` contains the static website origin (set by the template).
 * [ ] Optional: run `python scripts/precompute_demo.py` against the deployed settings to warm the cache.

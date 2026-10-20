@@ -46,7 +46,7 @@ out, and an honest account of uncertainty - in seconds, in a form a broadcast ca
 | **Microsoft Agent Framework** (`agent-framework-core` 1.22) | `Agent` per specialist, `@tool` with invocation budgets, function middleware for tool-call tracing, structured outputs, `WorkflowBuilder` with switch-case edges, executors, bounded self-loops, workflow state | Implemented and tested (CI) |
 | **Microsoft Foundry** (`agent-framework-foundry` `FoundryChatClient`, Azure Identity) | Live model for all agents when `FOUNDRY_PROJECT_ENDPOINT`/`FOUNDRY_MODEL` are set; managed identity in Azure; diagnostics endpoint; optional live test | Implemented; **not exercised live in the build environment** (no credentials) - see deployment checklist |
 | **Azure Container Apps** | API (HTTPS + WebSockets), managed identity, single replica by default | Bicep + deploy workflow; deployment pending credentials |
-| **Azure Static Web Apps** | Static Next.js export | Bicep + deploy workflow; deployment pending |
+| **Azure Storage static website** | Static Next.js export (always on) | Bicep + deploy script |
 | **Azure Container Registry** | API image via `az acr build` | Bicep |
 | **Azure Monitor / Application Insights** (OpenTelemetry) | Traces, logs, Agent Framework instrumentation when the connection string is set | Implemented; enabled by configuration |
 | **Azure Developer CLI / Bicep** | `azure.yaml`, `infra/azure/*.bicep` | Compiles (Bicep 0.48.1) |
@@ -104,7 +104,7 @@ intervals only, authored demo scenarios, Foundry/Azure not exercised in the buil
 
 * Repository: https://github.com/thomasdevving/parallel (must be public at submission)
 * Run locally: see [README](../README.md#quick-start) (two commands each for API and web).
-* Live demo: `<add Static Web App URL after deployment>`; API health `<apiUrl>/api/health`.
+* Live demo: `<web URL>`; API health `<apiUrl>/api/health`.
 * Video: `<add public YouTube/Vimeo URL>` - script in [demo-script.md](demo-script.md).
 
 ## Submission checklist
