@@ -96,11 +96,116 @@
         "title": "ActionResult",
         "type": "object"
       },
+      "ActionSpec": {
+        "additionalProperties": false,
+        "description": "A user/agent requested action at a node. Never silently converted into another action.",
+        "properties": {
+          "action_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "shoot",
+                  "pass",
+                  "dribble"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Type"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Use a generated candidate as-is",
+            "title": "Candidate Id"
+          },
+          "target_player_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Player Id"
+          },
+          "target_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target X"
+          },
+          "target_y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Y"
+          }
+        },
+        "title": "ActionSpec",
+        "type": "object"
+      },
+      "ActionValidation": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CandidateAction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "code",
+          "message"
+        ],
+        "title": "ActionValidation",
+        "type": "object"
+      },
       "AgentStep": {
         "additionalProperties": false,
         "properties": {
           "agent": {
             "enum": [
+              "attacking_agent",
+              "defending_agent",
               "decision_agent",
               "strategy_agent",
               "simulation_agent",
@@ -524,6 +629,74 @@
         "title": "AnalyzeRequest",
         "type": "object"
       },
+      "AttackProposal": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/CandidateAction"
+          },
+          "follow_up": {
+            "default": "",
+            "title": "Follow Up",
+            "type": "string"
+          },
+          "proposal_id": {
+            "title": "Proposal Id",
+            "type": "string"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "round": {
+            "title": "Round",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "user",
+              "attacking_agent",
+              "actual"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proposal_id",
+          "round",
+          "action",
+          "source"
+        ],
+        "title": "AttackProposal",
+        "type": "object"
+      },
+      "AutoPlayRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "max_steps": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Steps",
+            "type": "integer"
+          },
+          "sample_kind": {
+            "default": "representative",
+            "enum": [
+              "representative",
+              "high_upside",
+              "defensive_success",
+              "random"
+            ],
+            "title": "Sample Kind",
+            "type": "string"
+          }
+        },
+        "title": "AutoPlayRequest",
+        "type": "object"
+      },
       "BallState": {
         "additionalProperties": false,
         "properties": {
@@ -594,6 +767,367 @@
           "y"
         ],
         "title": "BallState",
+        "type": "object"
+      },
+      "BranchActionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActionSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit in assisted/autonomous continuation"
+          },
+          "max_rounds": {
+            "anyOf": [
+              {
+                "maximum": 3.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Rounds"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "manual",
+                  "assisted",
+                  "autonomous"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "sample_kind": {
+            "default": "representative",
+            "enum": [
+              "representative",
+              "high_upside",
+              "defensive_success",
+              "random"
+            ],
+            "title": "Sample Kind",
+            "type": "string"
+          }
+        },
+        "title": "BranchActionRequest",
+        "type": "object"
+      },
+      "BranchComparison": {
+        "additionalProperties": false,
+        "properties": {
+          "common_ancestor": {
+            "title": "Common Ancestor",
+            "type": "string"
+          },
+          "evidence_refs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "metrics_a": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Metrics A",
+            "type": "object"
+          },
+          "metrics_b": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Metrics B",
+            "type": "object"
+          },
+          "node_a": {
+            "title": "Node A",
+            "type": "string"
+          },
+          "node_b": {
+            "title": "Node B",
+            "type": "string"
+          },
+          "steps_a": {
+            "items": {
+              "$ref": "#/components/schemas/PathStep"
+            },
+            "title": "Steps A",
+            "type": "array"
+          },
+          "steps_b": {
+            "items": {
+              "$ref": "#/components/schemas/PathStep"
+            },
+            "title": "Steps B",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_a",
+          "node_b",
+          "common_ancestor",
+          "steps_a",
+          "steps_b",
+          "metrics_a",
+          "metrics_b",
+          "explanation"
+        ],
+        "title": "BranchComparison",
+        "type": "object"
+      },
+      "BranchNode": {
+        "additionalProperties": false,
+        "properties": {
+          "carrier_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carrier Id"
+          },
+          "children": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Children",
+            "type": "array"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "depth": {
+            "title": "Depth",
+            "type": "integer"
+          },
+          "entering_action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CandidateAction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entering_action_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "user",
+                  "attacking_agent",
+                  "actual"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entering Action Source"
+          },
+          "entering_strategy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DefensiveStrategy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fingerprint"
+          },
+          "kind": {
+            "default": "simulated",
+            "enum": [
+              "root",
+              "simulated",
+              "observed"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "outcome_label": {
+            "default": "",
+            "title": "Outcome Label",
+            "type": "string"
+          },
+          "parent_node_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Node Id"
+          },
+          "planning_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Planning that produced this node (from its parent)",
+            "title": "Planning Id"
+          },
+          "possession_team_id": {
+            "title": "Possession Team Id",
+            "type": "string"
+          },
+          "recommendation_planning_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Assisted-mode plan for this node",
+            "title": "Recommendation Planning Id"
+          },
+          "score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Score",
+            "type": "object"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "sim_time_ms": {
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "decision",
+              "terminal",
+              "pending",
+              "running",
+              "failed",
+              "depth_limit"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "transition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Transition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "node_id",
+          "session_id",
+          "parent_node_id",
+          "depth",
+          "status",
+          "snapshot_id",
+          "match_clock_ms",
+          "sim_time_ms",
+          "carrier_id",
+          "possession_team_id",
+          "score",
+          "created_at"
+        ],
+        "title": "BranchNode",
         "type": "object"
       },
       "CandidateAction": {
@@ -691,6 +1225,34 @@
           "initial_state_id"
         ],
         "title": "CandidateAction",
+        "type": "object"
+      },
+      "CompareRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "language": {
+            "default": "en",
+            "enum": [
+              "en",
+              "nl"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "node_a": {
+            "title": "Node A",
+            "type": "string"
+          },
+          "node_b": {
+            "title": "Node B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_a",
+          "node_b"
+        ],
+        "title": "CompareRequest",
         "type": "object"
       },
       "CounterfactualAnalysis": {
@@ -1087,6 +1649,158 @@
         ],
         "title": "DecisionTrigger",
         "type": "string"
+      },
+      "DefenseProposal": {
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "title": "Proposal Id",
+            "type": "string"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "round": {
+            "title": "Round",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "defending_agent",
+              "baseline"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "strategy": {
+            "$ref": "#/components/schemas/DefensiveStrategy"
+          },
+          "targets_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targets Action Id"
+          }
+        },
+        "required": [
+          "proposal_id",
+          "round",
+          "strategy",
+          "source"
+        ],
+        "title": "DefenseProposal",
+        "type": "object"
+      },
+      "DefensiveAssignment": {
+        "additionalProperties": false,
+        "properties": {
+          "defender_id": {
+            "title": "Defender Id",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "press",
+              "cover_lane",
+              "track_runner"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "target_player_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Attacker covered/tracked (cover_lane, track_runner)",
+            "title": "Target Player Id"
+          },
+          "target_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "World x of a lane point (cover_lane without player)",
+            "title": "Target X"
+          },
+          "target_y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Y"
+          }
+        },
+        "required": [
+          "defender_id",
+          "role"
+        ],
+        "title": "DefensiveAssignment",
+        "type": "object"
+      },
+      "DefensiveStrategy": {
+        "additionalProperties": false,
+        "properties": {
+          "assignments": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DefensiveAssignment"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "strategy_id": {
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "style": {
+            "enum": [
+              "balanced",
+              "press",
+              "cover_lane",
+              "track_runner",
+              "protect_central",
+              "contain"
+            ],
+            "title": "Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "strategy_id",
+          "style",
+          "label"
+        ],
+        "title": "DefensiveStrategy",
+        "type": "object"
       },
       "EventDetails": {
         "additionalProperties": false,
@@ -1960,6 +2674,72 @@
         "title": "MatchSummary",
         "type": "object"
       },
+      "MatrixCell": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "cached": {
+            "default": false,
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "n_rollouts": {
+            "title": "N Rollouts",
+            "type": "integer"
+          },
+          "p_first_action_success": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "p_goal": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "p_shot": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "p_turnover": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "round": {
+            "default": 1,
+            "title": "Round",
+            "type": "integer"
+          },
+          "strategy_id": {
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "xg": {
+            "description": "Modelled expected goals within the horizon (conditional Monte Carlo)",
+            "title": "Xg",
+            "type": "number"
+          },
+          "xg_ci95_high": {
+            "title": "Xg Ci95 High",
+            "type": "number"
+          },
+          "xg_ci95_low": {
+            "title": "Xg Ci95 Low",
+            "type": "number"
+          }
+        },
+        "required": [
+          "action_id",
+          "strategy_id",
+          "xg",
+          "xg_ci95_low",
+          "xg_ci95_high",
+          "p_goal",
+          "p_shot",
+          "p_turnover",
+          "p_first_action_success",
+          "n_rollouts"
+        ],
+        "title": "MatrixCell",
+        "type": "object"
+      },
       "ModelInfo": {
         "additionalProperties": false,
         "properties": {
@@ -2042,6 +2822,302 @@
           "final_third_entries"
         ],
         "title": "MomentumWindow",
+        "type": "object"
+      },
+      "MultiverseJob": {
+        "additionalProperties": false,
+        "properties": {
+          "child_node_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Child Node Id"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "parent_node_id": {
+            "title": "Parent Node Id",
+            "type": "string"
+          },
+          "planning_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planning Id"
+          },
+          "progress": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Progress",
+            "type": "array"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "timed_out",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "session_id",
+          "parent_node_id",
+          "created_at"
+        ],
+        "title": "MultiverseJob",
+        "type": "object"
+      },
+      "MultiversePlanning": {
+        "additionalProperties": false,
+        "properties": {
+          "attack_proposals": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AttackProposal"
+            },
+            "title": "Attack Proposals",
+            "type": "array"
+          },
+          "cache_hits": {
+            "default": 0,
+            "title": "Cache Hits",
+            "type": "integer"
+          },
+          "cells_computed": {
+            "default": 0,
+            "title": "Cells Computed",
+            "type": "integer"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "defense_proposals": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DefenseProposal"
+            },
+            "title": "Defense Proposals",
+            "type": "array"
+          },
+          "degraded": {
+            "default": false,
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "handoffs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/HandoffRecord"
+            },
+            "title": "Handoffs",
+            "type": "array"
+          },
+          "live_model_calls": {
+            "default": 0,
+            "title": "Live Model Calls",
+            "type": "integer"
+          },
+          "matrix": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MatrixCell"
+            },
+            "title": "Matrix",
+            "type": "array"
+          },
+          "max_rounds": {
+            "default": 3,
+            "title": "Max Rounds",
+            "type": "integer"
+          },
+          "mode": {
+            "enum": [
+              "manual",
+              "assisted",
+              "autonomous"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "narratives": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Narrative"
+            },
+            "title": "Narratives",
+            "type": "array"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "planning_id": {
+            "title": "Planning Id",
+            "type": "string"
+          },
+          "rollouts_per_cell": {
+            "default": 0,
+            "title": "Rollouts Per Cell",
+            "type": "integer"
+          },
+          "rounds": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanningRound"
+            },
+            "title": "Rounds",
+            "type": "array"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "state_version": {
+            "default": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "timed_out",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "steps": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgentStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StrategySummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "termination_reason": {
+            "default": "",
+            "title": "Termination Reason",
+            "type": "string"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "user_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Action Id"
+          },
+          "verification_checks": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Verification Checks",
+            "type": "array"
+          },
+          "verification_status": {
+            "default": "pending",
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "planning_id",
+          "node_id",
+          "snapshot_id",
+          "correlation_id",
+          "mode"
+        ],
+        "title": "MultiversePlanning",
         "type": "object"
       },
       "Narrative": {
@@ -2465,6 +3541,163 @@
           "verdict"
         ],
         "title": "PairwiseComparison",
+        "type": "object"
+      },
+      "PathStep": {
+        "additionalProperties": false,
+        "properties": {
+          "action_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Label"
+          },
+          "action_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Source"
+          },
+          "depth": {
+            "title": "Depth",
+            "type": "integer"
+          },
+          "first_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Outcome"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "p_goal_vs_counter": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Goal Vs Counter"
+          },
+          "strategy_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strategy Label"
+          },
+          "terminal_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminal Outcome"
+          }
+        },
+        "required": [
+          "node_id",
+          "depth",
+          "action_label",
+          "action_source",
+          "strategy_label",
+          "first_outcome",
+          "terminal_outcome",
+          "match_clock_ms"
+        ],
+        "title": "PathStep",
+        "type": "object"
+      },
+      "PlanningRound": {
+        "additionalProperties": false,
+        "properties": {
+          "attack_proposal_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Attack Proposal Ids",
+            "type": "array"
+          },
+          "best_robust_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Robust Action Id"
+          },
+          "best_robust_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Robust Value"
+          },
+          "defense_proposal_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Defense Proposal Ids",
+            "type": "array"
+          },
+          "new_cells": {
+            "title": "New Cells",
+            "type": "integer"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "round": {
+            "title": "Round",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "round",
+          "attack_proposal_ids",
+          "defense_proposal_ids",
+          "new_cells"
+        ],
+        "title": "PlanningRound",
         "type": "object"
       },
       "Player": {
@@ -3003,6 +4236,41 @@
         "title": "RejectedCandidate",
         "type": "object"
       },
+      "SessionCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "decision_point_id": {
+            "title": "Decision Point Id",
+            "type": "string"
+          },
+          "match_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Id"
+          },
+          "mode": {
+            "default": "manual",
+            "enum": [
+              "manual",
+              "assisted",
+              "autonomous"
+            ],
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision_point_id"
+        ],
+        "title": "SessionCreate",
+        "type": "object"
+      },
       "SimEvent": {
         "additionalProperties": false,
         "properties": {
@@ -3307,6 +4575,89 @@
           "description"
         ],
         "title": "SimulationSettings",
+        "type": "object"
+      },
+      "StrategySummary": {
+        "additionalProperties": false,
+        "properties": {
+          "best_expected_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Highest mean value across defensive responses",
+            "title": "Best Expected Action Id"
+          },
+          "counter_effect_pp": {
+            "description": "Value change caused by the counter vs balanced defence (points)",
+            "title": "Counter Effect Pp",
+            "type": "number"
+          },
+          "defensive_counter_id": {
+            "description": "Defending agent's chosen response to the selected action",
+            "title": "Defensive Counter Id",
+            "type": "string"
+          },
+          "highest_upside_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Highest best-case value",
+            "title": "Highest Upside Action Id"
+          },
+          "most_robust_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Highest worst-case value (maximin)",
+            "title": "Most Robust Action Id"
+          },
+          "per_action": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "default": {},
+            "title": "Per Action",
+            "type": "object"
+          },
+          "selected_action_id": {
+            "title": "Selected Action Id",
+            "type": "string"
+          },
+          "selected_value_vs_baseline": {
+            "title": "Selected Value Vs Baseline",
+            "type": "number"
+          },
+          "selected_value_vs_counter": {
+            "title": "Selected Value Vs Counter",
+            "type": "number"
+          }
+        },
+        "required": [
+          "selected_action_id",
+          "defensive_counter_id",
+          "selected_value_vs_counter",
+          "selected_value_vs_baseline",
+          "counter_effect_pp"
+        ],
+        "title": "StrategySummary",
         "type": "object"
       },
       "Team": {
@@ -3661,6 +5012,106 @@
           "start_match_clock_ms"
         ],
         "title": "Trajectory",
+        "type": "object"
+      },
+      "Transition": {
+        "additionalProperties": false,
+        "description": "The realized step from a parent node to a child node (one sampled continuation).",
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "child_snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Child Snapshot Id"
+          },
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/SimEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "first_outcome": {
+            "title": "First Outcome",
+            "type": "string"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingFrame"
+            },
+            "title": "Frames",
+            "type": "array"
+          },
+          "parent_snapshot_id": {
+            "title": "Parent Snapshot Id",
+            "type": "string"
+          },
+          "rollout_index": {
+            "title": "Rollout Index",
+            "type": "integer"
+          },
+          "sample_kind": {
+            "enum": [
+              "representative",
+              "high_upside",
+              "defensive_success",
+              "random"
+            ],
+            "title": "Sample Kind",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "selection_rule": {
+            "title": "Selection Rule",
+            "type": "string"
+          },
+          "strategy_id": {
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "terminal_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminal Outcome"
+          }
+        },
+        "required": [
+          "parent_snapshot_id",
+          "child_snapshot_id",
+          "action_id",
+          "strategy_id",
+          "sample_kind",
+          "rollout_index",
+          "seed",
+          "first_outcome",
+          "duration_ms",
+          "frames",
+          "events",
+          "selection_rule"
+        ],
+        "title": "Transition",
         "type": "object"
       },
       "ValidationError": {
@@ -4975,6 +6426,855 @@
           }
         },
         "summary": "Get Metrics"
+      }
+    },
+    "/api/multiverse/branches": {
+      "post": {
+        "description": "Alias: {\"parent_node_id\": ..., ...BranchActionRequest}.",
+        "operationId": "create_branch_api_multiverse_branches_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Body",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiverseJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Branch",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}": {
+      "get": {
+        "operationId": "get_node_api_multiverse_branches__node_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchNode"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Node",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/actions": {
+      "post": {
+        "description": "Create a child branch from `node_id` with the given action (manual) or the agents' choice.",
+        "operationId": "branch_action_api_multiverse_branches__node_id__actions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchActionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiverseJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Branch Action",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/agents": {
+      "get": {
+        "operationId": "agents_api_multiverse_branches__node_id__agents_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "which",
+            "required": false,
+            "schema": {
+              "default": "entering",
+              "title": "Which",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Agents Api Multiverse Branches  Node Id  Agents Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Agents",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/analysis": {
+      "get": {
+        "description": "The adversarial planning that produced this node (`which=recommendation` for assisted mode).",
+        "operationId": "analysis_api_multiverse_branches__node_id__analysis_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "which",
+            "required": false,
+            "schema": {
+              "default": "entering",
+              "title": "Which",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiversePlanning"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analysis",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/auto-play": {
+      "post": {
+        "operationId": "auto_play_api_multiverse_branches__node_id__auto_play_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AutoPlayRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiverseJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Auto Play",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/cancel": {
+      "post": {
+        "operationId": "cancel_api_multiverse_branches__node_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Api Multiverse Branches  Node Id  Cancel Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/continue": {
+      "post": {
+        "description": "Assisted: ask the agents for a recommendation (no branch). Autonomous: agents choose and branch.",
+        "operationId": "continue_branch_api_multiverse_branches__node_id__continue_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/BranchActionRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiverseJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Continue Branch",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/options": {
+      "get": {
+        "operationId": "get_options_api_multiverse_branches__node_id__options_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Options Api Multiverse Branches  Node Id  Options Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Options",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/state": {
+      "get": {
+        "description": "Exact frozen state at a node (rewind restores this; nothing is re-simulated).",
+        "operationId": "get_state_api_multiverse_branches__node_id__state_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchStateSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get State",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/trajectory": {
+      "get": {
+        "description": "Frames/events from the root decision to this node (persisted: no model or simulation calls).",
+        "operationId": "trajectory_api_multiverse_branches__node_id__trajectory_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Trajectory Api Multiverse Branches  Node Id  Trajectory Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trajectory",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/branches/{node_id}/validate": {
+      "post": {
+        "operationId": "validate_api_multiverse_branches__node_id__validate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "title": "Node Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionSpec"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionValidation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/compare": {
+      "post": {
+        "operationId": "compare_api_multiverse_compare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchComparison"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_api_multiverse_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiverseJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Job",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/plannings/{planning_id}": {
+      "get": {
+        "operationId": "planning_api_multiverse_plannings__planning_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "planning_id",
+            "required": true,
+            "schema": {
+              "title": "Planning Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultiversePlanning"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Planning",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/sessions": {
+      "post": {
+        "operationId": "create_session_api_multiverse_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Session Api Multiverse Sessions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Session",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/sessions/{session_id}": {
+      "get": {
+        "operationId": "get_session_api_multiverse_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Session Api Multiverse Sessions  Session Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Session",
+        "tags": [
+          "multiverse"
+        ]
+      }
+    },
+    "/api/multiverse/sessions/{session_id}/tree": {
+      "get": {
+        "operationId": "get_tree_api_multiverse_sessions__session_id__tree_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Tree Api Multiverse Sessions  Session Id  Tree Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Tree",
+        "tags": [
+          "multiverse"
+        ]
       }
     },
     "/api/scenarios": {

@@ -430,14 +430,19 @@ def pressure_count(state: EngineState, idx: int, radius: float = 4.0) -> int:
 class Engine:
     """Resolves actions on an EngineState. Stateless apart from configuration."""
 
-    def __init__(self, record: Recorder | None = None):
+    def __init__(self, record: Recorder | None = None, defense=None):
         self.record = record
+        # Optional validated defensive strategy (app.simulation.defense.DefenseRuntime): changes
+        # defender targets and anticipation, never speeds or positions.
+        self.defense = defense
         # Scripted off-ball runs (player index -> attack-frame target). Only used by the scenario
         # generator to choreograph an authored build-up; counterfactual rollouts never set it.
         self.run_overrides: dict[int, np.ndarray] = {}
 
     def _targets(self, state: EngineState, ball_dest: np.ndarray, rng: np.random.Generator, exclude: set[int]):
         targets, speeds = team_targets(state, ball_dest, rng, exclude)
+        if self.defense is not None:
+            self.defense.adjust_targets(state, ball_dest, targets, speeds, exclude)
         for i, tgt in self.run_overrides.items():
             if i not in exclude:
                 targets[i] = tgt
@@ -614,6 +619,8 @@ class Engine:
         u_int = ex.random(state.n)
         u_ctrl = float(ex.random())
         react = self._sample_react(state, rx)
+        if self.defense is not None:
+            react = np.clip(react * self.defense.react_multipliers(state, intended, receiver), 0.1, 0.8)
         end = intended if forced == "complete" else s + g.rotate(intended - s, ang_err) * (1 + len_err)
         length = float(np.linalg.norm(end - s))
         v0 = pass_speed(length)
@@ -901,6 +908,8 @@ class Engine:
         for o, j in enumerate(near):
             if best[o] > 0.05:
                 p_tackle = float(np.clip(0.12 + 0.3 * sigmoid((best[o] - 0.2) / 0.25) - 0.3 * (drib - 0.5), 0.03, 0.6))
+                if self.defense is not None:
+                    p_tackle = float(np.clip(p_tackle * self.defense.tackle_scale(), 0.03, 0.7))
                 duels.append((float(fr[best_k[o]]), int(j), int(best_k[o]), p_tackle))
         duels.sort()
         return duels
@@ -911,6 +920,8 @@ class Engine:
         ex, rx, mv = rng[STREAM_EXECUTION], rng[STREAM_REACTION], rng[STREAM_MOVEMENT]
         s = state.pos[carrier].copy()
         react = self._sample_react(state, rx)
+        if self.defense is not None:
+            react = np.clip(react * self.defense.react_multipliers(state, target, None), 0.1, 0.8)
         vd = self.dribble_speed(state, carrier)
         D = float(np.linalg.norm(target - s))
         dur_full = D / vd

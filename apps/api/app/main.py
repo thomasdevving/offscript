@@ -12,8 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from .agents.runner import ChatClientProvider
-from .api import routes, ws
+from .api import multiverse_routes, routes, ws
 from .config import Settings, get_settings
+from .multiverse.service import MultiverseService
 from .services.analysis_service import AnalysisService
 from .services.hub import EventHub
 from .services.metrics import configure_logging
@@ -28,6 +29,7 @@ class Services:
     store: Store
     hub: EventHub
     analyses: AnalysisService
+    multiverse: MultiverseService
     ready: bool = False
 
 
@@ -55,7 +57,9 @@ def create_app(settings: Settings | None = None, preload: list[str] | None = Non
         _configure_telemetry(settings)
         store = Store(settings.scenarios_dir, settings.data_dir)
         hub = EventHub()
-        services = Services(settings, store, hub, AnalysisService(settings, store, hub, ChatClientProvider(settings)))
+        provider = ChatClientProvider(settings)
+        services = Services(settings, store, hub, AnalysisService(settings, store, hub, provider),
+                            MultiverseService(settings, store, hub, provider))
         app.state.services = services
         await asyncio.to_thread(store.load, preload)
         services.ready = True
@@ -74,6 +78,8 @@ def create_app(settings: Settings | None = None, preload: list[str] | None = Non
                        allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(routes.router)
     app.include_router(ws.router)
+    app.include_router(multiverse_routes.router)
+    app.include_router(multiverse_routes.ws_router)
     return app
 
 

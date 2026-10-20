@@ -114,6 +114,8 @@ class RolloutSummary:
     progression: float
     n_actions: int
     end_ball: tuple[float, float]
+    first_end_ball: tuple[float, float] = (0.0, 0.0)
+    shot_goal_prob: float = 0.0  # conditional P(goal | shot state); 0 when no shot (conditional Monte Carlo)
 
 
 @dataclass
@@ -158,10 +160,16 @@ def run_rollout(
     rng: RolloutRng,
     horizon_s: float,
     record: bool = False,
+    defense=None,
+    conditional_shots: int = 0,
 ) -> tuple[RolloutSummary, list[TrackingFrame], list[SimEvent]]:
+    """Simulate one continuation. With `conditional_shots > 0`, every shot inside the horizon is also
+    scored by its conditional goal probability under the shot model (estimated with that many draws
+    from an independent stream), giving a lower-variance estimate of P(goal within horizon)."""
     state = base.copy()
     recorder = _Recorder(state) if record else None
-    engine = Engine(record=recorder)
+    engine = Engine(record=recorder, defense=defense)
+    first_end = (float(state.ball[0]), float(state.ball[1]))
     sim_events: list[SimEvent] = []
     start_x = float(state.ball[0])
     shot_time: float | None = None
@@ -170,8 +178,14 @@ def run_rollout(
     outcome = "retained"
     n_actions = 0
     act = first
+    shot_goal_prob = 0.0
     while True:
         t_before = state.t
+        if conditional_shots and act.action_type == "shoot" and t_before <= horizon_s:
+            sub_rng = np.random.default_rng(np.random.SeedSequence(entropy=rng.key[0], spawn_key=(rng.key[1], 77)))
+            goals = sum(engine.sample_shot(state, act.actor, sub_rng)["outcome"] == "goal"
+                        for _ in range(conditional_shots))
+            shot_goal_prob = goals / conditional_shots
         res = _apply(engine, state, act, rng)
         n_actions += 1
         if record:
@@ -183,6 +197,7 @@ def run_rollout(
                                            detail=str(ev.get("detail", {}).get("reason", ""))))
         if n_actions == 1:
             first_outcome = res.outcome
+            first_end = (float(state.ball[0]), float(state.ball[1]))
             # Pass completed / dribble succeeded / shot on target (goal or saved).
             first_success = res.outcome in ("completed", "loose_won", "success", "goal", "saved")
         if res.kind == "shot":
@@ -223,9 +238,60 @@ def run_rollout(
         progression=float(state.ball[0]) - start_x,
         n_actions=n_actions,
         end_ball=(float(state.ball[0]), float(state.ball[1])),
+        first_end_ball=first_end,
+        shot_goal_prob=shot_goal_prob,
     )
     frames = recorder.frames if recorder else []
     if frames:
         cutoff = int(math.ceil(summary.t_end * 1000)) + 600
         frames = [f for f in frames if f.t_ms <= cutoff]
     return summary, frames, sim_events
+
+
+@dataclass
+class StepResult:
+    """One realized action (plus the control moment before the next decision)."""
+
+    state: EngineState
+    phase: PhaseResult
+    possession_retained: bool
+    terminal_outcome: str | None
+    frames: list[TrackingFrame]
+    events: list[SimEvent]
+    duration_s: float
+
+
+def run_first_action(base: EngineState, first: ResolvedAction, rng: RolloutRng, record: bool = True,
+                     defense=None) -> StepResult:
+    """Replays only the first action of rollout `rng` (same random streams as `run_rollout`).
+
+    If possession is retained the new carrier takes the same control moment a rollout would, so the
+    returned state is a valid starting point for the next decision. Otherwise the step is terminal.
+    """
+    state = base.copy()
+    recorder = _Recorder(state) if record else None
+    engine = Engine(record=recorder, defense=defense)
+    events: list[SimEvent] = []
+    t0 = state.t
+    res = _apply(engine, state, first, rng)
+    for k, ev in enumerate(res.events):
+        wp = state.to_world(ev["pos"])
+        events.append(SimEvent(t_ms=int(round((t0 if k == 0 else state.t) * 1000)), event_type=ev["type"],
+                               player_ids=ev["players"], x=round(float(wp[0]), 2), y=round(float(wp[1]), 2),
+                               detail=str(ev.get("detail", {}).get("reason", ""))))
+    terminal: str | None = None
+    if res.kind == "shot":
+        terminal = res.outcome
+    elif res.turnover_to is not None:
+        terminal = "turnover"
+    elif res.outcome == "out_of_play":
+        terminal = "out_of_play"
+    retained = terminal is None
+    if retained:
+        ctrl = float(rng[STREAM_MOVEMENT].uniform(0.35, 0.8))
+        state.carrier = res.new_carrier
+        state.ball = state.pos[state.carrier].copy()
+        engine.control_phase(state, ctrl, rng[STREAM_MOVEMENT])
+    frames = recorder.frames if recorder else []
+    return StepResult(state=state, phase=res, possession_retained=retained, terminal_outcome=terminal,
+                      frames=frames, events=events, duration_s=state.t - t0)

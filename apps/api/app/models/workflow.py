@@ -7,6 +7,8 @@ from pydantic import Field
 from .common import Contract
 
 AgentName = Literal[
+    "attacking_agent",
+    "defending_agent",
     "decision_agent",
     "strategy_agent",
     "simulation_agent",

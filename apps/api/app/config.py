@@ -42,6 +42,16 @@ class Settings(BaseSettings):
     max_strategy_revisions: int = 2
     max_explanation_retries: int = 1
 
+    # --- Football Multiverse -------------------------------------------------
+    multiverse_cell_rollouts: int = 80
+    multiverse_max_cell_rollouts: int = 200
+    multiverse_max_rounds: int = 3
+    multiverse_max_depth: int = 3
+    multiverse_max_children: int = 6
+    multiverse_max_nodes: int = 40
+    multiverse_max_sessions: int = 200
+    multiverse_timeout_s: float = 180.0
+
     # --- Storage / web ------------------------------------------------------
     data_dir: Path = Field(default=API_ROOT / "data")
     scenarios_dir: Path = Field(default=REPO_ROOT / "scenarios")

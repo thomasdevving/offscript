@@ -419,6 +419,330 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/multiverse/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Branch
+         * @description Alias: {"parent_node_id": ..., ...BranchActionRequest}.
+         */
+        post: operations["create_branch_api_multiverse_branches_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Node */
+        get: operations["get_node_api_multiverse_branches__node_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Branch Action
+         * @description Create a child branch from `node_id` with the given action (manual) or the agents' choice.
+         */
+        post: operations["branch_action_api_multiverse_branches__node_id__actions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agents */
+        get: operations["agents_api_multiverse_branches__node_id__agents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Analysis
+         * @description The adversarial planning that produced this node (`which=recommendation` for assisted mode).
+         */
+        get: operations["analysis_api_multiverse_branches__node_id__analysis_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/auto-play": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Auto Play */
+        post: operations["auto_play_api_multiverse_branches__node_id__auto_play_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_api_multiverse_branches__node_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Continue Branch
+         * @description Assisted: ask the agents for a recommendation (no branch). Autonomous: agents choose and branch.
+         */
+        post: operations["continue_branch_api_multiverse_branches__node_id__continue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Options */
+        get: operations["get_options_api_multiverse_branches__node_id__options_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get State
+         * @description Exact frozen state at a node (rewind restores this; nothing is re-simulated).
+         */
+        get: operations["get_state_api_multiverse_branches__node_id__state_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/trajectory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Trajectory
+         * @description Frames/events from the root decision to this node (persisted: no model or simulation calls).
+         */
+        get: operations["trajectory_api_multiverse_branches__node_id__trajectory_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/branches/{node_id}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate */
+        post: operations["validate_api_multiverse_branches__node_id__validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Compare */
+        post: operations["compare_api_multiverse_compare_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Job */
+        get: operations["get_job_api_multiverse_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/plannings/{planning_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Planning */
+        get: operations["planning_api_multiverse_plannings__planning_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Session */
+        post: operations["create_session_api_multiverse_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session_api_multiverse_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/multiverse/sessions/{session_id}/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tree */
+        get: operations["get_tree_api_multiverse_sessions__session_id__tree_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/scenarios": {
         parameters: {
             query?: never;
@@ -517,13 +841,42 @@ export interface components {
             /** Representative Rollout */
             representative_rollout: number;
         };
+        /**
+         * ActionSpec
+         * @description A user/agent requested action at a node. Never silently converted into another action.
+         */
+        ActionSpec: {
+            /** Action Type */
+            action_type?: ("shoot" | "pass" | "dribble") | null;
+            /**
+             * Candidate Id
+             * @description Use a generated candidate as-is
+             */
+            candidate_id?: string | null;
+            /** Target Player Id */
+            target_player_id?: string | null;
+            /** Target X */
+            target_x?: number | null;
+            /** Target Y */
+            target_y?: number | null;
+        };
+        /** ActionValidation */
+        ActionValidation: {
+            action?: components["schemas"]["CandidateAction"] | null;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Ok */
+            ok: boolean;
+        };
         /** AgentStep */
         AgentStep: {
             /**
              * Agent
              * @enum {string}
              */
-            agent: "decision_agent" | "strategy_agent" | "simulation_agent" | "verification_agent" | "explanation_agent" | "publisher";
+            agent: "attacking_agent" | "defending_agent" | "decision_agent" | "strategy_agent" | "simulation_agent" | "verification_agent" | "explanation_agent" | "publisher";
             /**
              * Attempt
              * @default 1
@@ -708,6 +1061,43 @@ export interface components {
             /** Rollouts */
             rollouts?: number | null;
         };
+        /** AttackProposal */
+        AttackProposal: {
+            action: components["schemas"]["CandidateAction"];
+            /**
+             * Follow Up
+             * @default
+             */
+            follow_up: string;
+            /** Proposal Id */
+            proposal_id: string;
+            /**
+             * Rationale
+             * @default
+             */
+            rationale: string;
+            /** Round */
+            round: number;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "user" | "attacking_agent" | "actual";
+        };
+        /** AutoPlayRequest */
+        AutoPlayRequest: {
+            /**
+             * Max Steps
+             * @default 3
+             */
+            max_steps: number;
+            /**
+             * Sample Kind
+             * @default representative
+             * @enum {string}
+             */
+            sample_kind: "representative" | "high_upside" | "defensive_success" | "random";
+        };
         /** BallState */
         BallState: {
             /** Current Event */
@@ -740,6 +1130,121 @@ export interface components {
              * @default 0
              */
             z: number;
+        };
+        /** BranchActionRequest */
+        BranchActionRequest: {
+            /** @description Omit in assisted/autonomous continuation */
+            action?: components["schemas"]["ActionSpec"] | null;
+            /** Max Rounds */
+            max_rounds?: number | null;
+            /** Mode */
+            mode?: ("manual" | "assisted" | "autonomous") | null;
+            /**
+             * Sample Kind
+             * @default representative
+             * @enum {string}
+             */
+            sample_kind: "representative" | "high_upside" | "defensive_success" | "random";
+        };
+        /** BranchComparison */
+        BranchComparison: {
+            /** Common Ancestor */
+            common_ancestor: string;
+            /**
+             * Evidence Refs
+             * @default []
+             */
+            evidence_refs: string[];
+            /** Explanation */
+            explanation: string;
+            /** Metrics A */
+            metrics_a: {
+                [key: string]: number | string | null;
+            };
+            /** Metrics B */
+            metrics_b: {
+                [key: string]: number | string | null;
+            };
+            /** Node A */
+            node_a: string;
+            /** Node B */
+            node_b: string;
+            /** Steps A */
+            steps_a: components["schemas"]["PathStep"][];
+            /** Steps B */
+            steps_b: components["schemas"]["PathStep"][];
+        };
+        /** BranchNode */
+        BranchNode: {
+            /** Carrier Id */
+            carrier_id: string | null;
+            /**
+             * Children
+             * @default []
+             */
+            children: string[];
+            /** Created At */
+            created_at: string;
+            /** Depth */
+            depth: number;
+            entering_action?: components["schemas"]["CandidateAction"] | null;
+            /** Entering Action Source */
+            entering_action_source?: ("user" | "attacking_agent" | "actual") | null;
+            entering_strategy?: components["schemas"]["DefensiveStrategy"] | null;
+            /** Error */
+            error?: string | null;
+            /** Fingerprint */
+            fingerprint?: string | null;
+            /**
+             * Kind
+             * @default simulated
+             * @enum {string}
+             */
+            kind: "root" | "simulated" | "observed";
+            /**
+             * Label
+             * @default
+             */
+            label: string;
+            /** Match Clock Ms */
+            match_clock_ms: number;
+            /** Node Id */
+            node_id: string;
+            /**
+             * Outcome Label
+             * @default
+             */
+            outcome_label: string;
+            /** Parent Node Id */
+            parent_node_id: string | null;
+            /**
+             * Planning Id
+             * @description Planning that produced this node (from its parent)
+             */
+            planning_id?: string | null;
+            /** Possession Team Id */
+            possession_team_id: string;
+            /**
+             * Recommendation Planning Id
+             * @description Assisted-mode plan for this node
+             */
+            recommendation_planning_id?: string | null;
+            /** Score */
+            score: {
+                [key: string]: number;
+            };
+            /** Session Id */
+            session_id: string;
+            /** Sim Time Ms */
+            sim_time_ms: number;
+            /** Snapshot Id */
+            snapshot_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "decision" | "terminal" | "pending" | "running" | "failed" | "depth_limit";
+            transition?: components["schemas"]["Transition"] | null;
         };
         /** CandidateAction */
         CandidateAction: {
@@ -789,6 +1294,19 @@ export interface components {
              * @description World y of the intended target point
              */
             target_y?: number | null;
+        };
+        /** CompareRequest */
+        CompareRequest: {
+            /**
+             * Language
+             * @default en
+             * @enum {string}
+             */
+            language: "en" | "nl";
+            /** Node A */
+            node_a: string;
+            /** Node B */
+            node_b: string;
         };
         /** CounterfactualAnalysis */
         CounterfactualAnalysis: {
@@ -929,6 +1447,70 @@ export interface components {
          * @enum {string}
          */
         DecisionTrigger: "SHOT_WITH_TEAMMATE_AVAILABLE" | "DIFFICULT_PASS" | "HIGH_VALUE_POSSESSION" | "MULTIPLE_OPTIONS" | "DANGEROUS_TURNOVER" | "DECISION_UNDER_PRESSURE" | "MISSED_FORWARD_PASS";
+        /** DefenseProposal */
+        DefenseProposal: {
+            /** Proposal Id */
+            proposal_id: string;
+            /**
+             * Rationale
+             * @default
+             */
+            rationale: string;
+            /** Round */
+            round: number;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "defending_agent" | "baseline";
+            strategy: components["schemas"]["DefensiveStrategy"];
+            /** Targets Action Id */
+            targets_action_id?: string | null;
+        };
+        /** DefensiveAssignment */
+        DefensiveAssignment: {
+            /** Defender Id */
+            defender_id: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "press" | "cover_lane" | "track_runner";
+            /**
+             * Target Player Id
+             * @description Attacker covered/tracked (cover_lane, track_runner)
+             */
+            target_player_id?: string | null;
+            /**
+             * Target X
+             * @description World x of a lane point (cover_lane without player)
+             */
+            target_x?: number | null;
+            /** Target Y */
+            target_y?: number | null;
+        };
+        /** DefensiveStrategy */
+        DefensiveStrategy: {
+            /**
+             * Assignments
+             * @default []
+             */
+            assignments: components["schemas"]["DefensiveAssignment"][];
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Label */
+            label: string;
+            /** Strategy Id */
+            strategy_id: string;
+            /**
+             * Style
+             * @enum {string}
+             */
+            style: "balanced" | "press" | "cover_lane" | "track_runner" | "protect_central" | "contain";
+        };
         /**
          * EventDetails
          * @description Event-specific fields. Every field is optional; which ones are set depends on event type.
@@ -1239,6 +1821,38 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** MatrixCell */
+        MatrixCell: {
+            /** Action Id */
+            action_id: string;
+            /**
+             * Cached
+             * @default false
+             */
+            cached: boolean;
+            /** N Rollouts */
+            n_rollouts: number;
+            p_first_action_success: components["schemas"]["ProbabilityEstimate"];
+            p_goal: components["schemas"]["ProbabilityEstimate"];
+            p_shot: components["schemas"]["ProbabilityEstimate"];
+            p_turnover: components["schemas"]["ProbabilityEstimate"];
+            /**
+             * Round
+             * @default 1
+             */
+            round: number;
+            /** Strategy Id */
+            strategy_id: string;
+            /**
+             * Xg
+             * @description Modelled expected goals within the horizon (conditional Monte Carlo)
+             */
+            xg: number;
+            /** Xg Ci95 High */
+            xg_ci95_high: number;
+            /** Xg Ci95 Low */
+            xg_ci95_low: number;
+        };
         /** ModelInfo */
         ModelInfo: {
             /**
@@ -1280,6 +1894,155 @@ export interface components {
             };
             /** Start Clock */
             start_clock: string;
+        };
+        /** MultiverseJob */
+        MultiverseJob: {
+            /** Child Node Id */
+            child_node_id?: string | null;
+            /** Created At */
+            created_at: string;
+            /** Error */
+            error?: string | null;
+            /** Job Id */
+            job_id: string;
+            /** Parent Node Id */
+            parent_node_id: string;
+            /** Planning Id */
+            planning_id?: string | null;
+            /**
+             * Progress
+             * @default []
+             */
+            progress: string[];
+            /** Session Id */
+            session_id: string;
+            /**
+             * Status
+             * @default pending
+             * @enum {string}
+             */
+            status: "pending" | "running" | "completed" | "failed" | "timed_out" | "cancelled";
+        };
+        /** MultiversePlanning */
+        MultiversePlanning: {
+            /**
+             * Attack Proposals
+             * @default []
+             */
+            attack_proposals: components["schemas"]["AttackProposal"][];
+            /**
+             * Cache Hits
+             * @default 0
+             */
+            cache_hits: number;
+            /**
+             * Cells Computed
+             * @default 0
+             */
+            cells_computed: number;
+            /** Correlation Id */
+            correlation_id: string;
+            /**
+             * Defense Proposals
+             * @default []
+             */
+            defense_proposals: components["schemas"]["DefenseProposal"][];
+            /**
+             * Degraded
+             * @default false
+             */
+            degraded: boolean;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /**
+             * Errors
+             * @default []
+             */
+            errors: string[];
+            /**
+             * Handoffs
+             * @default []
+             */
+            handoffs: components["schemas"]["HandoffRecord"][];
+            /**
+             * Live Model Calls
+             * @default 0
+             */
+            live_model_calls: number;
+            /**
+             * Matrix
+             * @default []
+             */
+            matrix: components["schemas"]["MatrixCell"][];
+            /**
+             * Max Rounds
+             * @default 3
+             */
+            max_rounds: number;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "manual" | "assisted" | "autonomous";
+            /**
+             * Narratives
+             * @default []
+             */
+            narratives: components["schemas"]["Narrative"][];
+            /** Node Id */
+            node_id: string;
+            /** Planning Id */
+            planning_id: string;
+            /**
+             * Rollouts Per Cell
+             * @default 0
+             */
+            rollouts_per_cell: number;
+            /**
+             * Rounds
+             * @default []
+             */
+            rounds: components["schemas"]["PlanningRound"][];
+            /** Snapshot Id */
+            snapshot_id: string;
+            /**
+             * State Version
+             * @default 0
+             */
+            state_version: number;
+            /**
+             * Status
+             * @default pending
+             * @enum {string}
+             */
+            status: "pending" | "running" | "completed" | "failed" | "timed_out" | "cancelled";
+            /**
+             * Steps
+             * @default []
+             */
+            steps: components["schemas"]["AgentStep"][];
+            summary?: components["schemas"]["StrategySummary"] | null;
+            /**
+             * Termination Reason
+             * @default
+             */
+            termination_reason: string;
+            /** Updated At */
+            updated_at?: string | null;
+            /** User Action Id */
+            user_action_id?: string | null;
+            /**
+             * Verification Checks
+             * @default []
+             */
+            verification_checks: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Verification Status
+             * @default pending
+             */
+            verification_status: string;
         };
         /** Narrative */
         Narrative: {
@@ -1473,6 +2236,47 @@ export interface components {
              * @enum {string}
              */
             verdict: "more_promising" | "less_promising" | "similar" | "inconclusive";
+        };
+        /** PathStep */
+        PathStep: {
+            /** Action Label */
+            action_label: string | null;
+            /** Action Source */
+            action_source: string | null;
+            /** Depth */
+            depth: number;
+            /** First Outcome */
+            first_outcome: string | null;
+            /** Match Clock Ms */
+            match_clock_ms: number;
+            /** Node Id */
+            node_id: string;
+            /** P Goal Vs Counter */
+            p_goal_vs_counter?: number | null;
+            /** Strategy Label */
+            strategy_label: string | null;
+            /** Terminal Outcome */
+            terminal_outcome: string | null;
+        };
+        /** PlanningRound */
+        PlanningRound: {
+            /** Attack Proposal Ids */
+            attack_proposal_ids: string[];
+            /** Best Robust Action Id */
+            best_robust_action_id?: string | null;
+            /** Best Robust Value */
+            best_robust_value?: number | null;
+            /** Defense Proposal Ids */
+            defense_proposal_ids: string[];
+            /** New Cells */
+            new_cells: number;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Round */
+            round: number;
         };
         /** Player */
         Player: {
@@ -1724,6 +2528,19 @@ export interface components {
             /** Stage */
             stage: string;
         };
+        /** SessionCreate */
+        SessionCreate: {
+            /** Decision Point Id */
+            decision_point_id: string;
+            /** Match Id */
+            match_id?: string | null;
+            /**
+             * Mode
+             * @default manual
+             * @enum {string}
+             */
+            mode: "manual" | "assisted" | "autonomous";
+        };
         /** SimEvent */
         SimEvent: {
             /**
@@ -1862,6 +2679,49 @@ export interface components {
             seed: number;
             /** Simulator Version */
             simulator_version: string;
+        };
+        /** StrategySummary */
+        StrategySummary: {
+            /**
+             * Best Expected Action Id
+             * @description Highest mean value across defensive responses
+             */
+            best_expected_action_id?: string | null;
+            /**
+             * Counter Effect Pp
+             * @description Value change caused by the counter vs balanced defence (points)
+             */
+            counter_effect_pp: number;
+            /**
+             * Defensive Counter Id
+             * @description Defending agent's chosen response to the selected action
+             */
+            defensive_counter_id: string;
+            /**
+             * Highest Upside Action Id
+             * @description Highest best-case value
+             */
+            highest_upside_action_id?: string | null;
+            /**
+             * Most Robust Action Id
+             * @description Highest worst-case value (maximin)
+             */
+            most_robust_action_id?: string | null;
+            /**
+             * Per Action
+             * @default {}
+             */
+            per_action: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Selected Action Id */
+            selected_action_id: string;
+            /** Selected Value Vs Baseline */
+            selected_value_vs_baseline: number;
+            /** Selected Value Vs Counter */
+            selected_value_vs_counter: number;
         };
         /** Team */
         Team: {
@@ -2040,6 +2900,41 @@ export interface components {
             start_match_clock_ms: number;
             /** Terminated Reason */
             terminated_reason: string;
+        };
+        /**
+         * Transition
+         * @description The realized step from a parent node to a child node (one sampled continuation).
+         */
+        Transition: {
+            /** Action Id */
+            action_id: string;
+            /** Child Snapshot Id */
+            child_snapshot_id: string | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Events */
+            events: components["schemas"]["SimEvent"][];
+            /** First Outcome */
+            first_outcome: string;
+            /** Frames */
+            frames: components["schemas"]["TrackingFrame"][];
+            /** Parent Snapshot Id */
+            parent_snapshot_id: string;
+            /** Rollout Index */
+            rollout_index: number;
+            /**
+             * Sample Kind
+             * @enum {string}
+             */
+            sample_kind: "representative" | "high_upside" | "defensive_success" | "random";
+            /** Seed */
+            seed: number;
+            /** Selection Rule */
+            selection_rule: string;
+            /** Strategy Id */
+            strategy_id: string;
+            /** Terminal Outcome */
+            terminal_outcome?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2873,6 +3768,606 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    create_branch_api_multiverse_branches_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiverseJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_node_api_multiverse_branches__node_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchNode"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    branch_action_api_multiverse_branches__node_id__actions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiverseJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    agents_api_multiverse_branches__node_id__agents_get: {
+        parameters: {
+            query?: {
+                which?: string;
+            };
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analysis_api_multiverse_branches__node_id__analysis_get: {
+        parameters: {
+            query?: {
+                which?: string;
+            };
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiversePlanning"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    auto_play_api_multiverse_branches__node_id__auto_play_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AutoPlayRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiverseJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_api_multiverse_branches__node_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    continue_branch_api_multiverse_branches__node_id__continue_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BranchActionRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiverseJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_options_api_multiverse_branches__node_id__options_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_state_api_multiverse_branches__node_id__state_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchStateSnapshot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trajectory_api_multiverse_branches__node_id__trajectory_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_api_multiverse_branches__node_id__validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionSpec"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionValidation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_api_multiverse_compare_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompareRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchComparison"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_job_api_multiverse_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiverseJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    planning_api_multiverse_plannings__planning_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                planning_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiversePlanning"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_session_api_multiverse_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_api_multiverse_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tree_api_multiverse_sessions__session_id__tree_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -64,3 +64,35 @@ class NarrativeDraft(BaseModel):
 
 class ExplanationBundle(BaseModel):
     narratives: list[NarrativeDraft]
+
+
+# ---------------------------------------------------------------------------- Football Multiverse
+
+class AttackItem(BaseModel):
+    candidate_id: str
+    rationale: str = ""
+    follow_up: str = ""
+
+
+class AttackPlan(BaseModel):
+    proposals: list[AttackItem]
+    revised: bool = False
+    revision_reason: str = ""
+
+
+class DefenseItem(BaseModel):
+    strategy_id: str
+    rationale: str = ""
+    targets_candidate_id: str | None = None
+
+
+class DefensePlan(BaseModel):
+    strategies: list[DefenseItem]
+    revised: bool = False
+    revision_reason: str = ""
+
+
+class MatrixReport(BaseModel):
+    cells_evaluated: int
+    continue_planning: bool
+    reason: str = ""

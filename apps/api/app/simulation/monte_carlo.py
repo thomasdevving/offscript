@@ -107,6 +107,7 @@ class EvaluationOutput:
     elapsed_s: float
     timed_out: bool
     cancelled: bool
+    summaries: list[list[RolloutSummary]] | None = None
 
 
 def _medoid(summaries: list[RolloutSummary], idxs: list[int], horizon: float) -> int:
@@ -129,7 +130,10 @@ def evaluate_actions(
     cancel: threading.Event | None = None,
     progress: callable | None = None,
     baseline_action_id: str | None = None,
+    defense=None,
+    conditional_shots: int = 0,
 ) -> EvaluationOutput:
+    """Evaluate `actions` from `snapshot`; `defense` is an optional DefenseRuntime (same for all actions)."""
     started = time.perf_counter()
     base = state_from_snapshot(snapshot, roster)
     resolved = [resolve_candidate(base, snapshot, a) for a in actions]
@@ -145,7 +149,8 @@ def evaluate_actions(
             break
         for k, act in enumerate(resolved):
             rng = rollout_rng(config, actions[k].action_id, i)
-            s, _, _ = run_rollout(base, act, rng, config.horizon_s, record=False)
+            s, _, _ = run_rollout(base, act, rng, config.horizon_s, record=False, defense=defense,
+                                  conditional_shots=conditional_shots)
             summaries[k].append(s)
         done += 1
         if progress is not None and (done % 25 == 0):
@@ -254,6 +259,7 @@ def evaluate_actions(
         elapsed_s=time.perf_counter() - started,
         timed_out=timed_out,
         cancelled=cancelled,
+        summaries=summaries,
     )
 
 
