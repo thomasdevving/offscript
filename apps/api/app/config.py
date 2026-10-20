@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     agent_mode: Literal["auto", "foundry", "policy"] = "auto"
     foundry_timeout_s: float = 25.0
     foundry_max_output_tokens: int = 1200
+    # The Explanation Agent writes 6 narratives (3 viewer modes x EN/NL) in one structured output.
+    foundry_explanation_max_output_tokens: int = 4000
+    foundry_explanation_timeout_s: float = 75.0
     agent_max_tool_calls: int = 6
 
     # --- Simulation ----------------------------------------------------------
