@@ -1,0 +1,15 @@
+{
+  "name": "parallel",
+  "private": true,
+  "version": "1.0.0",
+  "description": "PARALLEL - multi-agent counterfactual football intelligence",
+  "workspaces": ["apps/web", "packages/contracts"],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "build:web": "npm run build -w apps/web",
+    "test:web": "npm run test -w apps/web",
+    "e2e": "npm run e2e -w apps/web",
+    "contracts": "npm run generate -w packages/contracts"
+  },
+  "license": "MIT"
+}

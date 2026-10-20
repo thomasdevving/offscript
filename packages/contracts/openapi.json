@@ -1,0 +1,5063 @@
+{
+  "components": {
+    "schemas": {
+      "ActionResult": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "example_rollouts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "outcome -> rollout index",
+            "title": "Example Rollouts",
+            "type": "object"
+          },
+          "first_action_detail": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "First Action Detail",
+            "type": "object"
+          },
+          "mean_progression_m": {
+            "description": "Mean ball progression towards goal at rollout end",
+            "title": "Mean Progression M",
+            "type": "number"
+          },
+          "mean_time_to_shot_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Time To Shot S"
+          },
+          "n_rollouts": {
+            "title": "N Rollouts",
+            "type": "integer"
+          },
+          "outcome_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Outcome Counts",
+            "type": "object"
+          },
+          "outcome_distribution": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Outcome Distribution",
+            "type": "object"
+          },
+          "p_first_action_success": {
+            "$ref": "#/components/schemas/ProbabilityEstimate",
+            "description": "Completion rate of the first action itself (pass completed, dribble succeeded, shot on target)"
+          },
+          "p_goal": {
+            "$ref": "#/components/schemas/ProbabilityEstimate",
+            "description": "P(goal within horizon | state, action) under the model"
+          },
+          "p_shot": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "p_turnover": {
+            "$ref": "#/components/schemas/ProbabilityEstimate"
+          },
+          "representative_outcome": {
+            "title": "Representative Outcome",
+            "type": "string"
+          },
+          "representative_rollout": {
+            "title": "Representative Rollout",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action_id",
+          "n_rollouts",
+          "p_goal",
+          "p_shot",
+          "p_turnover",
+          "p_first_action_success",
+          "mean_progression_m",
+          "outcome_distribution",
+          "outcome_counts",
+          "representative_rollout",
+          "representative_outcome"
+        ],
+        "title": "ActionResult",
+        "type": "object"
+      },
+      "AgentStep": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "enum": [
+              "decision_agent",
+              "strategy_agent",
+              "simulation_agent",
+              "verification_agent",
+              "explanation_agent",
+              "publisher"
+            ],
+            "title": "Agent",
+            "type": "string"
+          },
+          "attempt": {
+            "default": 1,
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "handoff_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff Reason"
+          },
+          "handoff_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff To"
+          },
+          "live_model": {
+            "default": false,
+            "title": "Live Model",
+            "type": "boolean"
+          },
+          "model": {
+            "description": "'foundry:<deployment>' for live model calls, 'policy' for the deterministic planner",
+            "title": "Model",
+            "type": "string"
+          },
+          "notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "output": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Output",
+            "type": "object"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "default": "running",
+            "enum": [
+              "running",
+              "completed",
+              "failed",
+              "rejected",
+              "skipped",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step_id": {
+            "title": "Step Id",
+            "type": "string"
+          },
+          "task": {
+            "title": "Task",
+            "type": "string"
+          },
+          "tool_calls": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ToolCallRecord"
+            },
+            "title": "Tool Calls",
+            "type": "array"
+          }
+        },
+        "required": [
+          "step_id",
+          "agent",
+          "task",
+          "started_at",
+          "model"
+        ],
+        "title": "AgentStep",
+        "type": "object"
+      },
+      "AnalysisWorkflowState": {
+        "additionalProperties": false,
+        "description": "Shared, typed state every agent reads from and writes to (one per analysis).",
+        "properties": {
+          "actual_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Action Id"
+          },
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "candidate_action_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Candidate Action Ids",
+            "type": "array"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "decision_point_id": {
+            "title": "Decision Point Id",
+            "type": "string"
+          },
+          "degraded": {
+            "default": false,
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "explanation_retries": {
+            "default": 0,
+            "title": "Explanation Retries",
+            "type": "integer"
+          },
+          "fault_injection": {
+            "default": [],
+            "items": {
+              "enum": [
+                "invalid_candidate",
+                "contradictory_claim",
+                "model_unavailable",
+                "simulation_timeout"
+              ],
+              "type": "string"
+            },
+            "title": "Fault Injection",
+            "type": "array"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "handoffs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/HandoffRecord"
+            },
+            "title": "Handoffs",
+            "type": "array"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "narrative_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Narrative Ids",
+            "type": "array"
+          },
+          "rejected_candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/RejectedCandidate"
+            },
+            "title": "Rejected Candidates",
+            "type": "array"
+          },
+          "retry_count": {
+            "default": 0,
+            "title": "Retry Count",
+            "type": "integer"
+          },
+          "revision_feedback": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Revision Feedback",
+            "type": "array"
+          },
+          "simulation_budget": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Simulation Budget"
+          },
+          "simulation_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Simulation Run Id"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state_version": {
+            "default": 0,
+            "title": "State Version",
+            "type": "integer"
+          },
+          "steps": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AgentStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "verification_issues": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Verification Issues",
+            "type": "array"
+          },
+          "verification_status": {
+            "default": "pending",
+            "title": "Verification Status",
+            "type": "string"
+          },
+          "workflow_status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "unavailable",
+              "failed",
+              "cancelled",
+              "timed_out"
+            ],
+            "title": "Workflow Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "match_id",
+          "snapshot_id",
+          "decision_point_id",
+          "correlation_id"
+        ],
+        "title": "AnalysisWorkflowState",
+        "type": "object"
+      },
+      "AnalyzeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "fault_injection": {
+            "default": [],
+            "items": {
+              "enum": [
+                "invalid_candidate",
+                "contradictory_claim",
+                "model_unavailable",
+                "simulation_timeout"
+              ],
+              "type": "string"
+            },
+            "title": "Fault Injection",
+            "type": "array"
+          },
+          "force_refresh": {
+            "default": false,
+            "title": "Force Refresh",
+            "type": "boolean"
+          },
+          "horizon_s": {
+            "anyOf": [
+              {
+                "maximum": 15.0,
+                "minimum": 4.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon S"
+          },
+          "languages": {
+            "default": [
+              "en",
+              "nl"
+            ],
+            "items": {
+              "enum": [
+                "en",
+                "nl"
+              ],
+              "type": "string"
+            },
+            "title": "Languages",
+            "type": "array"
+          },
+          "rollouts": {
+            "anyOf": [
+              {
+                "maximum": 500.0,
+                "minimum": 20.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rollouts"
+          }
+        },
+        "title": "AnalyzeRequest",
+        "type": "object"
+      },
+      "BallState": {
+        "additionalProperties": false,
+        "properties": {
+          "current_event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Event"
+          },
+          "in_play": {
+            "default": true,
+            "title": "In Play",
+            "type": "boolean"
+          },
+          "last_touch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Touch Id"
+          },
+          "possessor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Possessor Id"
+          },
+          "vx": {
+            "default": 0.0,
+            "title": "Vx",
+            "type": "number"
+          },
+          "vy": {
+            "default": 0.0,
+            "title": "Vy",
+            "type": "number"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "z": {
+            "default": 0.0,
+            "title": "Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "BallState",
+        "type": "object"
+      },
+      "CandidateAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "action_type": {
+            "enum": [
+              "shoot",
+              "pass",
+              "dribble"
+            ],
+            "title": "Action Type",
+            "type": "string"
+          },
+          "actor_id": {
+            "title": "Actor Id",
+            "type": "string"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "default": {},
+            "title": "Features",
+            "type": "object"
+          },
+          "initial_state_id": {
+            "title": "Initial State Id",
+            "type": "string"
+          },
+          "is_actual": {
+            "default": false,
+            "title": "Is Actual",
+            "type": "boolean"
+          },
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "default": "generator",
+            "enum": [
+              "observed",
+              "generator",
+              "agent"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "target_player_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Player Id"
+          },
+          "target_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "World x of the intended target point",
+            "title": "Target X"
+          },
+          "target_y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "World y of the intended target point",
+            "title": "Target Y"
+          }
+        },
+        "required": [
+          "action_id",
+          "action_type",
+          "actor_id",
+          "initial_state_id"
+        ],
+        "title": "CandidateAction",
+        "type": "object"
+      },
+      "CounterfactualAnalysis": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Action Id"
+          },
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "cache_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cache Key"
+          },
+          "cached": {
+            "default": false,
+            "description": "True when served from the analysis cache (replay)",
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CandidateAction"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "correlation_id": {
+            "title": "Correlation Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision_point_id": {
+            "title": "Decision Point Id",
+            "type": "string"
+          },
+          "decision_summary": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "default": {},
+            "title": "Decision Summary",
+            "type": "object"
+          },
+          "fault_injection": {
+            "default": [],
+            "items": {
+              "enum": [
+                "invalid_candidate",
+                "contradictory_claim",
+                "model_unavailable",
+                "simulation_timeout"
+              ],
+              "type": "string"
+            },
+            "title": "Fault Injection",
+            "type": "array"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInfo"
+          },
+          "narratives": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Narrative"
+            },
+            "title": "Narratives",
+            "type": "array"
+          },
+          "simulation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimulationRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "verified",
+              "unavailable",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "verification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VerificationRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workflow": {
+            "$ref": "#/components/schemas/AnalysisWorkflowState"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "match_id",
+          "decision_point_id",
+          "snapshot_id",
+          "correlation_id",
+          "created_at",
+          "workflow",
+          "model"
+        ],
+        "title": "CounterfactualAnalysis",
+        "type": "object"
+      },
+      "DecisionFeatures": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_pass_difficulty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Pass Difficulty"
+          },
+          "actual_shot_quality": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Shot Quality"
+          },
+          "best_alternative_gain_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cheap heuristic estimate used only for triage, never shown as a result",
+            "title": "Best Alternative Gain Estimate"
+          },
+          "distance_to_goal_m": {
+            "title": "Distance To Goal M",
+            "type": "number"
+          },
+          "forward_options": {
+            "title": "Forward Options",
+            "type": "integer"
+          },
+          "goal_angle_deg": {
+            "title": "Goal Angle Deg",
+            "type": "number"
+          },
+          "nearest_defender_m": {
+            "title": "Nearest Defender M",
+            "type": "number"
+          },
+          "open_teammates": {
+            "title": "Open Teammates",
+            "type": "integer"
+          },
+          "pressure_count_5m": {
+            "title": "Pressure Count 5M",
+            "type": "integer"
+          },
+          "zone_value": {
+            "title": "Zone Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "distance_to_goal_m",
+          "goal_angle_deg",
+          "pressure_count_5m",
+          "nearest_defender_m",
+          "open_teammates",
+          "forward_options",
+          "zone_value"
+        ],
+        "title": "DecisionFeatures",
+        "type": "object"
+      },
+      "DecisionPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_id": {
+            "title": "Actor Id",
+            "type": "string"
+          },
+          "actor_name": {
+            "title": "Actor Name",
+            "type": "string"
+          },
+          "actual_action": {
+            "$ref": "#/components/schemas/CandidateAction"
+          },
+          "actual_outcome": {
+            "title": "Actual Outcome",
+            "type": "string"
+          },
+          "analysis_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Analysis Ids",
+            "type": "array"
+          },
+          "candidate_score": {
+            "description": "Deterministic triage score in [0,1]",
+            "title": "Candidate Score",
+            "type": "number"
+          },
+          "decision_point_id": {
+            "title": "Decision Point Id",
+            "type": "string"
+          },
+          "event_id": {
+            "title": "Event Id",
+            "type": "string"
+          },
+          "features": {
+            "$ref": "#/components/schemas/DecisionFeatures"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "outcome_event_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome Event Id"
+          },
+          "outcome_time_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome Time Ms"
+          },
+          "sim_time_ms": {
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "source": {
+            "default": "detector",
+            "enum": [
+              "detector",
+              "manual"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "triggers": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionTrigger"
+            },
+            "title": "Triggers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "decision_point_id",
+          "match_id",
+          "snapshot_id",
+          "event_id",
+          "actor_id",
+          "actor_name",
+          "team_id",
+          "sim_time_ms",
+          "match_clock_ms",
+          "actual_action",
+          "actual_outcome",
+          "triggers",
+          "features",
+          "candidate_score"
+        ],
+        "title": "DecisionPoint",
+        "type": "object"
+      },
+      "DecisionTrigger": {
+        "enum": [
+          "SHOT_WITH_TEAMMATE_AVAILABLE",
+          "DIFFICULT_PASS",
+          "HIGH_VALUE_POSSESSION",
+          "MULTIPLE_OPTIONS",
+          "DANGEROUS_TURNOVER",
+          "DECISION_UNDER_PRESSURE",
+          "MISSED_FORWARD_PASS"
+        ],
+        "title": "DecisionTrigger",
+        "type": "string"
+      },
+      "EventDetails": {
+        "additionalProperties": false,
+        "description": "Event-specific fields. Every field is optional; which ones are set depends on event type.",
+        "properties": {
+          "ball_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ball Speed Mps"
+          },
+          "distance_to_goal_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance To Goal M"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "intended_receiver_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intended Receiver Id"
+          },
+          "lost_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lost By Id"
+          },
+          "modeled_scoring_probability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Model estimate (not observed). Synthetic, uncalibrated.",
+            "title": "Modeled Scoring Probability"
+          },
+          "nearest_defender_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Defender M"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "pass_difficulty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Model estimate in [0,1].",
+            "title": "Pass Difficulty"
+          },
+          "pass_length_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Length M"
+          },
+          "positions": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Positions"
+          },
+          "pressure_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pressure Count"
+          },
+          "receiver_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receiver Id"
+          },
+          "restart_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restart Type"
+          },
+          "score_away": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Away"
+          },
+          "score_home": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Home"
+          },
+          "scripted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scripted"
+          },
+          "shot_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shot Speed Mps"
+          },
+          "won_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Won By Id"
+          }
+        },
+        "title": "EventDetails",
+        "type": "object"
+      },
+      "EventType": {
+        "enum": [
+          "MATCH_STARTED",
+          "MATCH_ENDED",
+          "PASS_ATTEMPTED",
+          "PASS_COMPLETED",
+          "PASS_FAILED",
+          "SHOT_ATTEMPTED",
+          "SHOT_BLOCKED",
+          "SHOT_SAVED",
+          "SHOT_MISSED",
+          "GOAL",
+          "DRIBBLE_ATTEMPTED",
+          "DRIBBLE_COMPLETED",
+          "DRIBBLE_FAILED",
+          "TACKLE",
+          "INTERCEPTION",
+          "POSSESSION_CHANGED",
+          "PRESSURE_APPLIED",
+          "BALL_OUT_OF_PLAY",
+          "RESTART",
+          "PLAYER_POSITION_UPDATED",
+          "BALL_POSITION_UPDATED"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
+      "EvidenceItem": {
+        "additionalProperties": false,
+        "properties": {
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "ref",
+          "label",
+          "value",
+          "display"
+        ],
+        "title": "EvidenceItem",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HandoffRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "from_agent": {
+            "title": "From Agent",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "to_agent": {
+            "title": "To Agent",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_agent",
+          "to_agent",
+          "reason",
+          "at"
+        ],
+        "title": "HandoffRecord",
+        "type": "object"
+      },
+      "MatchEvent": {
+        "additionalProperties": false,
+        "description": "Immutable synthetic match event. `x/y` are world coordinates in metres.",
+        "properties": {
+          "details": {
+            "$ref": "#/components/schemas/EventDetails",
+            "default": {}
+          },
+          "end_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End X"
+          },
+          "end_y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Y"
+          },
+          "event_id": {
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "match_clock_ms": {
+            "description": "Match clock in milliseconds",
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "player_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Player Ids",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "sim_time_ms": {
+            "description": "Milliseconds since the start of the simulated segment",
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Id"
+          },
+          "team_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          }
+        },
+        "required": [
+          "event_id",
+          "match_id",
+          "seq",
+          "sim_time_ms",
+          "match_clock_ms",
+          "event_type"
+        ],
+        "title": "MatchEvent",
+        "type": "object"
+      },
+      "MatchInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "away": {
+            "$ref": "#/components/schemas/Team"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "end_clock_ms": {
+            "title": "End Clock Ms",
+            "type": "integer"
+          },
+          "final_score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Final Score",
+            "type": "object"
+          },
+          "home": {
+            "$ref": "#/components/schemas/Team"
+          },
+          "home_attack_direction_first_half": {
+            "default": 1,
+            "title": "Home Attack Direction First Half",
+            "type": "integer"
+          },
+          "initial_score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Initial Score",
+            "type": "object"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "integer"
+          },
+          "players": {
+            "items": {
+              "$ref": "#/components/schemas/Player"
+            },
+            "title": "Players",
+            "type": "array"
+          },
+          "scenario_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenario Id"
+          },
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/SimulationSettings"
+          },
+          "start_clock_ms": {
+            "title": "Start Clock Ms",
+            "type": "integer"
+          },
+          "status": {
+            "default": "finished",
+            "enum": [
+              "scheduled",
+              "live",
+              "finished"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "match_id",
+          "title",
+          "home",
+          "away",
+          "players",
+          "settings",
+          "period",
+          "start_clock_ms",
+          "end_clock_ms",
+          "duration_ms",
+          "initial_score",
+          "final_score"
+        ],
+        "title": "MatchInfo",
+        "type": "object"
+      },
+      "MatchStateSnapshot": {
+        "additionalProperties": false,
+        "description": "Immutable, reconstructable moment of the match (world coordinates).\n\nCounterfactual simulations always start from exactly one snapshot, and never use\ninformation recorded after `sim_time_ms`.",
+        "properties": {
+          "attack_direction": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "team_id -> +1 (towards x=105) or -1",
+            "title": "Attack Direction",
+            "type": "object"
+          },
+          "ball": {
+            "$ref": "#/components/schemas/BallState"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "off_pitch_player_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Off Pitch Player Ids",
+            "type": "array"
+          },
+          "period": {
+            "title": "Period",
+            "type": "integer"
+          },
+          "players": {
+            "items": {
+              "$ref": "#/components/schemas/PlayerState"
+            },
+            "title": "Players",
+            "type": "array"
+          },
+          "possession_team_id": {
+            "title": "Possession Team Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Score",
+            "type": "object"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "sim_time_ms": {
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "simulator_version": {
+            "default": "parallel-sim-1.0.0",
+            "title": "Simulator Version",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "source_event_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Event Id"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "match_id",
+          "sim_time_ms",
+          "match_clock_ms",
+          "period",
+          "possession_team_id",
+          "attack_direction",
+          "ball",
+          "players",
+          "score",
+          "seed"
+        ],
+        "title": "MatchStateSnapshot",
+        "type": "object"
+      },
+      "MatchStateView": {
+        "additionalProperties": false,
+        "properties": {
+          "ball": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ball"
+          },
+          "decisions_detected": {
+            "title": "Decisions Detected",
+            "type": "integer"
+          },
+          "duplicates_ignored": {
+            "title": "Duplicates Ignored",
+            "type": "integer"
+          },
+          "last_seq": {
+            "title": "Last Seq",
+            "type": "integer"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "player_stats": {
+            "items": {
+              "$ref": "#/components/schemas/PlayerStats"
+            },
+            "title": "Player Stats",
+            "type": "array"
+          },
+          "possession_team_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Possession Team Id"
+          },
+          "recent_event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recent Event Ids",
+            "type": "array"
+          },
+          "reordered_events": {
+            "title": "Reordered Events",
+            "type": "integer"
+          },
+          "score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Score",
+            "type": "object"
+          },
+          "sim_time_ms": {
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "team_stats": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TeamStats"
+            },
+            "title": "Team Stats",
+            "type": "object"
+          }
+        },
+        "required": [
+          "match_id",
+          "last_seq",
+          "sim_time_ms",
+          "match_clock_ms",
+          "score",
+          "possession_team_id",
+          "ball",
+          "team_stats",
+          "player_stats",
+          "recent_event_ids",
+          "duplicates_ignored",
+          "reordered_events",
+          "decisions_detected"
+        ],
+        "title": "MatchStateView",
+        "type": "object"
+      },
+      "MatchSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "away": {
+            "title": "Away",
+            "type": "string"
+          },
+          "decision_count": {
+            "title": "Decision Count",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "duration_s": {
+            "title": "Duration S",
+            "type": "number"
+          },
+          "home": {
+            "title": "Home",
+            "type": "string"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "period": {
+            "title": "Period",
+            "type": "integer"
+          },
+          "scenario_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenario Id"
+          },
+          "start_clock": {
+            "title": "Start Clock",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "match_id",
+          "title",
+          "scenario_id",
+          "home",
+          "away",
+          "period",
+          "start_clock",
+          "duration_s",
+          "mode",
+          "description",
+          "decision_count"
+        ],
+        "title": "MatchSummary",
+        "type": "object"
+      },
+      "ModelInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_mode": {
+            "enum": [
+              "foundry",
+              "policy"
+            ],
+            "title": "Agent Mode",
+            "type": "string"
+          },
+          "degraded": {
+            "default": false,
+            "title": "Degraded",
+            "type": "boolean"
+          },
+          "deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment"
+          },
+          "live_model_calls": {
+            "default": 0,
+            "title": "Live Model Calls",
+            "type": "integer"
+          },
+          "policy_fallbacks": {
+            "default": 0,
+            "title": "Policy Fallbacks",
+            "type": "integer"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_mode",
+          "provider"
+        ],
+        "title": "ModelInfo",
+        "type": "object"
+      },
+      "MomentumWindow": {
+        "additionalProperties": false,
+        "properties": {
+          "end_clock": {
+            "title": "End Clock",
+            "type": "string"
+          },
+          "final_third_entries": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Final Third Entries",
+            "type": "object"
+          },
+          "possession_share": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Possession Share",
+            "type": "object"
+          },
+          "start_clock": {
+            "title": "Start Clock",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_clock",
+          "end_clock",
+          "possession_share",
+          "final_third_entries"
+        ],
+        "title": "MomentumWindow",
+        "type": "object"
+      },
+      "Narrative": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "audience": {
+            "enum": [
+              "casual",
+              "analyst",
+              "broadcaster"
+            ],
+            "title": "Audience",
+            "type": "string"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "bullets": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Bullets",
+            "type": "array"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence_refs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "generated_by": {
+            "title": "Generated By",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "is_live_model_output": {
+            "title": "Is Live Model Output",
+            "type": "boolean"
+          },
+          "language": {
+            "enum": [
+              "en",
+              "nl"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "narrative_id": {
+            "title": "Narrative Id",
+            "type": "string"
+          },
+          "verification_notes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Verification Notes",
+            "type": "array"
+          },
+          "verification_status": {
+            "default": "pending",
+            "enum": [
+              "verified",
+              "rejected",
+              "pending"
+            ],
+            "title": "Verification Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "narrative_id",
+          "analysis_id",
+          "audience",
+          "language",
+          "headline",
+          "body",
+          "generated_by",
+          "is_live_model_output",
+          "created_at"
+        ],
+        "title": "Narrative",
+        "type": "object"
+      },
+      "Overlay": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Analysis Id"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "data_fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/OverlayDataField"
+            },
+            "title": "Data Fields",
+            "type": "array"
+          },
+          "decision_point_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Point Id"
+          },
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "expires": {
+            "$ref": "#/components/schemas/OverlayExpiry"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "language": {
+            "enum": [
+              "en",
+              "nl"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "match_time_ms": {
+            "title": "Match Time Ms",
+            "type": "integer"
+          },
+          "narrative": {
+            "title": "Narrative",
+            "type": "string"
+          },
+          "overlay_id": {
+            "title": "Overlay Id",
+            "type": "string"
+          },
+          "priority": {
+            "title": "Priority",
+            "type": "integer"
+          },
+          "render_hint": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "default": {},
+            "title": "Render Hint",
+            "type": "object"
+          },
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sim_time_ms": {
+            "title": "Sim Time Ms",
+            "type": "integer"
+          },
+          "source_refs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Refs",
+            "type": "array"
+          },
+          "type": {
+            "enum": [
+              "decision_comparison",
+              "goal",
+              "match_stat",
+              "analysis_unavailable"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "verification_status": {
+            "title": "Verification Status",
+            "type": "string"
+          },
+          "viewer_mode": {
+            "enum": [
+              "casual",
+              "analyst",
+              "broadcaster"
+            ],
+            "title": "Viewer Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "overlay_id",
+          "type",
+          "match_id",
+          "viewer_mode",
+          "language",
+          "match_time_ms",
+          "sim_time_ms",
+          "duration_ms",
+          "priority",
+          "headline",
+          "narrative",
+          "verification_status",
+          "expires"
+        ],
+        "title": "Overlay",
+        "type": "object"
+      },
+      "OverlayDataField": {
+        "additionalProperties": false,
+        "properties": {
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "source_ref": {
+            "title": "Source Ref",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value",
+          "display",
+          "source_ref"
+        ],
+        "title": "OverlayDataField",
+        "type": "object"
+      },
+      "OverlayExpiry": {
+        "additionalProperties": false,
+        "properties": {
+          "max_age_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Age Ms"
+          },
+          "on_event_types": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "On Event Types",
+            "type": "array"
+          }
+        },
+        "title": "OverlayExpiry",
+        "type": "object"
+      },
+      "PairwiseComparison": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "baseline_action_id": {
+            "title": "Baseline Action Id",
+            "type": "string"
+          },
+          "diff_ci95_high": {
+            "title": "Diff Ci95 High",
+            "type": "number"
+          },
+          "diff_ci95_low": {
+            "title": "Diff Ci95 Low",
+            "type": "number"
+          },
+          "diff_p_goal": {
+            "title": "Diff P Goal",
+            "type": "number"
+          },
+          "diff_p_shot": {
+            "default": 0.0,
+            "title": "Diff P Shot",
+            "type": "number"
+          },
+          "diff_p_shot_ci95_high": {
+            "default": 0.0,
+            "title": "Diff P Shot Ci95 High",
+            "type": "number"
+          },
+          "diff_p_shot_ci95_low": {
+            "default": 0.0,
+            "title": "Diff P Shot Ci95 Low",
+            "type": "number"
+          },
+          "diff_p_turnover": {
+            "default": 0.0,
+            "title": "Diff P Turnover",
+            "type": "number"
+          },
+          "diff_p_turnover_ci95_high": {
+            "default": 0.0,
+            "title": "Diff P Turnover Ci95 High",
+            "type": "number"
+          },
+          "diff_p_turnover_ci95_low": {
+            "default": 0.0,
+            "title": "Diff P Turnover Ci95 Low",
+            "type": "number"
+          },
+          "paired": {
+            "title": "Paired",
+            "type": "boolean"
+          },
+          "secondary_note": {
+            "default": "",
+            "title": "Secondary Note",
+            "type": "string"
+          },
+          "verdict": {
+            "enum": [
+              "more_promising",
+              "less_promising",
+              "similar",
+              "inconclusive"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action_id",
+          "baseline_action_id",
+          "diff_p_goal",
+          "diff_ci95_low",
+          "diff_ci95_high",
+          "paired",
+          "verdict"
+        ],
+        "title": "PairwiseComparison",
+        "type": "object"
+      },
+      "Player": {
+        "additionalProperties": false,
+        "properties": {
+          "acceleration_mps2": {
+            "maximum": 8.0,
+            "minimum": 2.0,
+            "title": "Acceleration Mps2",
+            "type": "number"
+          },
+          "dribbling": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Dribbling",
+            "type": "number"
+          },
+          "finishing": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Finishing",
+            "type": "number"
+          },
+          "max_speed_mps": {
+            "maximum": 10.5,
+            "minimum": 5.0,
+            "title": "Max Speed Mps",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "reaction_time_s": {
+            "maximum": 0.6,
+            "minimum": 0.1,
+            "title": "Reaction Time S",
+            "type": "number"
+          },
+          "role": {
+            "enum": [
+              "GK",
+              "RB",
+              "CB",
+              "LB",
+              "DM",
+              "CM",
+              "AM",
+              "RW",
+              "LW",
+              "ST"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "shirt_number": {
+            "title": "Shirt Number",
+            "type": "integer"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "stamina": {
+            "default": 1.0,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Stamina",
+            "type": "number"
+          },
+          "starting": {
+            "default": true,
+            "title": "Starting",
+            "type": "boolean"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "technique": {
+            "description": "Passing execution quality",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Technique",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "name",
+          "short_name",
+          "shirt_number",
+          "role",
+          "max_speed_mps",
+          "acceleration_mps2",
+          "reaction_time_s",
+          "technique",
+          "finishing",
+          "dribbling"
+        ],
+        "title": "Player",
+        "type": "object"
+      },
+      "PlayerPerformance": {
+        "additionalProperties": false,
+        "properties": {
+          "event_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Metrics",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "player_id",
+          "name",
+          "team_id",
+          "metrics",
+          "summary"
+        ],
+        "title": "PlayerPerformance",
+        "type": "object"
+      },
+      "PlayerState": {
+        "additionalProperties": false,
+        "properties": {
+          "facing": {
+            "default": 0.0,
+            "title": "Facing",
+            "type": "number"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "vx": {
+            "default": 0.0,
+            "title": "Vx",
+            "type": "number"
+          },
+          "vy": {
+            "default": 0.0,
+            "title": "Vy",
+            "type": "number"
+          },
+          "x": {
+            "maximum": 106.0,
+            "minimum": -1.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 69.0,
+            "minimum": -1.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "player_id",
+          "team_id",
+          "x",
+          "y"
+        ],
+        "title": "PlayerState",
+        "type": "object"
+      },
+      "PlayerStats": {
+        "additionalProperties": false,
+        "properties": {
+          "dribbles_completed": {
+            "default": 0,
+            "title": "Dribbles Completed",
+            "type": "integer"
+          },
+          "goals": {
+            "default": 0,
+            "title": "Goals",
+            "type": "integer"
+          },
+          "interceptions": {
+            "default": 0,
+            "title": "Interceptions",
+            "type": "integer"
+          },
+          "involvement": {
+            "default": 0,
+            "title": "Involvement",
+            "type": "integer"
+          },
+          "key_passes": {
+            "default": 0,
+            "title": "Key Passes",
+            "type": "integer"
+          },
+          "modeled_shot_quality": {
+            "default": 0.0,
+            "title": "Modeled Shot Quality",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "passes_attempted": {
+            "default": 0,
+            "title": "Passes Attempted",
+            "type": "integer"
+          },
+          "passes_completed": {
+            "default": 0,
+            "title": "Passes Completed",
+            "type": "integer"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "shots": {
+            "default": 0,
+            "title": "Shots",
+            "type": "integer"
+          },
+          "tackles": {
+            "default": 0,
+            "title": "Tackles",
+            "type": "integer"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "turnovers": {
+            "default": 0,
+            "title": "Turnovers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id",
+          "name",
+          "team_id"
+        ],
+        "title": "PlayerStats",
+        "type": "object"
+      },
+      "ProbabilityEstimate": {
+        "additionalProperties": false,
+        "properties": {
+          "ci95_high": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Ci95 High",
+            "type": "number"
+          },
+          "ci95_low": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Ci95 Low",
+            "type": "number"
+          },
+          "method": {
+            "const": "wilson",
+            "default": "wilson",
+            "title": "Method",
+            "type": "string"
+          },
+          "successes": {
+            "title": "Successes",
+            "type": "integer"
+          },
+          "trials": {
+            "title": "Trials",
+            "type": "integer"
+          },
+          "value": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "value",
+          "ci95_low",
+          "ci95_high",
+          "successes",
+          "trials"
+        ],
+        "title": "ProbabilityEstimate",
+        "type": "object"
+      },
+      "Recap": {
+        "additionalProperties": false,
+        "properties": {
+          "analyst": {
+            "$ref": "#/components/schemas/RecapFormat"
+          },
+          "casual": {
+            "$ref": "#/components/schemas/RecapFormat"
+          },
+          "decision_insights": {
+            "items": {
+              "$ref": "#/components/schemas/RecapItem"
+            },
+            "title": "Decision Insights",
+            "type": "array"
+          },
+          "disclaimer": {
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "final_score": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Final Score",
+            "type": "object"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "generated_by": {
+            "title": "Generated By",
+            "type": "string"
+          },
+          "key_events": {
+            "items": {
+              "$ref": "#/components/schemas/RecapItem"
+            },
+            "title": "Key Events",
+            "type": "array"
+          },
+          "language": {
+            "enum": [
+              "en",
+              "nl"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "momentum": {
+            "items": {
+              "$ref": "#/components/schemas/MomentumWindow"
+            },
+            "title": "Momentum",
+            "type": "array"
+          },
+          "player_performances": {
+            "items": {
+              "$ref": "#/components/schemas/PlayerPerformance"
+            },
+            "title": "Player Performances",
+            "type": "array"
+          },
+          "recap_id": {
+            "title": "Recap Id",
+            "type": "string"
+          },
+          "referenced_analysis_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Referenced Analysis Ids",
+            "type": "array"
+          },
+          "referenced_event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Referenced Event Ids",
+            "type": "array"
+          },
+          "score_line": {
+            "title": "Score Line",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recap_id",
+          "match_id",
+          "language",
+          "generated_at",
+          "generated_by",
+          "final_score",
+          "score_line",
+          "key_events",
+          "decision_insights",
+          "player_performances",
+          "momentum",
+          "casual",
+          "analyst",
+          "referenced_event_ids",
+          "referenced_analysis_ids",
+          "disclaimer"
+        ],
+        "title": "Recap",
+        "type": "object"
+      },
+      "RecapFormat": {
+        "additionalProperties": false,
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "story": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Story",
+            "type": "array"
+          }
+        },
+        "required": [
+          "headline",
+          "story"
+        ],
+        "title": "RecapFormat",
+        "type": "object"
+      },
+      "RecapItem": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Analysis Ids",
+            "type": "array"
+          },
+          "event_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "kind": {
+            "default": "event",
+            "title": "Kind",
+            "type": "string"
+          },
+          "match_clock": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Clock"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "RecapItem",
+        "type": "object"
+      },
+      "RejectedCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "proposal": {
+            "additionalProperties": true,
+            "title": "Proposal",
+            "type": "object"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proposal",
+          "reason",
+          "stage"
+        ],
+        "title": "RejectedCandidate",
+        "type": "object"
+      },
+      "SimEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "player_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Player Ids",
+            "type": "array"
+          },
+          "t_ms": {
+            "title": "T Ms",
+            "type": "integer"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "t_ms",
+          "event_type",
+          "x",
+          "y"
+        ],
+        "title": "SimEvent",
+        "type": "object"
+      },
+      "SimulateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "action_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Ids"
+          },
+          "horizon_s": {
+            "anyOf": [
+              {
+                "maximum": 15.0,
+                "minimum": 4.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon S"
+          },
+          "rollouts": {
+            "default": 200,
+            "maximum": 500.0,
+            "minimum": 20.0,
+            "title": "Rollouts",
+            "type": "integer"
+          }
+        },
+        "title": "SimulateRequest",
+        "type": "object"
+      },
+      "SimulationConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "common_random_numbers": {
+            "default": true,
+            "title": "Common Random Numbers",
+            "type": "boolean"
+          },
+          "horizon_s": {
+            "default": 10.0,
+            "maximum": 15.0,
+            "minimum": 4.0,
+            "title": "Horizon S",
+            "type": "number"
+          },
+          "metric": {
+            "const": "p_goal_within_horizon",
+            "default": "p_goal_within_horizon",
+            "title": "Metric",
+            "type": "string"
+          },
+          "rollouts": {
+            "default": 200,
+            "maximum": 500.0,
+            "minimum": 20.0,
+            "title": "Rollouts",
+            "type": "integer"
+          },
+          "seed": {
+            "default": 0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "simulator_version": {
+            "default": "parallel-sim-1.0.0",
+            "title": "Simulator Version",
+            "type": "string"
+          },
+          "time_budget_s": {
+            "default": 20.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 120.0,
+            "title": "Time Budget S",
+            "type": "number"
+          }
+        },
+        "title": "SimulationConfig",
+        "type": "object"
+      },
+      "SimulationRun": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "comparisons": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PairwiseComparison"
+            },
+            "title": "Comparisons",
+            "type": "array"
+          },
+          "config": {
+            "$ref": "#/components/schemas/SimulationConfig"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "overall_verdict": {
+            "anyOf": [
+              {
+                "enum": [
+                  "more_promising",
+                  "less_promising",
+                  "similar",
+                  "inconclusive"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overall Verdict"
+          },
+          "partial": {
+            "default": false,
+            "title": "Partial",
+            "type": "boolean"
+          },
+          "ranking": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Ranking",
+            "type": "array"
+          },
+          "results": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ActionResult"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "simulation_run_id": {
+            "title": "Simulation Run Id",
+            "type": "string"
+          },
+          "simulator_version": {
+            "default": "parallel-sim-1.0.0",
+            "title": "Simulator Version",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "timed_out",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "simulation_run_id",
+          "analysis_id",
+          "snapshot_id",
+          "config"
+        ],
+        "title": "SimulationRun",
+        "type": "object"
+      },
+      "SimulationSettings": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "frame_rate_hz": {
+            "title": "Frame Rate Hz",
+            "type": "integer"
+          },
+          "mode": {
+            "enum": [
+              "scenario",
+              "procedural"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "simulator_version": {
+            "title": "Simulator Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "seed",
+          "simulator_version",
+          "frame_rate_hz",
+          "description"
+        ],
+        "title": "SimulationSettings",
+        "type": "object"
+      },
+      "Team": {
+        "additionalProperties": false,
+        "properties": {
+          "color_primary": {
+            "title": "Color Primary",
+            "type": "string"
+          },
+          "color_secondary": {
+            "title": "Color Secondary",
+            "type": "string"
+          },
+          "formation": {
+            "title": "Formation",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "team_id",
+          "name",
+          "short_name",
+          "color_primary",
+          "color_secondary",
+          "formation"
+        ],
+        "title": "Team",
+        "type": "object"
+      },
+      "TeamStats": {
+        "additionalProperties": false,
+        "properties": {
+          "dribbles_attempted": {
+            "default": 0,
+            "title": "Dribbles Attempted",
+            "type": "integer"
+          },
+          "dribbles_completed": {
+            "default": 0,
+            "title": "Dribbles Completed",
+            "type": "integer"
+          },
+          "goals": {
+            "default": 0,
+            "title": "Goals",
+            "type": "integer"
+          },
+          "interceptions": {
+            "default": 0,
+            "title": "Interceptions",
+            "type": "integer"
+          },
+          "max_ball_speed_mps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Ball Speed Mps"
+          },
+          "mean_pass_difficulty_model": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Model estimate, not observed",
+            "title": "Mean Pass Difficulty Model"
+          },
+          "mean_pass_length_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Pass Length M"
+          },
+          "pass_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass Accuracy"
+          },
+          "passes_attempted": {
+            "default": 0,
+            "title": "Passes Attempted",
+            "type": "integer"
+          },
+          "passes_completed": {
+            "default": 0,
+            "title": "Passes Completed",
+            "type": "integer"
+          },
+          "possession_changes_won": {
+            "default": 0,
+            "title": "Possession Changes Won",
+            "type": "integer"
+          },
+          "possession_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Possession Share"
+          },
+          "pressure_events": {
+            "default": 0,
+            "title": "Pressure Events",
+            "type": "integer"
+          },
+          "shots": {
+            "default": 0,
+            "title": "Shots",
+            "type": "integer"
+          },
+          "shots_on_target": {
+            "default": 0,
+            "title": "Shots On Target",
+            "type": "integer"
+          },
+          "tackles": {
+            "default": 0,
+            "title": "Tackles",
+            "type": "integer"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          },
+          "total_modeled_shot_quality": {
+            "default": 0.0,
+            "description": "Sum of modeled scoring probabilities",
+            "title": "Total Modeled Shot Quality",
+            "type": "number"
+          }
+        },
+        "required": [
+          "team_id"
+        ],
+        "title": "TeamStats",
+        "type": "object"
+      },
+      "ToolCallRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "arguments": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Arguments",
+            "type": "object"
+          },
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "duration_ms": {
+            "default": 0.0,
+            "title": "Duration Ms",
+            "type": "number"
+          },
+          "result_summary": {
+            "title": "Result Summary"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tool_name": {
+            "title": "Tool Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "call_id",
+          "tool_name",
+          "started_at"
+        ],
+        "title": "ToolCallRecord",
+        "type": "object"
+      },
+      "TrackingFrame": {
+        "additionalProperties": false,
+        "description": "Positions of ball and all players at one instant (world coords, metres).",
+        "properties": {
+          "ball": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ball",
+            "type": "array"
+          },
+          "players": {
+            "additionalProperties": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Players",
+            "type": "object"
+          },
+          "possessor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Possessor Id"
+          },
+          "t_ms": {
+            "title": "T Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "t_ms",
+          "ball",
+          "players"
+        ],
+        "title": "TrackingFrame",
+        "type": "object"
+      },
+      "Trajectory": {
+        "additionalProperties": false,
+        "description": "One sampled continuation (world coordinates). Always a simulation, never an observation.",
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/SimEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/components/schemas/TrackingFrame"
+            },
+            "title": "Frames",
+            "type": "array"
+          },
+          "kind": {
+            "const": "simulated",
+            "default": "simulated",
+            "title": "Kind",
+            "type": "string"
+          },
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "rollout_index": {
+            "title": "Rollout Index",
+            "type": "integer"
+          },
+          "seed_key": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Seed Key",
+            "type": "array"
+          },
+          "selection_rule": {
+            "title": "Selection Rule",
+            "type": "string"
+          },
+          "simulation_run_id": {
+            "title": "Simulation Run Id",
+            "type": "string"
+          },
+          "start_match_clock_ms": {
+            "title": "Start Match Clock Ms",
+            "type": "integer"
+          },
+          "terminated_reason": {
+            "title": "Terminated Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "simulation_run_id",
+          "action_id",
+          "rollout_index",
+          "seed_key",
+          "outcome",
+          "terminated_reason",
+          "selection_rule",
+          "frames",
+          "events",
+          "start_match_clock_ms"
+        ],
+        "title": "Trajectory",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerificationCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "details": {
+            "default": "",
+            "title": "Details",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "severity": {
+            "default": "error",
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "name",
+          "passed"
+        ],
+        "title": "VerificationCheck",
+        "type": "object"
+      },
+      "VerificationRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceItem"
+            },
+            "title": "Accepted Evidence",
+            "type": "array"
+          },
+          "agent_assessment": {
+            "default": "",
+            "title": "Agent Assessment",
+            "type": "string"
+          },
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/VerificationCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "failures": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "verified",
+              "verified_with_warnings",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "verification_id": {
+            "title": "Verification Id",
+            "type": "string"
+          },
+          "verified_at": {
+            "title": "Verified At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verification_id",
+          "analysis_id",
+          "status",
+          "checks",
+          "failures",
+          "accepted_evidence",
+          "verified_at"
+        ],
+        "title": "VerificationRecord",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Multi-agent counterfactual football intelligence on synthetic matches. All counterfactual numbers are model estimates.",
+    "title": "PARALLEL API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/analyses/{analysis_id}": {
+      "get": {
+        "operationId": "analysis_api_analyses__analysis_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CounterfactualAnalysis"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analysis"
+      }
+    },
+    "/api/analyses/{analysis_id}/cancel": {
+      "post": {
+        "operationId": "cancel_api_analyses__analysis_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cancel Api Analyses  Analysis Id  Cancel Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel"
+      }
+    },
+    "/api/analyses/{analysis_id}/evidence": {
+      "get": {
+        "operationId": "evidence_api_analyses__analysis_id__evidence_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvidenceItem"
+                  },
+                  "title": "Response Evidence Api Analyses  Analysis Id  Evidence Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Evidence"
+      }
+    },
+    "/api/analyses/{analysis_id}/overlays": {
+      "get": {
+        "operationId": "overlays_api_analyses__analysis_id__overlays_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Overlay"
+                  },
+                  "title": "Response Overlays Api Analyses  Analysis Id  Overlays Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Overlays"
+      }
+    },
+    "/api/analyses/{analysis_id}/results": {
+      "get": {
+        "operationId": "results_api_analyses__analysis_id__results_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationRun"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Results"
+      }
+    },
+    "/api/analyses/{analysis_id}/simulate": {
+      "post": {
+        "operationId": "simulate_api_analyses__analysis_id__simulate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationRun"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Simulate"
+      }
+    },
+    "/api/analyses/{analysis_id}/trajectories/{action_id}": {
+      "get": {
+        "operationId": "trajectory_api_analyses__analysis_id__trajectories__action_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "action_id",
+            "required": true,
+            "schema": {
+              "title": "Action Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rollout",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 499,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Rollout"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trajectory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trajectory"
+      }
+    },
+    "/api/analyses/{analysis_id}/workflow": {
+      "get": {
+        "operationId": "workflow_api_analyses__analysis_id__workflow_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisWorkflowState"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Workflow"
+      }
+    },
+    "/api/decisions/{decision_id}": {
+      "get": {
+        "operationId": "decision_api_decisions__decision_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decision_id",
+            "required": true,
+            "schema": {
+              "title": "Decision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionPoint"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decision"
+      }
+    },
+    "/api/decisions/{decision_id}/analyze": {
+      "post": {
+        "operationId": "analyze_api_decisions__decision_id__analyze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decision_id",
+            "required": true,
+            "schema": {
+              "title": "Decision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AnalyzeRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CounterfactualAnalysis"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Analyze"
+      }
+    },
+    "/api/decisions/{decision_id}/snapshot": {
+      "get": {
+        "operationId": "decision_snapshot_api_decisions__decision_id__snapshot_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decision_id",
+            "required": true,
+            "schema": {
+              "title": "Decision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchStateSnapshot"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decision Snapshot"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Api Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/matches": {
+      "get": {
+        "operationId": "matches_api_matches_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MatchSummary"
+                  },
+                  "title": "Response Matches Api Matches Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Matches"
+      }
+    },
+    "/api/matches/{match_id}": {
+      "get": {
+        "operationId": "match_api_matches__match_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match"
+      }
+    },
+    "/api/matches/{match_id}/decisions": {
+      "get": {
+        "operationId": "match_decisions_api_matches__match_id__decisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DecisionPoint"
+                  },
+                  "title": "Response Match Decisions Api Matches  Match Id  Decisions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match Decisions"
+      }
+    },
+    "/api/matches/{match_id}/events": {
+      "get": {
+        "operationId": "match_events_api_matches__match_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_ms",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "From Ms",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_ms",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To Ms"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_tracking",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Tracking",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "types",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Types"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MatchEvent"
+                  },
+                  "title": "Response Match Events Api Matches  Match Id  Events Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match Events"
+      }
+    },
+    "/api/matches/{match_id}/events.jsonl": {
+      "get": {
+        "operationId": "match_events_jsonl_api_matches__match_id__events_jsonl_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match Events Jsonl"
+      }
+    },
+    "/api/matches/{match_id}/events/{event_id}/decision": {
+      "post": {
+        "description": "Turn any on-ball action into a decision point (analyst request), with the same features.",
+        "operationId": "manual_decision_api_matches__match_id__events__event_id__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "title": "Event Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionPoint"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Manual Decision"
+      }
+    },
+    "/api/matches/{match_id}/frames": {
+      "get": {
+        "operationId": "match_frames_api_matches__match_id__frames_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_ms",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "From Ms",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_ms",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To Ms"
+            }
+          },
+          {
+            "in": "query",
+            "name": "step",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Step",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TrackingFrame"
+                  },
+                  "title": "Response Match Frames Api Matches  Match Id  Frames Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match Frames"
+      }
+    },
+    "/api/matches/{match_id}/overlays": {
+      "get": {
+        "operationId": "match_overlays_api_matches__match_id__overlays_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "viewer_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Viewer Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "en",
+                    "nl"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Language"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Overlay"
+                  },
+                  "title": "Response Match Overlays Api Matches  Match Id  Overlays Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match Overlays"
+      }
+    },
+    "/api/matches/{match_id}/recap": {
+      "get": {
+        "operationId": "get_recap_api_matches__match_id__recap_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "enum": [
+                "en",
+                "nl"
+              ],
+              "title": "Language",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recap"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Recap"
+      },
+      "post": {
+        "operationId": "make_recap_api_matches__match_id__recap_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "enum": [
+                "en",
+                "nl"
+              ],
+              "title": "Language",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recap"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Make Recap"
+      }
+    },
+    "/api/matches/{match_id}/state": {
+      "get": {
+        "operationId": "match_state_api_matches__match_id__state_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "t_ms",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "T Ms"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchStateView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Match State"
+      }
+    },
+    "/api/metrics": {
+      "get": {
+        "operationId": "get_metrics_api_metrics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Metrics Api Metrics Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Metrics"
+      }
+    },
+    "/api/scenarios": {
+      "get": {
+        "operationId": "scenarios_api_scenarios_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response Scenarios Api Scenarios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Scenarios"
+      }
+    },
+    "/api/scenarios/{scenario_id}/start": {
+      "post": {
+        "operationId": "start_scenario_api_scenarios__scenario_id__start_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Start Scenario Api Scenarios  Scenario Id  Start Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Scenario"
+      }
+    },
+    "/api/simulations/{job_id}": {
+      "get": {
+        "operationId": "simulation_job_api_simulations__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationRun"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Simulation Job"
+      }
+    }
+  }
+}
