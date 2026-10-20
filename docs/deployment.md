@@ -63,7 +63,7 @@ scripts/deploy_azure.sh
 | `ONLY_WEB` | `false` | `true` only rebuilds and re-uploads the web app |
 
 The script is idempotent: after the image workflow has run, run it again to roll out a new revision
-(it re-pulls `:latest`) and re-upload the web app. It also works unchanged in **Azure Cloud Shell**
+(a new `DEPLOY_REVISION` value re-pulls `:latest`) and re-upload the web app. It also works unchanged in **Azure Cloud Shell**
 (shell.azure.com), which helps when an organisation blocks Azure CLI sign-in on personal devices.
 
 What it does: create the resource group → deploy `infra/azure/main.bicep` with the API image and a

@@ -120,7 +120,42 @@ async def foundry_diagnostics(request: Request) -> dict:
                 if value else resp.text[:200], "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
     except Exception as exc:  # report, never crash
         return {"configured": True, "live": False, "deployment": s.foundry_model,
-                "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+                "error": f"{type(exc).__name__}: {str(exc)[:300]}", "cause_chain": _cause_chain(exc),
+                "checks": await _foundry_connectivity(s.foundry_project_endpoint)}
+
+
+def _cause_chain(exc: BaseException, limit: int = 6) -> list[str]:
+    """The underlying causes of a wrapped exception (SDKs often report only 'Connection error')."""
+    out: list[str] = []
+    cur = exc.__cause__ or exc.__context__
+    while cur is not None and len(out) < limit:
+        out.append(f"{type(cur).__name__}: {str(cur)[:240]}")
+        cur = cur.__cause__ or cur.__context__
+    return out
+
+
+async def _foundry_connectivity(endpoint: str | None) -> dict:
+    """Separates the usual failure points: DNS for the project host, then the managed identity token."""
+    import asyncio
+    import socket
+    from urllib.parse import urlparse
+
+    from azure.identity.aio import DefaultAzureCredential
+
+    out: dict = {}
+    host = urlparse(endpoint or "").hostname
+    try:
+        infos = await asyncio.get_running_loop().getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+        out["dns"] = f"ok ({infos[0][4][0]})"
+    except Exception as exc:
+        out["dns"] = f"{type(exc).__name__}: {exc}"
+    try:
+        async with DefaultAzureCredential(exclude_interactive_browser_credential=True) as cred:
+            tok = await asyncio.wait_for(cred.get_token("https://ai.azure.com/.default"), 30)
+            out["token"] = f"ok (expires {tok.expires_on})"
+    except Exception as exc:
+        out["token"] = f"{type(exc).__name__}: {str(exc)[:300]}"
+    return out
 
 
 # ------------------------------------------------------------------------------- scenarios / matches

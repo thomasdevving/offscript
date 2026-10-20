@@ -22,7 +22,7 @@ param location string = resourceGroup().location
 @description('Container image for the API (public image, or one in the registry created with createRegistry=true).')
 param apiImage string = 'ghcr.io/thomasdevving/parallel-api:latest'
 
-@description('Revision suffix; a new value rolls out a new revision (and re-pulls a moving tag such as :latest).')
+@description('Deployment marker; a new value rolls out a new revision (and re-pulls a moving tag such as :latest).')
 param revision string = ''
 
 @description('Create an Azure Container Registry for the API image (fixed monthly cost). Not needed for public images.')
@@ -183,7 +183,6 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
       ] : []
     }
     template: {
-      revisionSuffix: empty(revision) ? null : revision
       containers: [
         {
           name: 'api'
@@ -198,6 +197,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsights.properties.ConnectionString }
             { name: 'CORS_ORIGINS', value: webOrigin }
             { name: 'MAX_CONCURRENT_ANALYSES', value: '2' }
+            { name: 'DEPLOY_REVISION', value: revision }
           ]
           probes: isPlaceholder ? [] : [
             { type: 'Startup', httpGet: { path: '/api/health', port: 8000 }, initialDelaySeconds: 3, periodSeconds: 2, failureThreshold: 60 }
