@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from ..models.match import MatchSummary
+from ..models.match import MatchInfo, MatchSummary
 from ..simulation import geometry as g
 from .match_generator import GeneratedMatch, MatchGenerator
 from .roster import KICKOFF, ROSTER, starters, template_positions
@@ -105,8 +105,7 @@ def generate(defn: ScenarioDefinition) -> GeneratedMatch:
     return gen.run(defn.script, defn.continuation_s)
 
 
-def summary_of(match: GeneratedMatch, decision_count: int) -> MatchSummary:
-    info = match.info
+def summary_of(info: MatchInfo, decision_count: int) -> MatchSummary:
     return MatchSummary(
         match_id=info.match_id,
         title=info.title,

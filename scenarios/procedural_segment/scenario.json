@@ -7,7 +7,10 @@
   "seed": 2026,
   "period": 2,
   "start_clock": "60:00",
-  "score": { "HCF": 1, "NVA": 1 },
+  "score": {
+    "HCF": 1,
+    "NVA": 1
+  },
   "attacking_team": "NVA",
   "carrier": null,
   "coordinates": "attack_frame",

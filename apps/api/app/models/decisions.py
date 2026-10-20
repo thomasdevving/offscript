@@ -66,4 +66,5 @@ class DecisionPoint(Contract):
     triggers: list[DecisionTrigger]
     features: DecisionFeatures
     candidate_score: float = Field(description="Deterministic triage score in [0,1]")
+    source: Literal["detector", "manual"] = "detector"
     analysis_ids: list[str] = []
