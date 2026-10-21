@@ -1,6 +1,6 @@
 "use client";
 
-import type { Language, ViewerMode } from "@offscript/contracts";
+import type { ViewerMode } from "@offscript/contracts";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 import BrandMark from "./BrandMark";
@@ -60,8 +60,6 @@ export default function Header() {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <Segmented<ViewerMode> label={L.mode} value={s.mode} onChange={actions.setMode} testId="mode-switch"
             options={[{ v: "casual", label: L.casual }, { v: "analyst", label: L.analyst }, { v: "broadcaster", label: L.broadcaster }]} />
-          <Segmented<Language> label={L.language} value={s.lang} onChange={actions.setLang} testId="lang-switch"
-            options={[{ v: "en", label: "EN" }, { v: "nl", label: "NL" }]} />
           <button type="button" onClick={() => void actions.openRecap()} data-testid="open-recap" className="btn">{L.recap}</button>
           <ThemeToggle lang={s.lang} />
           <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-2.5 py-1.5 text-[11px]">

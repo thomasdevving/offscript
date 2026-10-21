@@ -61,15 +61,10 @@ test("shoot-or-pass end to end", async ({ page }) => {
   await expect(page.getByTestId("overlay-json")).toContainText("decision_comparison");
   await expect(page.getByTestId("caption")).toContainText("Model");
 
-  // Dutch.
-  await page.getByRole("radio", { name: "NL" }).click();
-  await expect(page.getByTestId("caption")).toContainText("Model");
-  await expect(page.getByTestId("verdict")).toContainText("model");
-
   // Recap.
   await page.getByTestId("open-recap").click();
   await expect(page.getByTestId("recap")).toContainText("Harbour City FC");
-  await page.getByRole("button", { name: "Sluiten" }).click();
+  await page.getByRole("button", { name: "Close" }).click();
 
   // Switch scenario.
   await page.getByTestId("scenario-select").selectOption("risky_through_ball");

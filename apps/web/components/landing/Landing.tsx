@@ -23,16 +23,28 @@ const COPY = {
     stats: [
       ["200", "simulations per option"],
       ["5", "agents, one verified answer"],
-      ["3", "viewer modes, EN and NL"],
+      ["3", "viewer modes: fan, analyst, broadcast"],
     ],
     howEyebrow: "How it works",
-    howTitle: ["From one moment", "to many possibilities."],
-    howSub: "You choose a decision, the agents compete with strategies, the simulator explores the outcomes, and you rewind, compare and discover what could have happened.",
+    howTitle: ["One frozen moment.", "Every option played out."],
+    howSub: "OFFSCRIPT follows a live match, stops at the decisions that matter and turns each one into a fair experiment: same starting position, different choices, hundreds of simulated continuations, and nothing shown until it has been checked.",
     steps: [
-      ["Choose", "Change the decision, or let the agents suggest the alternatives."],
-      ["Simulate", "Attacking and defending agents plan against each other; every option runs hundreds of times."],
-      ["Explore", "Compare outcomes, read the tactical explanation and continue to the next decision."],
+      ["Detect", "The live feed is watched for decisive moments: a shot while a teammate is free, a risky pass, a dribble under pressure. The game state is frozen just before the action, without peeking at what happened next."],
+      ["Propose", "From that exact position, an agent lists the options that were really on, such as the pass to the free winger or the through ball. Every option is checked: the right players, reachable space, nothing invented."],
+      ["Simulate", "Each option, including the one the player actually chose, is played forward 200 times from the same frozen state with paired random seeds, so differences come from the decision, not from luck."],
+      ["Verify & explain", "A verification agent recomputes every number and rejects any claim the data does not support. Only then is the story written for fans, analysts or broadcast, with its uncertainty."],
     ],
+    howMultiverse: "Then take over in the Multiverse: choose the action yourself, watch a defending agent pick the best counter, and branch, rewind and compare futures that never happened.",
+    usesEyebrow: "Who it is for",
+    usesTitle: ["One engine,", "four kinds of questions."],
+    usesSub: "The same verified analysis is shaped for whoever needs it: a sentence for the fan, intervals and evidence for the analyst, a timed overlay for the director.",
+    uses: [
+      ["Broadcasters", "A verified 'what if' seconds after the moment: a lower-third caption, a replay of the alternative and machine-readable overlay instructions with timing and priority, ready for the studio or second screen."],
+      ["Analysts & coaches", "Review decisions with numbers instead of hindsight: compare the options with confidence intervals, see which defensive response neutralises which choice, and bring the branches into video sessions."],
+      ["Fans", "Settle the debate with evidence. Watch the pass that was never played, take the decision yourself in the Multiverse and see how often it would have worked under the model."],
+      ["Player development", "Teach decision-making from real situations: why the pass was on, how the defence would react and what a better option looks like, in plain language for young players."],
+    ],
+    usesNote: "Today OFFSCRIPT runs on synthetic matches; the pipeline takes any event stream with player positions.",
     compareEyebrow: "Compare realities",
     compareTitle: ["See how the game", "could have unfolded."],
     compareSub: "Watch the actual outcome and your alternative side by side. Different decisions. Different strategies. Different futures.",
@@ -77,16 +89,28 @@ const COPY = {
     stats: [
       ["200", "simulaties per optie"],
       ["5", "agents, één geverifieerd antwoord"],
-      ["3", "kijkmodi, EN en NL"],
+      ["3", "kijkmodi: fan, analist, omroep"],
     ],
     howEyebrow: "Hoe het werkt",
-    howTitle: ["Van één moment", "naar talloze mogelijkheden."],
-    howSub: "Jij kiest een beslissing, de agents strijden met strategieën, de simulator verkent de uitkomsten en jij spoelt terug, vergelijkt en ontdekt wat er had kunnen gebeuren.",
+    howTitle: ["Eén bevroren moment.", "Elke optie uitgespeeld."],
+    howSub: "OFFSCRIPT volgt een live wedstrijd, stopt bij de beslissingen die ertoe doen en maakt van elke beslissing een eerlijk experiment: dezelfde uitgangspositie, andere keuzes, honderden gesimuleerde vervolgen, en niets in beeld voordat het gecontroleerd is.",
     steps: [
-      ["Kiezen", "Verander de beslissing, of laat de agents de alternatieven voorstellen."],
-      ["Simuleren", "Aanvallende en verdedigende agents plannen tegen elkaar; elke optie wordt honderden keren gespeeld."],
-      ["Verkennen", "Vergelijk uitkomsten, lees de tactische uitleg en ga door naar de volgende beslissing."],
+      ["Herkennen", "De live feed wordt gevolgd op beslissende momenten: een schot terwijl een medespeler vrij staat, een riskante pass, een dribbel onder druk. De situatie wordt vlak vóór de actie bevroren, zonder vooruit te kijken."],
+      ["Voorstellen", "Vanuit precies die positie zet een agent de opties op een rij die echt konden, zoals de pass naar de vrije vleugelspeler of de steekpass. Elke optie wordt gecontroleerd: juiste spelers, bereikbare ruimte, niets verzonnen."],
+      ["Simuleren", "Elke optie, ook de echte keuze, wordt 200 keer vooruitgespeeld vanuit dezelfde bevroren situatie met gepaarde toevalsgetallen, zodat verschillen uit de beslissing komen en niet uit geluk."],
+      ["Controleren & uitleggen", "Een verificatie-agent rekent elk getal na en verwerpt elke bewering die de data niet steunt. Pas dan wordt het verhaal geschreven voor fans, analisten of omroep, met de onzekerheid erbij."],
     ],
+    howMultiverse: "Neem daarna zelf het roer in het Multiverse: kies de actie, zie een verdedigende agent de beste tegenzet kiezen, en vertak, spoel terug en vergelijk toekomsten die nooit plaatsvonden.",
+    usesEyebrow: "Voor wie",
+    usesTitle: ["Eén motor,", "vier soorten vragen."],
+    usesSub: "Dezelfde geverifieerde analyse wordt gevormd voor wie hem nodig heeft: een zin voor de fan, intervallen en bewijs voor de analist, een getimede overlay voor de regie.",
+    uses: [
+      ["Omroepen", "Een geverifieerde 'wat als' seconden na het moment: een ondertitel, een replay van het alternatief en machineleesbare overlay-instructies met timing en prioriteit, klaar voor studio of second screen."],
+      ["Analisten & trainers", "Beoordeel beslissingen met cijfers in plaats van achteraf-wijsheid: vergelijk opties met betrouwbaarheidsintervallen, zie welke verdedigende reactie welke keuze neutraliseert en gebruik de takken in videosessies."],
+      ["Fans", "Beslecht de discussie met bewijs. Bekijk de pass die nooit werd gegeven, neem zelf de beslissing in het Multiverse en zie hoe vaak die volgens het model had gewerkt."],
+      ["Talentontwikkeling", "Leer beslissen aan de hand van echte situaties: waarom de pass erop zat, hoe de verdediging zou reageren en hoe een betere optie eruitziet, in begrijpelijke taal voor jonge spelers."],
+    ],
+    usesNote: "OFFSCRIPT draait nu op synthetische wedstrijden; de pijplijn werkt met elke eventstream met spelersposities.",
     compareEyebrow: "Vergelijk werkelijkheden",
     compareTitle: ["Zie hoe de wedstrijd", "had kunnen verlopen."],
     compareSub: "Bekijk de echte uitkomst en jouw alternatief naast elkaar. Andere beslissingen. Andere strategieën. Andere toekomsten.",
@@ -180,32 +204,71 @@ function MiniPitch({ path, tone = "#8fca7c", dashed, crop, view, players = true,
   );
 }
 
+/** One small illustration per pipeline step: detect, propose, simulate, verify. */
 function StepArt({ i }: { i: number }) {
   const c = { fill: "none", stroke: "#8fca7c", strokeWidth: 1.4 } as const;
   if (i === 0) {
+    // Frozen moment: the carrier inside a freeze ring, play paused.
     return (
-      <div className="w-24 shrink-0">
-        <MiniPitch path={PASS_PATH} crop players={false}
-          extra={<><circle cx={22.8} cy={37} r={2} fill="#facc15" /><circle cx={11.8} cy={20.5} r={2} fill="#d4ee8f" /></>} />
-      </div>
-    );
-  }
-  if (i === 1) {
-    return (
-      <svg viewBox="0 0 80 64" className="w-24 shrink-0" aria-hidden>
-        <circle cx={40} cy={32} r={20} {...c} strokeDasharray="3 3" />
-        {[[40, 12], [60, 32], [40, 52], [20, 32]].map(([x, y], k) => <rect key={k} x={x - 4} y={y - 4} width={8} height={8} fill={k % 2 ? "#f59e0b" : "#38bdf8"} />)}
-        <rect x={36} y={28} width={8} height={8} fill="#d4ee8f" />
+      <svg viewBox="0 0 80 64" className="w-20 shrink-0" aria-hidden>
+        <circle cx={40} cy={32} r={18} {...c} strokeDasharray="3 3" />
+        <circle cx={40} cy={32} r={5} fill="#facc15" />
+        <circle cx={22} cy={20} r={3} fill="#38bdf8" /><circle cx={60} cy={44} r={3} fill="#38bdf8" />
+        <circle cx={56} cy={18} r={3} fill="#f59e0b" /><circle cx={24} cy={46} r={3} fill="#f59e0b" />
+        <rect x={68} y={4} width={3} height={10} fill="#d4ee8f" /><rect x={74} y={4} width={3} height={10} fill="#d4ee8f" />
       </svg>
     );
   }
+  if (i === 1) {
+    // Realistic options from the carrier: the actual shot and two checked passes.
+    return (
+      <svg viewBox="0 0 80 64" className="w-20 shrink-0" aria-hidden>
+        <path d="M30 34 L6 32" stroke="#f8fafc" strokeWidth={1.4} strokeDasharray="3 2" />
+        <path d="M30 34 Q34 14 58 10" {...c} /><path d="M30 34 Q46 44 66 50" {...c} />
+        <circle cx={30} cy={34} r={4} fill="#facc15" />
+        <circle cx={58} cy={10} r={3.5} fill="#38bdf8" /><circle cx={66} cy={50} r={3.5} fill="#38bdf8" />
+        <path d="M70 6 l3 3 l6 -7" fill="none" stroke="#d4ee8f" strokeWidth={1.6} />
+      </svg>
+    );
+  }
+  if (i === 2) {
+    // Many continuations fanning out from the same frozen state.
+    return (
+      <svg viewBox="0 0 80 64" className="w-20 shrink-0" aria-hidden>
+        {[-24, -15, -7, 0, 7, 15, 24].map((dy, k) => (
+          <path key={k} d={`M10 32 C 30 32, 40 ${32 + dy * 0.6}, 70 ${32 + dy}`} fill="none" stroke="#8fca7c" strokeWidth={1} opacity={0.35 + (k % 3) * 0.2} />
+        ))}
+        <rect x={6} y={28} width={8} height={8} fill="#facc15" />
+        <text x={72} y={62} fontSize={9} textAnchor="end" fill="#d4ee8f" fontFamily="monospace">×200</text>
+      </svg>
+    );
+  }
+  // Every claim checked against the evidence.
   return (
-    <svg viewBox="0 0 80 64" className="w-24 shrink-0" aria-hidden>
-      <path d="M8 32 H30 M30 32 L52 12 M30 32 H52 M30 32 L52 52" {...c} />
-      {[[56, 12], [56, 32], [56, 52]].map(([x, y], k) => <rect key={k} x={x - 4} y={y - 4} width={8} height={8} fill="none" stroke="#d4ee8f" strokeWidth={1.4} />)}
-      <rect x={4} y={28} width={8} height={8} fill="#facc15" />
+    <svg viewBox="0 0 80 64" className="w-20 shrink-0" aria-hidden>
+      {[12, 30, 48].map((y, k) => (
+        <g key={y}>
+          <rect x={8} y={y - 5} width={10} height={10} fill="none" stroke="#8fca7c" strokeWidth={1.2} />
+          {k === 2
+            ? <path d={`M10 ${y - 3} l6 6 M16 ${y - 3} l-6 6`} fill="none" stroke="#f87171" strokeWidth={1.6} />
+            : <path d={`M10 ${y} l3 3 l5 -6`} fill="none" stroke="#d4ee8f" strokeWidth={1.6} />}
+          <rect x={24} y={y - 2} width={k === 1 ? 36 : 46} height={4} fill="#8fca7c" opacity={0.35} />
+        </g>
+      ))}
     </svg>
   );
+}
+
+/** Line icons for the use cases: broadcast screen, analyst chart, fan, player development. */
+function UseIcon({ i }: { i: number }) {
+  const s = { fill: "none", stroke: "#8fca7c", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+  const paths = [
+    <><rect x={4} y={6} width={28} height={18} {...s} /><path d="M12 30 H24 M18 24 V30" {...s} /><path d="M8 20 H20" stroke="#d4ee8f" strokeWidth={2.2} /></>,
+    <><path d="M5 30 H31 M5 30 V6" {...s} /><path d="M9 24 L16 16 L21 20 L30 9" {...s} /><circle cx={30} cy={9} r={2} fill="#d4ee8f" /></>,
+    <><circle cx={18} cy={18} r={12} {...s} /><path d="M18 11 L23 15 L21 21 H15 L13 15 Z" fill="#d4ee8f" opacity={0.85} /></>,
+    <><path d="M6 28 L14 20 L20 24 L30 10" {...s} /><path d="M24 10 H30 V16" {...s} /><circle cx={6} cy={28} r={2} fill="#d4ee8f" /></>,
+  ];
+  return <svg viewBox="0 0 36 36" className="h-9 w-9" aria-hidden>{paths[i % paths.length]}</svg>;
 }
 
 function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: readonly string[]; sub: string }) {
@@ -417,18 +480,16 @@ function AgentRelay({ C }: { C: (typeof COPY)[Lang] }) {
 }
 
 export default function Landing() {
-  const [lang, setLang] = useState<Lang>("en");
+  // The site is English-only (the Dutch copy is kept in COPY but not offered).
+  const lang: Lang = "en";
   const [playKey, setPlayKey] = useState(0);
   const C = COPY[lang];
   useEffect(() => {
     // Older links put app state on the root URL: forward them to the app.
     const q = window.location.search;
     if (/[?&](scenario|view)=/.test(q)) window.location.replace(`/app/${q}`);
-    if (navigator.language?.toLowerCase().startsWith("nl")) setLang("nl");
-  }, []);
-  useEffect(() => {
     document.documentElement.lang = lang;
-  }, [lang]);
+  }, []);
 
   return (
     <div className={`landing ${display.variable} ${body.variable} min-h-screen overflow-x-hidden`}>
@@ -438,11 +499,6 @@ export default function Landing() {
           <span className="text-[15px] font-black tracking-[0.32em] text-white">OFFSCRIPT</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <div role="radiogroup" aria-label="Language" className="flex rounded-sm bg-white/[0.04] p-0.5">
-            {(["en", "nl"] as const).map((l) => (
-              <button key={l} type="button" role="radio" aria-checked={lang === l} onClick={() => setLang(l)} className="tab">{l.toUpperCase()}</button>
-            ))}
-          </div>
           <ThemeToggle lang={lang} />
           <Link href={APP} className="btn whitespace-nowrap">{C.open} →</Link>
         </div>
@@ -475,21 +531,25 @@ export default function Landing() {
       <section className="section-band">
         <div className="mx-auto max-w-[1400px] px-5 py-16">
           <SectionHead eyebrow={C.howEyebrow} title={C.howTitle} sub={C.howSub} />
-          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {C.steps.map(([title, text], i) => (
-              <li key={title} className="glass relative flex items-center gap-4 p-5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center self-start bg-leaf-500/15 font-mono text-sm font-bold text-leaf-300 ring-1 ring-leaf-400/40">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-[15px] font-bold text-white">{title}</h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-400">{text}</p>
+              <li key={title} className="glass relative flex flex-col gap-3 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center bg-leaf-500/15 font-mono text-sm font-bold text-leaf-300 ring-1 ring-leaf-400/40">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <StepArt i={i} />
                 </div>
-                <StepArt i={i} />
-                {i < 2 && <span className="absolute -right-3.5 top-1/2 z-10 hidden -translate-y-1/2 text-leaf-400 md:block" aria-hidden>→</span>}
+                <h3 className="text-[15px] font-bold text-white">{title}</h3>
+                <p className="text-[13px] leading-relaxed text-slate-400">{text}</p>
+                {i < C.steps.length - 1 && <span className="absolute -right-3.5 top-1/2 z-10 hidden -translate-y-1/2 text-leaf-400 lg:block" aria-hidden>→</span>}
               </li>
             ))}
           </ol>
+          <p className="mt-6 flex items-start gap-2 text-[14px] leading-relaxed text-slate-300">
+            <span className="mt-1.5 h-2 w-2 shrink-0 bg-leaf-400" aria-hidden />
+            <span>{C.howMultiverse}</span>
+          </p>
         </div>
       </section>
 
@@ -524,6 +584,20 @@ export default function Landing() {
             <span className="absolute left-1/2 top-[42%] z-10 hidden h-9 w-9 -translate-x-1/2 place-items-center bg-white text-sm font-bold text-ink md:grid" aria-hidden>⇄</span>
           </div>
         </div>
+      </section>
+
+      <section className="relative mx-auto max-w-[1400px] px-5 py-20">
+        <SectionHead eyebrow={C.usesEyebrow} title={C.usesTitle} sub={C.usesSub} />
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {C.uses.map(([who, what], i) => (
+            <li key={who} className="glass flex flex-col gap-3 p-5">
+              <UseIcon i={i} />
+              <h3 className="text-[16px] font-bold text-white">{who}</h3>
+              <p className="text-[13px] leading-relaxed text-slate-400">{what}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 text-[12px] text-slate-500">{C.usesNote}</p>
       </section>
 
       <section className="relative mx-auto max-w-[1400px] px-5 pb-16 pt-10">
