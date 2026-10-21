@@ -67,7 +67,11 @@ echo "[3/4] Web app (API: $API)"
 NEXT_PUBLIC_API_BASE_URL="$API" npm run build -w apps/web
 az_ storage blob service-properties update --account-name "$SA" --auth-mode key -o none \
   --static-website --index-document index.html --404-document 404.html
-az_ storage blob upload-batch --account-name "$SA" --auth-mode key -d '$web' -s apps/web/out --overwrite -o none
+# Pages revalidate on every visit; content-hashed assets are cached for a year.
+az_ storage blob upload-batch --account-name "$SA" --auth-mode key -d '$web' -s apps/web/out --overwrite -o none \
+  --content-cache-control "no-cache"
+az_ storage blob upload-batch --account-name "$SA" --auth-mode key -d '$web' -s apps/web/out --overwrite -o none \
+  --pattern "_next/static/*" --content-cache-control "public, max-age=31536000, immutable"
 
 echo "[4/4] Smoke test (the first request wakes a scaled-to-zero API)"
 curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 120 "$API/api/health"

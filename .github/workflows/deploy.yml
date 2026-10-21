@@ -78,9 +78,14 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: ${{ env.API_URL }}
       - name: Upload the web app
+        # Pages are revalidated on every visit (a deploy is visible immediately); content-hashed
+        # assets under _next/static never change and are cached for a year.
         run: |
           az storage blob upload-batch --account-name "$WEB_ACCOUNT" --auth-mode key -d '$web' -s apps/web/out \
-            --overwrite -o none --only-show-errors
+            --overwrite -o none --only-show-errors --content-cache-control "no-cache"
+          az storage blob upload-batch --account-name "$WEB_ACCOUNT" --auth-mode key -d '$web' -s apps/web/out \
+            --pattern "_next/static/*" --overwrite -o none --only-show-errors \
+            --content-cache-control "public, max-age=31536000, immutable"
 
       - name: Smoke test (wakes a scaled-to-zero API)
         run: |
