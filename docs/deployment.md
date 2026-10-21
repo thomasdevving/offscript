@@ -126,7 +126,10 @@ az identity federated-credential create -g <rg> --identity-name offscript-github
 az role assignment create --assignee-object-id <principalId> --assignee-principal-type ServicePrincipal   --role Contributor --scope <resource group id>
 ```
 
-then put the identity's client ID and your tenant/subscription IDs in `deploy.yml`. Infrastructure
+GitHub may present the subject with immutable owner/repository IDs instead
+(`repo:<owner>@<ownerId>/<repo>@<repoId>:ref:refs/heads/main`; the exact value is in the error of a
+failed `azure/login` step); add a second federated credential with that subject. Then put the
+identity's client ID and your tenant/subscription IDs in `deploy.yml`. Infrastructure
 changes (Bicep) are not applied automatically: run `scripts/deploy_azure.sh` for those.
 
 ## 3. Judge access checklist
