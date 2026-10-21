@@ -6,7 +6,7 @@ import { interpolate } from "@/lib/frames";
 import { pct } from "@/lib/format";
 import { mv, useMv } from "@/lib/mvStore";
 import { useApp } from "@/lib/store";
-import Pitch from "../Pitch";
+import PitchView from "../PitchView";
 
 export default function CompareModal() {
   const c = useMv((s) => s.compare);
@@ -41,7 +41,7 @@ export default function CompareModal() {
         <div className={`rounded px-2 py-1 text-xs font-bold uppercase tracking-wider ${observed ? "bg-slate-200 text-slate-900" : "bg-leaf-600 text-white"}`}>
           {which.toUpperCase()} · {observed ? "Canonical synthetic timeline" : "Simulated branch"}
         </div>
-        {match && <Pitch match={match} frame={frame} tint={observed ? "observed" : "simulated"} ariaLabel={`Branch ${which}`} />}
+        {match && <PitchView match={match} frame={frame} tint={observed ? "observed" : "simulated"} ariaLabel={`Branch ${which}`} />}
         <ol className="text-xs text-slate-300">
           {steps?.map((s) => (
             <li key={s.node_id}>

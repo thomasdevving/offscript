@@ -19,7 +19,7 @@ export interface Ring {
   r: number;
 }
 
-interface Props {
+export interface PitchProps {
   match: MatchInfo;
   frame: RenderFrame | null;
   highlightId?: string | null;
@@ -104,7 +104,7 @@ function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }
   );
 }
 
-export default function Pitch(p: Props) {
+export default function Pitch(p: PitchProps) {
   const home = p.match.home;
   const away = p.match.away;
   const teamOf = new Map(p.match.players.map((pl) => [pl.player_id, pl]));

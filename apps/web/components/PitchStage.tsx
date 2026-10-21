@@ -9,7 +9,8 @@ import { activeOverlay } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
 import { ScoreBug } from "./MatchIntel";
 import OverlayCard from "./OverlayCard";
-import Pitch, { type Arrow, type Ring } from "./Pitch";
+import { type Arrow, type Ring } from "./Pitch";
+import PitchView, { DimToggle } from "./PitchView";
 
 function useRaf(cb: (dt: number) => void, active: boolean) {
   const ref = useRef(cb);
@@ -58,6 +59,19 @@ function candidateArrows(a: CounterfactualAnalysis | null, s: MatchStateSnapshot
       rank: r ? ranked.findIndex((x) => x.action_id === c.action_id) + 1 : undefined,
     } satisfies Arrow;
   });
+}
+
+/** End-of-continuation result: what was chosen, how it ended and how likely that kind of outcome is. */
+export function OutcomeCard({ action, outcome, lines }: { action: string; outcome: string; lines: string[] }) {
+  return (
+    <div className="pointer-events-none absolute bottom-2 left-1/2 z-10 w-max max-w-[92%] -translate-x-1/2 animate-rise bg-slate-950/80 px-3 py-1.5 text-center shadow-2xl ring-1 ring-leaf-400/40 backdrop-blur"
+      data-testid="outcome-card">
+      <div className="text-[13px] font-bold text-white">
+        {action} → <span className="text-amber-300">{outcome.replace(/_/g, " ").toLowerCase()}</span>
+      </div>
+      {lines.filter(Boolean).map((l) => <div key={l} className="font-mono text-[10.5px] leading-snug text-leaf-200">{l}</div>)}
+    </div>
+  );
 }
 
 export default function PitchStage() {
@@ -123,11 +137,13 @@ export default function PitchStage() {
       : s.view === "snapshot" ? { text: `${L.frozen} · ${decision ? clock(decision.match_clock_ms) : ""}`, cls: "bg-sage-600/90 text-white shadow-lg shadow-sage-900/50" }
         : { text: L.observed, cls: "bg-slate-950/80 text-slate-300 ring-1 ring-white/10" };
 
+  const simRes = traj ? analysis?.simulation?.results.find((r) => r.action_id === traj.action_id) : undefined;
+  const atEnd = !!traj && s.whatIf.t >= (traj.frames[traj.frames.length - 1]?.t_ms ?? 0) - 1;
   const traceLabel = traj ? `${cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")} · rollout #${traj.rollout_index} · ${traj.outcome}` : "";
 
   return (
     <div className="relative">
-      <div className="absolute left-3 top-3 z-10"><ScoreBug /></div>
+      <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5"><ScoreBug /><DimToggle /></div>
       <div className="absolute bottom-3 right-3 z-10 flex max-w-[60%] flex-col items-end gap-1.5 sm:bottom-auto sm:top-3">
         <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${banner.cls}`} data-testid="view-banner">
           <span className={`h-1.5 w-1.5 rounded-full ${s.view === "observed" ? "bg-emerald-400" : "bg-white"} ${s.view !== "snapshot" ? "animate-pulse" : ""}`} />
@@ -135,10 +151,20 @@ export default function PitchStage() {
         </span>
         {s.view === "simulated" && <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-right text-[11px] text-leaf-200 backdrop-blur">{L.oneSample}</span>}
       </div>
-      {s.view === "simulated" && traj && (
+      {s.view === "simulated" && traj && !atEnd && (
         <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-slate-950/80 px-2 py-1 font-mono text-[11px] text-leaf-200 backdrop-blur" data-testid="trace-label">{traceLabel}</div>
       )}
-      <Pitch
+      {s.view === "simulated" && traj && atEnd && (
+        <OutcomeCard
+          action={cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")}
+          outcome={traj.outcome}
+          lines={[
+            simRes ? `P(goal) ${pct(simRes.p_goal.value, s.lang)} · ${simRes.n_rollouts} ${L.simulations}` : "",
+            `rollout #${traj.rollout_index} · ${s.lang === "en" ? "one simulated continuation" : "één gesimuleerd verloop"}`,
+          ]}
+        />
+      )}
+      <PitchView
         match={match}
         frame={frame}
         highlightId={s.view !== "observed" ? decision?.actor_id : null}

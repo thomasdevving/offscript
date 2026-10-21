@@ -6,7 +6,9 @@ import { interpolate, type RenderFrame } from "@/lib/frames";
 import { clock, pct } from "@/lib/format";
 import { mv, useMv } from "@/lib/mvStore";
 import { selectedDecision, useApp } from "@/lib/store";
-import Pitch, { type Arrow } from "../Pitch";
+import { type Arrow } from "../Pitch";
+import { OutcomeCard } from "../PitchStage";
+import PitchView, { DimToggle } from "../PitchView";
 import ActionComposer from "./ActionComposer";
 import AgentBattle, { PlanningSteps } from "./AgentBattle";
 import CompareModal from "./CompareModal";
@@ -97,6 +99,7 @@ function Stage() {
     ? snap.players.filter((p) => p.team_id === snap.possession_team_id && p.player_id !== snap.ball.possessor_id).map((p) => p.player_id) : undefined;
   const marker = st.composer.point ? { x: st.composer.point[0], y: st.composer.point[1], ok: !!st.composer.validation?.ok } : null;
   const simulated = node.kind === "simulated" || (path?.simulated ?? false);
+  const treeNode = st.tree?.nodes.find((n) => n.node_id === node.node_id);
   return (
     <div className="relative">
       <div className="absolute right-3 top-3 z-10 flex max-w-[65%] flex-col items-end gap-1.5">
@@ -108,7 +111,22 @@ function Stage() {
           <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] text-leaf-200 backdrop-blur">{node.transition.sample_kind.replace("_", " ")} sample · rollout #{node.transition.rollout_index} · not a certainty</span>
         )}
       </div>
-      <Pitch match={match} frame={frame} arrows={arrows} highlightId={snap?.ball.possessor_id ?? null}
+      <div className="absolute left-3 top-3 z-10"><DimToggle /></div>
+      {/* The defence's answer, named, while its movement arrows are on the pitch. */}
+      {node.entering_strategy && !atEnd && (
+        <div className="absolute bottom-3 left-3 z-10 max-w-[60%] bg-slate-950/85 px-2 py-1 text-[11px] text-orange-200 ring-1 ring-orange-400/30 backdrop-blur" data-testid="mv-defence">
+          Defence: <b className="text-orange-100">{node.entering_strategy.label}</b>
+        </div>
+      )}
+      {simulated && atEnd && node.kind !== "root" && (
+        <OutcomeCard action={node.label} outcome={node.outcome_label || treeNode?.outcome || node.status}
+          lines={[
+            treeNode?.value_vs_counter != null
+              ? `${pct(treeNode.value_vs_counter)} modelled goal chance vs ${node.entering_strategy ? `“${node.entering_strategy.label}”` : "the defence's best counter"}` : "",
+            node.transition ? `${node.transition.sample_kind.replace("_", " ")} sample · rollout #${node.transition.rollout_index} · one simulated continuation` : "one simulated continuation",
+          ]} />
+      )}
+      <PitchView match={match} frame={frame} arrows={arrows} highlightId={snap?.ball.possessor_id ?? null}
         tint={node.kind === "observed" ? "observed" : simulated ? "simulated" : "snapshot"}
         selectableIds={selectable} onPlayerClick={(id) => void mv.playerClicked(id)}
         onPitchClick={st.composer.type === "dribble" || st.composer.type === "pass_space" ? (x, y) => void mv.pitchClicked(x, y) : undefined}

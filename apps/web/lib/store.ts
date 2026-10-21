@@ -84,6 +84,8 @@ export interface AppState {
   recapOpen: boolean;
   recapLoading: boolean;
   inspectorOpen: boolean;
+  /** Pitch rendering: flat tactical board or the 3D replay. Shared by the live view and the Multiverse. */
+  pitchDim: "2d" | "3d";
   appView: "live" | "multiverse";
 }
 
@@ -129,6 +131,7 @@ export const useApp = create<AppState>(() => ({
   recapOpen: false,
   recapLoading: false,
   inspectorOpen: true,
+  pitchDim: "2d",
   appView: "live",
 }));
 
@@ -412,6 +415,25 @@ export const actions = {
       window.history.replaceState(null, "", url.toString());
     } catch {
       /* non-browser */
+    }
+  },
+
+  setPitchDim(v: "2d" | "3d"): void {
+    set({ pitchDim: v });
+    try {
+      localStorage.setItem("parallel.pitchDim", v);
+    } catch {
+      /* storage unavailable */
+    }
+  },
+  /** Restores the viewer's last 2D/3D choice (client only, after hydration). */
+  restorePitchDim(): void {
+    try {
+      // ?dim=3d in the URL wins (handy for demo links), then the remembered choice.
+      const v = new URLSearchParams(window.location.search).get("dim") ?? localStorage.getItem("parallel.pitchDim");
+      if (v === "2d" || v === "3d") set({ pitchDim: v });
+    } catch {
+      /* storage unavailable */
     }
   },
 

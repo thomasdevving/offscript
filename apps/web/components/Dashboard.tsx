@@ -78,6 +78,7 @@ export default function Dashboard() {
   const [slow, setSlow] = useState(false);
   useEffect(() => {
     void actions.init();
+    actions.restorePitchDim();
     const id = setTimeout(() => setSlow(true), 2500);
     return () => clearTimeout(id);
   }, []);
