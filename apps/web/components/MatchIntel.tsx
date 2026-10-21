@@ -71,7 +71,7 @@ export function Moments() {
                 <div className="mt-1 truncate text-[11px] text-slate-400">
                   {d.actual_action.label.replace(" (actual)", "")} → <span className="text-amber-200/90">{eventLabel(d.actual_outcome, s.lang)}</span>
                 </div>
-                <div className="mt-0.5 truncate text-[10px] text-slate-500">{triggerLabel(d.triggers[0] ?? "", s.lang)}</div>
+                {s.mode === "analyst" && <div className="mt-0.5 truncate text-[10px] text-slate-500">{triggerLabel(d.triggers[0] ?? "", s.lang)}</div>}
               </button>
             </li>
           );
@@ -88,7 +88,7 @@ function EventFeed() {
   const names = new Map((s.match?.players ?? []).map((p) => [p.player_id, p.short_name]));
   const feed = s.feed.filter((e) => e.event_type !== "PLAYER_POSITION_UPDATED" && e.event_type !== "BALL_POSITION_UPDATED");
   return (
-    <ol className="max-h-56 overflow-y-auto text-xs" aria-live="polite" aria-label={L.events} data-testid="event-feed">
+    <ol className={`${s.mode === "analyst" ? "max-h-56" : "max-h-40"} overflow-y-auto text-xs`} aria-live="polite" aria-label={L.events} data-testid="event-feed">
       {feed.slice(0, 40).map((e: MatchEvent) => (
         <li key={e.event_id} className={`flex items-center gap-2 rounded-lg px-2 py-1 ${e.event_type === "GOAL" ? "bg-emerald-500/20" : "hover:bg-white/[0.03]"}`}>
           <span className="num w-11 shrink-0 font-mono text-slate-500">{clock(e.match_clock_ms)}</span>
@@ -96,7 +96,7 @@ function EventFeed() {
             {eventLabel(e.event_type, s.lang)}
           </span>
           <span className="truncate text-slate-500">{e.player_ids.map((p) => names.get(p) ?? p).join(" → ")}</span>
-          {e.details?.scripted && <span className="ml-auto text-[9px] uppercase tracking-wider text-slate-600">script</span>}
+          {e.details?.scripted && s.mode === "analyst" && <span className="ml-auto text-[9px] uppercase tracking-wider text-slate-600">script</span>}
           {ACTIONS.has(e.event_type) && e.snapshot_id && !e.details?.scripted && (
             <button type="button" onClick={() => void actions.analyseEvent(e.event_id)} title={L.manualHint}
               className="ml-auto shrink-0 rounded-md bg-leaf-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-leaf-200 hover:bg-leaf-500/25">

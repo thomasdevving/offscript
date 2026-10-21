@@ -89,7 +89,11 @@ export default function PlaybackControls() {
           </button>
         ))}
       </div>
-      <div className="flex items-center gap-3 text-[11px] text-slate-400">
+      {/* Playback preferences are rarely changed: tucked behind a settings toggle. */}
+      <details className="group relative text-[11px] text-slate-400">
+        <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-sm text-sm hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"
+          aria-label={s.lang === "en" ? "Playback settings" : "Afspeelinstellingen"} title={s.lang === "en" ? "Playback settings" : "Afspeelinstellingen"}>⚙</summary>
+        <div className="glass absolute bottom-10 right-0 z-20 flex w-max flex-col gap-2 bg-panel/95 p-3">
         <label className="flex cursor-pointer items-center gap-1.5 hover:text-slate-200">
           <input type="checkbox" checked={s.autoPause} onChange={(e) => actions.setAutoPause(e.target.checked)} className="accent-sage-500" />
           {L.autoPause}
@@ -98,7 +102,8 @@ export default function PlaybackControls() {
           <input type="checkbox" checked={s.autoAnalyze} onChange={(e) => actions.setAutoAnalyze(e.target.checked)} className="accent-sage-500" />
           {L.autoAnalyze}
         </label>
-      </div>
+        </div>
+      </details>
     </div>
   );
 }
@@ -156,7 +161,7 @@ export function WhatIfControls() {
           </div>
           <input type="range" min={0} max={end} step={50} value={s.whatIf.t} aria-label="Scrub simulated continuation"
             onChange={(e) => actions.setWhatIf({ t: Number(e.target.value), playing: false })} className="timeline mt-2 w-full" />
-          <p className="mt-1 truncate text-[10px] text-leaf-200/60" title={traj.selection_rule}>{traj.selection_rule}</p>
+          {s.mode === "analyst" && <p className="mt-1 truncate text-[10px] text-leaf-200/60" title={traj.selection_rule}>{traj.selection_rule}</p>}
         </>
       )}
     </div>

@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
  * controlled recovery, broadcast overlay JSON, Dutch, recap, scenario switching.
  */
 test("shoot-or-pass end to end", async ({ page }) => {
-  await page.goto("/?scenario=shoot_vs_pass");
+  await page.goto("/app/?scenario=shoot_vs_pass");
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: /73' - The decision that changed the attack/ })).toBeVisible();
   await expect(page.getByTestId("agent-mode")).toContainText("Agents");
@@ -77,7 +77,7 @@ test("shoot-or-pass end to end", async ({ page }) => {
 });
 
 test("keyboard and decision timeline navigation", async ({ page }) => {
-  await page.goto("/?scenario=shoot_vs_pass");
+  await page.goto("/app/?scenario=shoot_vs_pass");
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
   await expect(page.getByTestId("decision-list")).toContainText("Ravi Castellane");
   await page.keyboard.press("ArrowRight");

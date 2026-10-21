@@ -6,7 +6,7 @@ test.skip(!process.env.SCREENSHOTS, "screenshots only on demand");
 const OUT = "../../docs/images";
 
 test("capture product screenshots", async ({ page }) => {
-  await page.goto("/?scenario=shoot_vs_pass");
+  await page.goto("/app/?scenario=shoot_vs_pass");
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "2×" }).click();
   await page.getByTestId("play-toggle").click();
@@ -43,7 +43,7 @@ test("capture product screenshots", async ({ page }) => {
 
 test("capture multiverse screenshots", async ({ page }) => {
   test.setTimeout(300_000);
-  await page.goto("/?scenario=shoot_vs_pass&view=multiverse");
+  await page.goto("/app/?scenario=shoot_vs_pass&view=multiverse");
   await page.getByTestId("mv-open-decision").first().click();
   await expect(page.getByTestId("tree-node-observed")).toBeVisible();
   await page.getByTestId("tool-pass").click();

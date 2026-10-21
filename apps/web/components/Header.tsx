@@ -7,10 +7,10 @@ import BrandMark from "./BrandMark";
 
 export function Logo() {
   return (
-    <div className="flex items-center gap-2">
+    <a href="/" className="flex items-center gap-2" aria-label="PARALLEL home">
       <BrandMark size={30} id="hdr" />
       <span className="text-[15px] font-black tracking-[0.32em] text-white">PARALLEL</span>
-    </div>
+    </a>
   );
 }
 

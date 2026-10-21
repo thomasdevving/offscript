@@ -74,7 +74,8 @@ npm ci
 npm run dev:web
 ```
 
-Open http://localhost:3000, keep **"73' - The decision that changed the attack"**, press ▶ (2× is a
+Open http://localhost:3000 for the landing page, or go straight to the app at
+http://localhost:3000/app/. Keep **"73' - The decision that changed the attack"**, press ▶ (2× is a
 good speed). For the Multiverse, open the **Multiverse** tab (or "Explore in the Multiverse" on an
 analysis), choose the 72:47 decision, pick *Pass to player* and click a highlighted teammate. Or run
 everything with Docker: `docker compose up --build`.

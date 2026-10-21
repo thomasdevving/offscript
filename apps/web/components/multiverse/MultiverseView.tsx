@@ -190,7 +190,7 @@ export default function MultiverseView() {
         <section className="glass p-3" aria-label="Multiverse map">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <h2 className="eyebrow">Multiverse map</h2>
-            <span className="hidden text-[10px] text-slate-500 md:inline">dashed white = canonical synthetic timeline (never changed) · amber = branch ended · % = modelled xG vs the defence&apos;s best counter</span>
+            {app.mode === "analyst" && <span className="hidden text-[10px] text-slate-500 md:inline">dashed white = canonical synthetic timeline (never changed) · amber = branch ended · % = modelled xG vs the defence&apos;s best counter</span>}
             <div className="ml-auto flex gap-1">
               <button type="button" onClick={() => void mv.newSession()} className="btn px-2 py-1 text-[11px]">New session</button>
               <button type="button" onClick={() => mv.close()} className="btn px-2 py-1 text-[11px]">Close</button>

@@ -12,7 +12,7 @@ test("football multiverse: branch, continue, rewind, fork, compare", async ({ pa
   const before = await (await request.get(`${API}/api/matches/demo-match-073/events`)).json();
   const decisions = await (await request.get(`${API}/api/matches/demo-match-073/decisions`)).json();
 
-  await page.goto("/?scenario=shoot_vs_pass&view=multiverse");
+  await page.goto("/app/?scenario=shoot_vs_pass&view=multiverse");
   await page.getByTestId("mv-open-decision").first().click();
   await expect(page.getByTestId("decision-tree")).toBeVisible();
   await expect(page.getByTestId("tree-node-observed")).toBeVisible();
