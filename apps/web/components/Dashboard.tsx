@@ -79,6 +79,9 @@ export default function Dashboard() {
   useEffect(() => {
     void actions.init();
     actions.restorePitchDim();
+    // Deep links from the landing page open in a viewer mode (?mode=casual|analyst|broadcaster).
+    const m = new URLSearchParams(window.location.search).get("mode");
+    if (m === "casual" || m === "analyst" || m === "broadcaster") actions.setMode(m);
     const id = setTimeout(() => setSlow(true), 2500);
     return () => clearTimeout(id);
   }, []);
