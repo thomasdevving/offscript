@@ -30,8 +30,10 @@ agents, 200 rollouts per option).
 | Decision Value Added, procedural 10-min segment (18 decisions, all verified) | **−6.5 pp** modelled goal chance left in total (95% interval −10.3 to −2.7 pp); 11 decisions at 0, 1 with a clearly better alternative |
 | DVA selection effect: in-sample vs held-out on fresh rollouts (24 decisions) | **−14.5 pp** vs **−10.5 pp** (held-out 95% interval −16.3 to −4.7 pp) |
 
-Latency with a live Foundry model adds model round-trips (up to 6 agent calls per analysis, each
-bounded by `FOUNDRY_TIMEOUT_S`); it was not measured in this environment.
+Latency with the live Foundry model (`gpt-4.1-mini`, deployed demo): one measured analysis of the
+73' decision made 6 live agent calls with 0 fallbacks and spent ~32 s in model calls (Decision 2.5 s,
+Strategy 3.8 s, Simulation 5.5 s, Verification 2.0 + 2.0 s, Explanation 16.0 s). This is a single
+run, not a benchmark; the deterministic planner figures above remain the reproducible numbers.
 
 ## Football Multiverse
 

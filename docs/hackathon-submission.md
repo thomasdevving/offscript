@@ -44,15 +44,14 @@ out, and an honest account of uncertainty - in seconds, in a form a broadcast ca
 | Technology | Use in OFFSCRIPT | Status |
 |---|---|---|
 | **Microsoft Agent Framework** (`agent-framework-core` 1.22) | `Agent` per specialist, `@tool` with invocation budgets, function middleware for tool-call tracing, structured outputs, `WorkflowBuilder` with switch-case edges, executors, bounded self-loops, workflow state | Implemented and tested (CI) |
-| **Microsoft Foundry** (`agent-framework-foundry` `FoundryChatClient`, Azure Identity) | Live model for all agents when `FOUNDRY_PROJECT_ENDPOINT`/`FOUNDRY_MODEL` are set; managed identity in Azure; diagnostics endpoint; optional live test | Implemented; **not exercised live in the build environment** (no credentials) - see deployment checklist |
-| **Azure Container Apps** | API (HTTPS + WebSockets), managed identity, single replica by default | Bicep + deploy workflow; deployment pending credentials |
-| **Azure Storage static website** | Static Next.js export (always on) | Bicep + deploy script |
-| **Azure Container Registry** | API image via `az acr build` | Bicep |
-| **Azure Monitor / Application Insights** (OpenTelemetry) | Traces, logs, Agent Framework instrumentation when the connection string is set | Implemented; enabled by configuration |
-| **Azure Developer CLI / Bicep** | `azure.yaml`, `infra/azure/*.bicep` | Compiles (Bicep 0.48.1) |
-| **GitHub Actions** | CI (lint, tests, contracts, build, Playwright e2e) and OIDC deploy | Workflows in repo |
+| **Microsoft Foundry** (`agent-framework-foundry` `FoundryChatClient`, Azure Identity) | Live model for all agents when `FOUNDRY_PROJECT_ENDPOINT`/`FOUNDRY_MODEL` are set; managed identity in Azure; diagnostics endpoint; optional live test | **Live in the deployed demo**: Foundry project with a `gpt-4.1-mini` deployment, keyless via the API's managed identity; one measured analysis ran all 6 agent steps on the live model with 0 fallbacks |
+| **Azure Container Apps** | API (HTTPS + WebSockets), managed identity, scale to zero when idle | **Deployed** (Germany West Central) |
+| **Azure Storage static website** | Static Next.js export (always on) | **Deployed** |
+| **Azure Monitor / Application Insights** (OpenTelemetry) | Traces, logs, Agent Framework instrumentation | **Deployed** and receiving telemetry |
+| **Bicep** (+ Azure Developer CLI manifest) | `infra/azure/*.bicep`, one-command `scripts/deploy_azure.sh` | Used for the live deployment |
+| **GitHub Actions** | CI (lint, tests, contracts, build, Playwright e2e), API image to GitHub Container Registry, and automatic deploy to Azure after CI passes (OIDC, no stored secrets) | **Running** on every push to `main` |
 
-Update the "Status" column once the deployment exists; do not claim more than is running.
+The API image is published to GitHub Container Registry rather than an Azure registry (the student subscription blocks ACR build tasks, and it keeps the running cost near zero).
 
 ## Technical innovation
 
@@ -92,19 +91,19 @@ Update the "Status" column once the deployment exists; do not claim more than is
 See [evaluation.md](evaluation.md) (measured on synthetic data; internal consistency, not real-world
 validity): 24/24 detected decisions verified; 240/240 numeric and 432/432 narrative corruptions
 caught with 0/144 false positives; 12/12 controlled faults recovered; bit-identical reproducibility;
-~2.6 s p50 end-to-end analysis in policy mode. Multiverse: single-decision vs branching vs adversarial
+~2.6 s p50 end-to-end analysis in policy mode; with the live Foundry model one measured analysis spent ~32 s in agent calls (16 s of it writing the six narratives). Multiverse: single-decision vs branching vs adversarial
 comparison, cost and cache measurements in [multiverse_evaluation.md](multiverse_evaluation.md).
 
 ## Limitations
 
 See [limitations.md](limitations.md). Headline: synthetic world, uncalibrated model, Monte Carlo
-intervals only, authored demo scenarios, Foundry/Azure not exercised in the build environment.
+intervals only, authored demo scenarios, a cold start of 20-40 s when the scaled-to-zero API wakes.
 
 ## Repository and demo instructions
 
 * Repository: https://github.com/thomasdevving/parallel (must be public at submission)
 * Run locally: see [README](../README.md#quick-start) (two commands each for API and web).
-* Live demo: `<web URL>`; API health `<apiUrl>/api/health`.
+* Live demo: https://parallelwebplb33l5h5wpok.z1.web.core.windows.net (app: https://parallelwebplb33l5h5wpok.z1.web.core.windows.net/app/); API health https://parallel-api.salmoncliff-9321cda4.germanywestcentral.azurecontainerapps.io/api/health. The API scales to zero: the first visit after a quiet period shows a "warming up" screen for 20-40 s.
 * Video: `<add public YouTube/Vimeo URL>` - script in [demo-script.md](demo-script.md).
 
 ## Submission checklist

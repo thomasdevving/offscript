@@ -1,9 +1,8 @@
 # Deployment
 
-> **Status (honest):** the Azure templates compile (`bicep build`, Bicep CLI 0.48.1) and the CI/CD
-> workflows are in the repository, but **no Azure resources were created from the build
-> environment** (no Azure credentials there). Follow the steps below to deploy; nothing in the
-> docs claims a live URL until you add one.
+> **Status:** deployed to Azure (Germany West Central) and updated automatically after CI passes on
+> `main`. Web app: https://parallelwebplb33l5h5wpok.z1.web.core.windows.net · API: https://parallel-api.salmoncliff-9321cda4.germanywestcentral.azurecontainerapps.io (health at `/api/health`, live model check with
+> `POST /api/diagnostics/foundry`). The steps below reproduce the deployment in another subscription.
 
 ## 1. Run locally (no Azure needed)
 

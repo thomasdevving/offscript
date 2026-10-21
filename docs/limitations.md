@@ -60,14 +60,19 @@
 
 ## Engineering / status
 
-* **Microsoft Foundry live path not exercised in this build environment.** The integration is
-  implemented with Agent Framework's `FoundryChatClient` and managed identity, with automatic,
-  labelled fallback; it needs a Foundry project endpoint + model deployment and credentials to run.
-  Verify with `POST /api/diagnostics/foundry` and `pytest -m foundry`.
-* **Azure deployment not executed here.** Bicep compiles cleanly (Bicep CLI 0.48.1) and CI/CD
-  workflows are provided, but no Azure resources were created from this environment (no Azure
-  credentials). Docker images were not built locally (Docker not installed here); CI builds the
-  stack natively and the deploy workflow builds with `az acr build`.
+* **Live model latency measured once, not benchmarked.** The deployed demo runs every agent on a
+  Microsoft Foundry `gpt-4.1-mini` deployment (one measured analysis: 6 live agent calls, 0
+  fallbacks, ~32 s of model time, of which 16 s for the six narratives). That is far slower than the
+  deterministic planner (~3 s); there is no systematic latency or cost benchmark of the live path,
+  and model output quality was not evaluated beyond the deterministic verifier's checks. When the
+  model fails or times out, the step falls back to the labelled planner and the analysis is marked
+  degraded.
+* **Cold start.** The API scales to zero when idle to keep the cost near zero; the first request
+  after a quiet period waits 20-40 s while it starts (the web app shows a "warming up" screen).
+  Analyses and Football Multiverse sessions held by a sleeping instance are lost.
+* **Network quirk on Azure Container Apps.** In the deployment region the container cannot resolve
+  `*.services.ai.azure.com`, so the agents reach the same Foundry deployment through the account's
+  Azure OpenAI endpoint (`FOUNDRY_OPENAI_ENDPOINT`); see `docs/deployment.md`.
 * **In-memory store.** Matches are generated at start-up; analyses live in memory with an optional
   disk cache. A multi-replica production deployment would use a shared store (e.g. Cosmos DB or
   Blob Storage) and a queue for simulation jobs.

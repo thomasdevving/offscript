@@ -6,6 +6,10 @@
 
 Multi-agent counterfactual football intelligence · Microsoft × Premier League *Inside the Game* Hackathon 2026
 
+**[Live demo](https://parallelwebplb33l5h5wpok.z1.web.core.windows.net)** · [Open the app](https://parallelwebplb33l5h5wpok.z1.web.core.windows.net/app/) · agents running live on Microsoft Foundry
+
+<sub>The API scales to zero when idle: the first visit after a quiet period shows a "warming up" screen for 20-40 seconds.</sub>
+
 </div>
 
 ![OFFSCRIPT at the 73rd-minute decision: the observed shot vs a pass to the overlapping winger](docs/images/casual-decision.png)
@@ -137,8 +141,8 @@ adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Te
 | | |
 |---|---|
 | Microsoft Agent Framework | Agents, tools with budgets, middleware tracing, structured outputs, workflow graph, shared state |
-| Microsoft Foundry | `FoundryChatClient` with Entra ID / managed identity; diagnostics endpoint; optional live test (requires your Foundry project - not exercised in the build environment) |
-| Azure Container Apps (scale to zero), Container Registry, Storage static website, Application Insights | Bicep templates (`infra/azure`), one-command deploy (`scripts/deploy_azure.sh`), OIDC deploy workflow - see [deployment](docs/deployment.md) |
+| Microsoft Foundry | **Live** in the deployed demo: a `gpt-4.1-mini` deployment drives every agent, keyless via managed identity; diagnostics endpoint and optional live test |
+| Azure Container Apps (scale to zero), Storage static website, Application Insights | **Deployed**; Bicep templates (`infra/azure`), one-command deploy (`scripts/deploy_azure.sh`) and automatic deploys from GitHub Actions after CI passes (OIDC, no stored secrets) - see [deployment](docs/deployment.md) |
 
 ## Repository
 
