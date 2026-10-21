@@ -13,7 +13,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Light is the default; the header toggle (or ?theme=dark|light) switches and is remembered. Runs before paint. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t="light";try{var q=new URLSearchParams(location.search).get("theme");if(q==="light"||q==="dark")localStorage.setItem("parallel.theme",q);t=q||localStorage.getItem("parallel.theme")||"light"}catch(e){}document.documentElement.dataset.theme=t==="dark"?"dark":"light"})()` }} />
+      </head>
       <body className="min-h-screen font-sans antialiased">{children}</body>
     </html>
   );

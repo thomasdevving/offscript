@@ -4,6 +4,7 @@ import { Space_Grotesk, Unbounded } from "next/font/google";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import BrandMark from "../BrandMark";
+import ThemeToggle from "../ThemeToggle";
 
 type Lang = "en" | "nl";
 
@@ -303,6 +304,7 @@ export default function Landing() {
               <button key={l} type="button" role="radio" aria-checked={lang === l} onClick={() => setLang(l)} className="tab">{l.toUpperCase()}</button>
             ))}
           </div>
+          <ThemeToggle lang={lang} />
           <Link href={APP} className="btn whitespace-nowrap">{C.open} →</Link>
         </div>
       </header>

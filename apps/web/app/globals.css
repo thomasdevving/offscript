@@ -464,3 +464,128 @@ input[type="range"].timeline::-moz-range-thumb {
 }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes fill { to { width: 100%; } }
+
+/* =============================================================================================
+   Light theme (default): white and green; dark via the header toggle or ?theme=dark. Shade scales are mirrored, so
+   every "light on dark" utility becomes "dark on light" without touching components; pitches keep
+   their grass colours.
+   ============================================================================================= */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-ink: #f5f9f2;
+  --color-panel: #ffffff;
+  --color-line: #dbe7d6;
+  --color-white: #0d2416;
+  --color-slate-50: #070c09;
+  --color-slate-100: #131a15;
+  --color-slate-200: #232b25;
+  --color-slate-300: #37423a;
+  --color-slate-400: #4c594f;
+  --color-slate-500: #6a786d;
+  --color-slate-600: #95a398;
+  --color-slate-700: #c3cdc5;
+  --color-slate-800: #dde4de;
+  --color-slate-900: #eef2ee;
+  --color-slate-950: #f6f8f6;
+  --color-leaf-50: #0f2216;
+  --color-leaf-100: #1e3a26;
+  --color-leaf-200: #2b4f33;
+  --color-leaf-300: #3a6742;
+  --color-leaf-400: #4a8150;
+  --color-leaf-500: #5f9c5e;
+  --color-leaf-600: #82bb74;
+  --color-leaf-700: #a3cf91;
+  --color-leaf-800: #c6e1b8;
+  --color-leaf-900: #e1efda;
+  --color-leaf-950: #f2f8ef;
+  --color-sage-50: #1b2313;
+  --color-sage-100: #334024;
+  --color-sage-200: #46572d;
+  --color-sage-300: #5e753a;
+  --color-sage-400: #7a964a;
+  --color-sage-500: #98b562;
+  --color-sage-600: #b2cb80;
+  --color-sage-700: #c9dca2;
+  --color-sage-800: #dde9c2;
+  --color-sage-900: #eef4df;
+  --color-sage-950: #f7faf0;
+  --color-muted: #4c594f;
+}
+:root[data-theme="light"] .text-amber-100 { color: oklch(41.4% 0.112 45.904); }
+:root[data-theme="light"] .text-amber-200 { color: oklch(47.3% 0.137 46.201); }
+:root[data-theme="light"] .text-amber-300 { color: oklch(47.3% 0.137 46.201); }
+:root[data-theme="light"] .text-amber-400 { color: oklch(55.5% 0.163 48.998); }
+:root[data-theme="light"] .text-emerald-100 { color: oklch(37.8% 0.077 168.94); }
+:root[data-theme="light"] .text-emerald-200 { color: oklch(43.2% 0.095 166.913); }
+:root[data-theme="light"] .text-emerald-300 { color: oklch(43.2% 0.095 166.913); }
+:root[data-theme="light"] .text-emerald-400 { color: oklch(50.8% 0.118 165.612); }
+:root[data-theme="light"] .text-red-100 { color: oklch(39.6% 0.141 25.723); }
+:root[data-theme="light"] .text-red-200 { color: oklch(44.4% 0.177 26.899); }
+:root[data-theme="light"] .text-red-300 { color: oklch(44.4% 0.177 26.899); }
+:root[data-theme="light"] .text-red-400 { color: oklch(50.5% 0.213 27.518); }
+:root[data-theme="light"] .text-orange-100 { color: oklch(40.8% 0.123 38.172); }
+:root[data-theme="light"] .text-orange-200 { color: oklch(47% 0.157 37.304); }
+:root[data-theme="light"] .text-orange-300 { color: oklch(47% 0.157 37.304); }
+:root[data-theme="light"] .text-orange-400 { color: oklch(55.3% 0.195 38.402); }
+:root[data-theme="light"] .text-emerald-950, :root[data-theme="light"] .text-sky-950, :root[data-theme="light"] .text-amber-950 { color: #0b1a10; }
+:root[data-theme="light"],
+:root[data-theme="light"] body {
+  background: #f5f9f2;
+  color: #1f2a22;
+}
+:root[data-theme="light"] body {
+  background-image:
+    radial-gradient(1100px 560px at 25% -14%, rgba(95, 156, 94, 0.18), transparent 62%),
+    radial-gradient(900px 480px at 95% -5%, rgba(152, 181, 98, 0.14), transparent 60%),
+    linear-gradient(rgba(30, 58, 38, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 58, 38, 0.045) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+}
+:root[data-theme="light"] .glass {
+  --bracket: rgba(74, 129, 80, 0.7);
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 10px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) top left / 1px 10px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 10px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 1px 10px no-repeat,
+    linear-gradient(90deg, transparent, rgba(74, 129, 80, 0.35) 30%, transparent 75%) top / 100% 1px no-repeat,
+    #ffffff;
+  border-color: rgba(30, 58, 38, 0.1);
+  box-shadow: 0 1px 2px rgba(30, 58, 38, 0.05), 0 12px 32px -18px rgba(30, 58, 38, 0.25);
+}
+:root[data-theme="light"] .frame { --bracket: rgba(74, 129, 80, 0.85); background-color: rgba(255, 255, 255, 0.7); }
+:root[data-theme="light"] .eyebrow { color: #4a8150; }
+:root[data-theme="light"] .chip { background: rgba(30, 58, 38, 0.06); color: #37423a; }
+:root[data-theme="light"] .tab { color: #4c594f; }
+:root[data-theme="light"] .tab:hover { color: #0d2416; background: rgba(30, 58, 38, 0.05); }
+:root[data-theme="light"] .tab:is([aria-selected="true"], [aria-checked="true"], [aria-pressed="true"]) {
+  background: rgba(74, 129, 80, 0.12); color: #0d2416; box-shadow: inset 0 -2px 0 #4a8150;
+}
+:root[data-theme="light"] .btn { background: #ffffff; color: #1f2a22; box-shadow: inset 0 0 0 1px rgba(30, 58, 38, 0.15); }
+:root[data-theme="light"] .btn:hover { background: #eef4ea; box-shadow: inset 0 0 0 1px rgba(74, 129, 80, 0.5); }
+:root[data-theme="light"] .btn-primary { background: #3a6742; color: #ffffff; box-shadow: none; }
+:root[data-theme="light"] .btn-primary:hover { background: #4a8150; color: #ffffff; }
+:root[data-theme="light"] input[type="range"].timeline { background: rgba(30, 58, 38, 0.15); accent-color: #4a8150; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(30, 58, 38, 0.18); }
+:root[data-theme="light"] :focus-visible { outline-color: #3a6742; }
+/* Landing */
+:root[data-theme="light"] .extrude { text-shadow: 1px 1px 0 #c6e1b8, 2px 2px 0 #a3cf91, 3px 3px 0 #82bb74, 6px 10px 20px rgba(30, 58, 38, 0.18); }
+:root[data-theme="light"] .tag3d { background: rgba(255, 255, 255, 0.94); box-shadow: 0 8px 24px rgba(30, 58, 38, 0.2); }
+:root[data-theme="light"] .tag3d.text-white, :root[data-theme="light"] .tag3d.border-white\/60 { border-color: #0d2416; }
+:root[data-theme="light"] .scene::before { background: radial-gradient(closest-side, rgba(95, 156, 94, 0.25), transparent); }
+:root[data-theme="light"] .layer.base { box-shadow: 0 0 0 1px rgba(30, 58, 38, 0.35), 0 50px 70px -24px rgba(30, 58, 38, 0.45); }
+:root[data-theme="light"] .layer.branch { background: linear-gradient(135deg, rgba(74, 129, 80, 0.14), rgba(74, 129, 80, 0.04)); box-shadow: inset 0 0 0 1px rgba(58, 103, 66, 0.55); }
+:root[data-theme="light"] .face { color: #0d2416; background: linear-gradient(135deg, rgba(163, 207, 145, 0.85), rgba(95, 156, 94, 0.8)); border-color: #3a6742; }
+:root[data-theme="light"] .face.top { background: #c6e1b8; }
+:root[data-theme="light"] .face.bottom { background: #3a6742; }
+:root[data-theme="light"] .section-band { border-color: rgba(30, 58, 38, 0.08); background: linear-gradient(180deg, rgba(74, 129, 80, 0.04), transparent 40%); }
+:root[data-theme="light"] .layer.branch .tag3d { color: #2b4f33 !important; border-color: #3a6742 !important; }
+:root[data-theme="light"] .layer.branch .branch-path { stroke: #3a6742; }
+:root[data-theme="light"] .layer.branch circle { stroke: #3a6742; }
+/* Multiverse map: node text is drawn for a dark canvas. */
+:root[data-theme="light"] [role="treeitem"] text:nth-of-type(1) { fill: #4c594f; }
+:root[data-theme="light"] [role="treeitem"] text:nth-of-type(2) { fill: #0d2416; }
+:root[data-theme="light"] [role="treeitem"] text:nth-of-type(3) { fill: #3a6742; }
+:root[data-theme="light"] [role="tree"] text, :root[data-theme="light"] [data-testid="mv-steps"] text { fill: #2b4f33; }
+:root[data-theme="light"] .text-amber-200\/90 { color: #b45309; }
+:root[data-theme="light"] .bg-black\/40 { background: rgba(30, 58, 38, 0.05); }

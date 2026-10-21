@@ -4,6 +4,7 @@ import type { Language, ViewerMode } from "@parallel/contracts";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 import BrandMark from "./BrandMark";
+import ThemeToggle from "./ThemeToggle";
 
 export function Logo() {
   return (
@@ -62,6 +63,7 @@ export default function Header() {
           <Segmented<Language> label={L.language} value={s.lang} onChange={actions.setLang} testId="lang-switch"
             options={[{ v: "en", label: "EN" }, { v: "nl", label: "NL" }]} />
           <button type="button" onClick={() => void actions.openRecap()} data-testid="open-recap" className="btn">{L.recap}</button>
+          <ThemeToggle lang={s.lang} />
           <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-2.5 py-1.5 text-[11px]">
             <span className={`rounded-md px-1.5 py-0.5 font-semibold ${live ? "bg-leaf-500/20 text-leaf-200" : "text-slate-300"}`}
               title={live ? `Microsoft Foundry deployment: ${s.health?.foundry_deployment}` : "No Foundry deployment configured: agents use the labelled deterministic planner"}

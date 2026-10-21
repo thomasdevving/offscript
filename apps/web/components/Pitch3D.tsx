@@ -18,6 +18,11 @@ const W = 68;
 const S = 1.5; // figures are drawn larger than life so they read from the broadcast distance
 const v3 = (x: number, y: number, h = 0) => new THREE.Vector3(x - L / 2, h, y - W / 2);
 
+const BACKDROP = {
+  dark: { sky: "#040906", apron: "#0a2419" },
+  light: { sky: "#eef4ea", apron: "#cfe0c6" },
+};
+
 const ARROW_COLOR: Record<Arrow["kind"], string> = {
   actual: "#f8fafc", selected: "#d4ee8f", alternative: "#cfe2b4", defense: "#f97316", recommended: "#34d399",
 };
@@ -213,12 +218,12 @@ export default function Pitch3D(p: PitchProps) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setClearColor("#040906");
+    renderer.setClearColor(BACKDROP.dark.sky);
     renderer.domElement.className = "block h-full w-full";
     host.prepend(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog("#040906", 95, 190);
+    scene.fog = new THREE.Fog(BACKDROP.dark.sky, 95, 190);
     const camera = new THREE.PerspectiveCamera(34, 1, 1, 400);
     camera.position.set(0, 58, 78);
 
@@ -231,11 +236,22 @@ export default function Pitch3D(p: PitchProps) {
     sun.shadow.bias = -0.0005;
     scene.add(sun);
 
-    const apron = new THREE.Mesh(new THREE.PlaneGeometry(L + 40, W + 30), new THREE.MeshStandardMaterial({ color: "#0a2419", roughness: 1 }));
+    const apronMat = new THREE.MeshStandardMaterial({ color: BACKDROP.dark.apron, roughness: 1 });
+    const apron = new THREE.Mesh(new THREE.PlaneGeometry(L + 40, W + 30), apronMat);
     apron.rotation.x = -Math.PI / 2;
     apron.position.y = -0.02;
     apron.receiveShadow = true;
     scene.add(apron);
+    // Sky, fog and the ground around the pitch follow the page theme (light or dark), live.
+    const applyTheme = () => {
+      const b = document.documentElement.dataset.theme === "dark" ? BACKDROP.dark : BACKDROP.light;
+      renderer.setClearColor(b.sky);
+      (scene.fog as THREE.Fog).color.set(b.sky);
+      apronMat.color.set(b.apron);
+    };
+    applyTheme();
+    const themeObs = new MutationObserver(applyTheme);
+    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     const pitch = new THREE.Mesh(new THREE.PlaneGeometry(L + 8, W + 8), new THREE.MeshStandardMaterial({ map: pitchTexture(), roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2;
     pitch.receiveShadow = true;
@@ -443,6 +459,7 @@ export default function Pitch3D(p: PitchProps) {
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      themeObs.disconnect();
       renderer.domElement.removeEventListener("click", onClick as EventListener);
       renderer.domElement.removeEventListener("pointermove", onMove);
       disposeTree(scene);
