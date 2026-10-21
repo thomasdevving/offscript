@@ -19,9 +19,56 @@ const S = 1.5; // figures are drawn larger than life so they read from the broad
 const v3 = (x: number, y: number, h = 0) => new THREE.Vector3(x - L / 2, h, y - W / 2);
 
 const BACKDROP = {
-  dark: { sky: "#040906", apron: "#0a2419" },
-  light: { sky: "#eef4ea", apron: "#cfe0c6" },
+  dark: { skyTop: "#0d1a12", sky: "#040906", apron: "#0a2419", board: "#0b140e", stand: "#0d1811" },
+  light: { skyTop: "#fbfdf9", sky: "#e4eddf", apron: "#cfe0c6", board: "#163a26", stand: "#d2dfcb" },
 };
+
+/** Camera rigs: TV broadcast from the touchline, a near top-down tactical view, and the ball carrier's view. */
+export type CameraMode = "broadcast" | "tactical" | "player";
+const CAMERAS: { id: CameraMode; label: string; title: string }[] = [
+  { id: "broadcast", label: "Broadcast", title: "TV camera on the touchline" },
+  { id: "tactical", label: "Tactical", title: "High camera: the whole shape" },
+  { id: "player", label: "Player view", title: "Behind the ball carrier: what the player saw" },
+];
+
+/** Vertical sky gradient used as the scene background. */
+function skyTexture(top: string, bottom: string): THREE.CanvasTexture {
+  const c = document.createElement("canvas");
+  c.width = 2;
+  c.height = 256;
+  const g = c.getContext("2d")!;
+  const grad = g.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0, top);
+  grad.addColorStop(1, bottom);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 2, 256);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/** Perimeter LED board texture: the brand line repeated along the board. */
+function boardTexture(): THREE.CanvasTexture {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 64;
+  const g = c.getContext("2d")!;
+  g.fillStyle = "#0b2016";
+  g.fillRect(0, 0, c.width, c.height);
+  g.font = "800 30px Inter, ui-sans-serif, system-ui, sans-serif";
+  g.textBaseline = "middle";
+  for (let x = 16, i = 0; x < c.width; i++) {
+    const text = i % 2 ? "EVERY DECISION CREATES ANOTHER GAME" : "OFFSCRIPT";
+    g.fillStyle = i % 2 ? "#8fca7c" : "#f2f8ef";
+    g.fillText(text, x, 34);
+    x += g.measureText(text).width + 48;
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.anisotropy = 8;
+  return tex;
+}
 
 const ARROW_COLOR: Record<Arrow["kind"], string> = {
   actual: "#f8fafc", selected: "#d4ee8f", alternative: "#cfe2b4", defense: "#f97316", recommended: "#34d399",
@@ -91,8 +138,10 @@ function numberSprite(n: number, fill: string, ink: string, gk: boolean): THREE.
   g.fillText(String(n), 48, 51);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
-  sp.scale.set(1.5, 1.5, 1);
+  // alphaTest drops the transparent corners outright, so badges stay round on every GPU.
+  // Fixed on-screen size (no size attenuation): readable from the high camera, not huge up close.
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true, alphaTest: 0.1, sizeAttenuation: false }));
+  sp.scale.set(0.024, 0.024, 1);
   sp.renderOrder = 10;
   return sp;
 }
@@ -168,6 +217,7 @@ interface PlayerRig {
   body: THREE.Mesh;
   hl: THREE.Mesh;
   sel: THREE.Mesh;
+  disc: THREE.Mesh;
   last: THREE.Vector3 | null;
 }
 
@@ -198,6 +248,24 @@ export default function Pitch3D(p: PitchProps) {
   const props = useRef(p);
   props.current = p;
   const [ok, setOk] = useState(true);
+  const [cam, setCam] = useState<CameraMode>(() => {
+    try {
+      const v = localStorage.getItem("offscript.camera");
+      return v === "tactical" || v === "player" ? v : "broadcast";
+    } catch {
+      return "broadcast";
+    }
+  });
+  const camRef = useRef(cam);
+  camRef.current = cam;
+  const chooseCam = (m: CameraMode) => {
+    setCam(m);
+    try {
+      localStorage.setItem("offscript.camera", m);
+    } catch {
+      /* per-viewer convenience only */
+    }
+  };
   // Imperative handles shared between the setup effect and the per-prop effects.
   const world = useRef<{
     scene: THREE.Scene; camera: THREE.PerspectiveCamera; renderer: THREE.WebGLRenderer;
@@ -219,12 +287,15 @@ export default function Pitch3D(p: PitchProps) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(BACKDROP.dark.sky);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     renderer.domElement.className = "block h-full w-full";
     host.prepend(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(BACKDROP.dark.sky, 95, 190);
-    const camera = new THREE.PerspectiveCamera(34, 1, 1, 400);
+    // Fog starts beyond the pitch so the ground around it fades into the sky instead of ending in an edge.
+    scene.fog = new THREE.Fog(BACKDROP.dark.sky, 110, 200);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.5, 500);
     camera.position.set(0, 58, 78);
 
     scene.add(new THREE.HemisphereLight("#dff3d6", "#0b1a10", 1.1));
@@ -237,17 +308,62 @@ export default function Pitch3D(p: PitchProps) {
     scene.add(sun);
 
     const apronMat = new THREE.MeshStandardMaterial({ color: BACKDROP.dark.apron, roughness: 1 });
-    const apron = new THREE.Mesh(new THREE.PlaneGeometry(L + 40, W + 30), apronMat);
+    const apron = new THREE.Mesh(new THREE.PlaneGeometry(L + 420, W + 320), apronMat);
     apron.rotation.x = -Math.PI / 2;
     apron.position.y = -0.02;
     apron.receiveShadow = true;
     scene.add(apron);
+
+    // Perimeter boards on the far touchline and behind both goals (the near side would block the TV view).
+    const boardTex = boardTexture();
+    const boardBack = new THREE.MeshStandardMaterial({ color: BACKDROP.dark.board, roughness: 0.9 });
+    const board = (len: number, x: number, y: number, rotY: number) => {
+      const tex = boardTex.clone();
+      tex.needsUpdate = true;
+      tex.repeat.set(len / 40, 1);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, 0.9, 0.25),
+        [boardBack, boardBack, boardBack, boardBack, new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), boardBack]);
+      mesh.position.copy(v3(x, y, 0.45));
+      mesh.rotation.y = rotY;
+      mesh.castShadow = true;
+      scene.add(mesh);
+    };
+    board(L + 10, L / 2, -6.5, 0);
+    board(W + 4, -6.5, W / 2, Math.PI / 2);
+    board(W + 4, L + 6.5, W / 2, -Math.PI / 2);
+
+    // Simple stepped stands behind the boards: they give the low cameras a horizon and fade into the fog.
+    // Unlit, close to the sky colour: a soft silhouette rather than a wall.
+    const standMat = new THREE.MeshBasicMaterial({ color: BACKDROP.dark.stand });
+    const standTop = new THREE.MeshBasicMaterial({ color: BACKDROP.dark.stand });
+    const stand = (len: number, x: number, y: number, rotY: number) => {
+      for (const [back, h] of [[9, 2.5], [15, 5], [22, 8]] as const) {
+        const tier = new THREE.Mesh(new THREE.BoxGeometry(len, h, 7), [standMat, standMat, standTop, standMat, standMat, standMat]);
+        // Away from the pitch: -Z for the far touchline, -X / +X behind the left / right goal.
+        const out = new THREE.Vector3(-Math.sin(rotY), 0, -Math.cos(rotY)).multiplyScalar(back);
+        tier.position.copy(v3(x, y, h / 2)).add(out);
+        tier.rotation.y = rotY;
+        scene.add(tier);
+      }
+    };
+    stand(L + 30, L / 2, -6.5, 0);
+    stand(W + 30, -6.5, W / 2, Math.PI / 2);
+    stand(W + 30, L + 6.5, W / 2, -Math.PI / 2);
+
     // Sky, fog and the ground around the pitch follow the page theme (light or dark), live.
+    let sky: THREE.CanvasTexture | null = null;
     const applyTheme = () => {
       const b = document.documentElement.dataset.theme === "dark" ? BACKDROP.dark : BACKDROP.light;
+      sky?.dispose();
+      sky = skyTexture(b.skyTop, b.sky);
+      scene.background = sky;
       renderer.setClearColor(b.sky);
       (scene.fog as THREE.Fog).color.set(b.sky);
       apronMat.color.set(b.apron);
+      boardBack.color.set(b.board);
+      standMat.color.set(b.stand);
+      // Tier tops a shade lighter, so the steps read as steps.
+      standTop.color.set(b.stand).offsetHSL(0, 0, document.documentElement.dataset.theme === "dark" ? 0.03 : 0.04);
     };
     applyTheme();
     const themeObs = new MutationObserver(applyTheme);
@@ -311,10 +427,15 @@ export default function Pitch3D(p: PitchProps) {
       badge.position.y = 2.55 * S;
       const hl = groundRing(1.5, 1.85, "#f8fafc", 0.9);
       const sel = groundRing(1.9, 2.15, "#34d399", 0.9);
-      group.add(legs, body, head, badge, hl, sel);
+      // A soft team-coloured disc under every player keeps the two sides readable from any camera.
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(1.05, 32),
+        new THREE.MeshBasicMaterial({ color: pl.role === "GK" ? "#f8fafc" : team.color_primary, transparent: true, opacity: 0.32, depthWrite: false }));
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.y = 0.025;
+      group.add(disc, legs, body, head, badge, hl, sel);
       group.visible = false;
       scene.add(group);
-      players.set(pl.player_id, { group, body, hl, sel, last: null });
+      players.set(pl.player_id, { group, body, hl, sel, disc, last: null });
     }
 
     const ball = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 14), new THREE.MeshStandardMaterial({ color: "#f8fafc", roughness: 0.35, emissive: "#334155", emissiveIntensity: 0.2 }));
@@ -334,9 +455,8 @@ export default function Pitch3D(p: PitchProps) {
       const h = host.clientHeight;
       if (!w || !h) return;
       renderer.setSize(w, h, false);
+      // The camera rig widens the field of view on narrow screens so both goals stay in view.
       camera.aspect = w / h;
-      // Pull the camera back on narrow screens so both goals stay in view.
-      camera.fov = w / h < 1.2 ? 46 : 34;
       camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
@@ -345,15 +465,19 @@ export default function Pitch3D(p: PitchProps) {
 
     const look = new THREE.Vector3(0, 0, 3);
     const camPos = camera.position.clone();
+    const goalTarget = new THREE.Vector3();
+    const carrierAt = new THREE.Vector3(0, 0, 0);
     let raf = 0;
     let lastT = performance.now();
     const tick = (now: number) => {
       // Time-based easing: the camera settles in about a second whatever the frame rate.
-      const k = 1 - Math.exp(-Math.min(0.25, (now - lastT) / 1000) * 4);
+      const dt = Math.min(0.25, (now - lastT) / 1000);
+      const k = 1 - Math.exp(-dt * 4);
       lastT = now;
       const f = props.current.frame;
       const hlId = props.current.highlightId;
       const selectable = new Set(props.current.selectableIds ?? []);
+      const pulse = 1 + 0.12 * Math.sin(now / 260);
       if (f) {
         for (const [id, rig] of players) {
           const pos = f.players[id];
@@ -365,16 +489,58 @@ export default function Pitch3D(p: PitchProps) {
           rig.last = at.clone();
           rig.group.position.copy(at);
           rig.hl.visible = id === hlId || id === f.possessor_id;
+          // The decision-maker's ring breathes gently, so the eye finds the ball carrier first.
+          rig.hl.scale.setScalar(rig.hl.visible ? pulse : 1);
           rig.sel.visible = selectable.has(id);
         }
         ball.position.copy(v3(f.ball[0], f.ball[1], 0.42 + Math.max(0, f.ball[2])));
         ballShadow.position.set(ball.position.x, 0.03, ball.position.z);
         const sc = Math.max(0.35, 1 - f.ball[2] * 0.12);
         ballShadow.scale.set(sc, sc, sc);
-        // Broadcast follow: drift along the touchline with the ball, never far enough to lose shape.
-        const tx = THREE.MathUtils.clamp((f.ball[0] - L / 2) * 0.45, -20, 20);
-        camPos.x += (tx - camPos.x) * k;
-        look.x += (tx - look.x) * k;
+        const carrier = (f.possessor_id && f.players[f.possessor_id]) || (hlId && f.players[hlId]) || null;
+        if (carrier) carrierAt.copy(v3(carrier[0], carrier[1]));
+        else carrierAt.set(ball.position.x, 0, ball.position.z);
+      }
+
+      // Camera rig for the chosen view. Positions, target and field of view all ease, so switching
+      // views (or following play) glides instead of jumping.
+      const mode = camRef.current;
+      const desiredPos = new THREE.Vector3();
+      const desiredLook = new THREE.Vector3();
+      let fov = camera.aspect < 1.2 ? 46 : 34;
+      if (mode === "tactical") {
+        const tx = THREE.MathUtils.clamp(ball.position.x * 0.25, -8, 8);
+        desiredPos.set(tx, 98, 26);
+        desiredLook.set(tx, 0, 1);
+        fov = camera.aspect < 1.2 ? 58 : 42;
+      } else if (mode === "player") {
+        // Behind the decision-maker, looking where the options are: the arrows' targets if any,
+        // otherwise the nearer goal.
+        const arrows = props.current.arrows ?? [];
+        if (arrows.length) {
+          goalTarget.set(0, 0, 0);
+          for (const a of arrows) goalTarget.add(v3(a.to[0], a.to[1]));
+          goalTarget.divideScalar(arrows.length);
+        } else {
+          goalTarget.copy(v3(carrierAt.x + L / 2 < L / 2 ? 0 : L, W / 2));
+        }
+        const dir = goalTarget.clone().sub(carrierAt).setY(0);
+        if (dir.lengthSq() < 1) dir.set(carrierAt.x < 0 ? -1 : 1, 0, 0);
+        dir.normalize();
+        desiredPos.copy(carrierAt).addScaledVector(dir, -14).setY(8.5);
+        desiredLook.copy(carrierAt).addScaledVector(dir, 20).setY(0);
+        fov = camera.aspect < 1.2 ? 64 : 50;
+      } else {
+        // Broadcast: drift along the touchline with the ball, never far enough to lose the shape.
+        const tx = THREE.MathUtils.clamp(ball.position.x * 0.45, -20, 20);
+        desiredPos.set(tx, 58, 78);
+        desiredLook.set(tx, 0, 3);
+      }
+      camPos.lerp(desiredPos, k);
+      look.lerp(desiredLook, k);
+      if (Math.abs(camera.fov - fov) > 0.05) {
+        camera.fov += (fov - camera.fov) * k;
+        camera.updateProjectionMatrix();
       }
       camera.position.copy(camPos);
       camera.lookAt(look);
@@ -460,6 +626,7 @@ export default function Pitch3D(p: PitchProps) {
       cancelAnimationFrame(raf);
       ro.disconnect();
       themeObs.disconnect();
+      sky?.dispose();
       renderer.domElement.removeEventListener("click", onClick as EventListener);
       renderer.domElement.removeEventListener("pointermove", onMove);
       disposeTree(scene);
@@ -513,9 +680,9 @@ export default function Pitch3D(p: PitchProps) {
       if (hit) wd.hits.push(hit);
       const el = document.createElement("span");
       const color = ARROW_COLOR[a.kind];
-      el.className = "pointer-events-none absolute left-0 top-0 whitespace-nowrap border bg-slate-950/85 px-1.5 py-0.5 text-[11px] font-semibold shadow-lg";
-      el.style.borderColor = color;
-      el.style.color = color;
+      // Fixed dark chip (inline, so the light theme's colour remapping cannot make it unreadable).
+      el.className = "pointer-events-none absolute left-0 top-0 whitespace-nowrap border px-1.5 py-0.5 text-[11px] font-semibold shadow-lg";
+      Object.assign(el.style, { background: "rgba(4, 9, 6, 0.88)", borderColor: color, color, backdropFilter: "blur(4px)" });
       el.textContent = `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
       host.append(el);
       wd.labels.push({ el, at: labelAt });
@@ -530,7 +697,7 @@ export default function Pitch3D(p: PitchProps) {
     for (const rig of wd.players.values()) {
       rig.group.traverse((o) => {
         const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
-        if (m && o !== rig.hl && o !== rig.sel) {
+        if (m && o !== rig.hl && o !== rig.sel && o !== rig.disc) {
           m.transparent = dim < 1;
           m.opacity = dim;
         }
@@ -548,9 +715,20 @@ export default function Pitch3D(p: PitchProps) {
     );
   }
   return (
-    <div ref={wrap} className="relative aspect-[111/74] w-full overflow-hidden" role="img" aria-label={`${p.ariaLabel} (3D replay)`}
+    <div ref={wrap} className="relative aspect-[111/74] w-full overflow-hidden" role="img" aria-label={`${p.ariaLabel} (3D replay, ${cam} camera)`}
       data-testid="pitch-3d">
       <div ref={labelsEl} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden />
+      <div role="radiogroup" aria-label="Camera" data-testid="camera-switch"
+        className="absolute bottom-3 right-3 z-10 flex p-0.5 ring-1 ring-white/15 backdrop-blur" style={{ background: "rgba(4, 9, 6, 0.78)" }}>
+        {CAMERAS.map((c) => (
+          <button key={c.id} type="button" role="radio" aria-checked={cam === c.id} title={c.title} onClick={() => chooseCam(c.id)}
+            data-testid={`camera-${c.id}`}
+            className={`px-2.5 py-1 text-[11px] font-semibold transition ${cam === c.id ? "bg-white text-slate-950" : "text-slate-200 hover:text-white"}`}
+            style={cam === c.id ? { background: "#f2f8ef", color: "#04090a" } : { color: "#e2e8e2" }}>
+            {c.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
