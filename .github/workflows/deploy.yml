@@ -1,62 +1,90 @@
 name: Deploy to Azure
 
-# Manual deployment (requires the repository to be configured as described in docs/deployment.md).
-# Uses OpenID Connect - no long-lived Azure credentials are stored in GitHub.
+# Automatic deployment: after CI passes on main, roll out that commit's API image (built by the
+# "API image" workflow) to Azure Container Apps and upload the web app to the Storage static website.
+# Signs in with OpenID Connect to a user-assigned managed identity that trusts only this repository's
+# main branch and can only change the parallel-rg resource group: no passwords or keys are stored.
+# Infrastructure changes (Bicep) are still applied with scripts/deploy_azure.sh.
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: deploy-azure
+  cancel-in-progress: false
+
 env:
-  IMAGE_NAME: parallel-api
+  # Identifiers, not secrets: the identity only accepts tokens issued to this repository's main branch.
+  AZURE_CLIENT_ID: 48da8a65-def9-43cb-a9f7-b361d71ab04a
+  AZURE_TENANT_ID: a0f1cacd-618c-4403-b945-76fb3d6874e5
+  AZURE_SUBSCRIPTION_ID: e8316446-e5a1-4862-91da-3ea50867d416
+  RESOURCE_GROUP: parallel-rg
+  CONTAINER_APP: parallel-api
+  IMAGE: ghcr.io/thomasdevving/parallel-api
 
 jobs:
-  api:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    outputs:
-      api_url: ${{ steps.url.outputs.api_url }}
+    # No GitHub "environment" here: it would change the OIDC subject the Azure identity trusts.
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+
+      - name: Wait for this commit's API image
+        run: |
+          for i in $(seq 1 60); do
+            token=$(curl -fsS "https://ghcr.io/token?scope=repository:thomasdevving/parallel-api:pull" | jq -r .token)
+            if curl -fsS -o /dev/null -H "Authorization: Bearer $token" \
+                 -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
+                 "https://ghcr.io/v2/thomasdevving/parallel-api/manifests/$SHA"; then
+              echo "image $IMAGE:$SHA is available"; exit 0
+            fi
+            sleep 15
+          done
+          echo "image $IMAGE:$SHA did not appear within 15 minutes" >&2; exit 1
+
       - uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Build and push image to Azure Container Registry
-        run: |
-          az acr build --registry "${{ vars.ACR_NAME }}" --image "$IMAGE_NAME:${{ github.sha }}" \
-            --file infra/docker/api.Dockerfile .
-      - name: Roll out new revision
-        run: |
-          az containerapp update --name "${{ vars.CONTAINER_APP_NAME }}" --resource-group "${{ vars.RESOURCE_GROUP }}" \
-            --image "${{ vars.ACR_NAME }}.azurecr.io/$IMAGE_NAME:${{ github.sha }}"
-      - id: url
-        run: |
-          fqdn=$(az containerapp show -n "${{ vars.CONTAINER_APP_NAME }}" -g "${{ vars.RESOURCE_GROUP }}" --query properties.configuration.ingress.fqdn -o tsv)
-          echo "api_url=https://$fqdn" >> "$GITHUB_OUTPUT"
-      - name: Smoke test
-        run: curl --fail --retry 10 --retry-delay 6 "${{ steps.url.outputs.api_url }}/api/health"
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-  web:
-    runs-on: ubuntu-latest
-    needs: api
-    steps:
-      - uses: actions/checkout@v5
+      - name: Roll out the API
+        run: |
+          az containerapp update -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --image "$IMAGE:$SHA" \
+            --set-env-vars DEPLOY_REVISION="$SHA" -o none
+          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query properties.configuration.ingress.fqdn -o tsv)
+          echo "API_URL=https://$fqdn" >> "$GITHUB_ENV"
+          echo "WEB_ACCOUNT=$(az storage account list -g "$RESOURCE_GROUP" --query "[?starts_with(name, 'parallelweb')].name | [0]" -o tsv)" >> "$GITHUB_ENV"
+
       - uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npm run build -w apps/web
+      - name: Build the web app against the deployed API
+        run: npm run build -w apps/web
         env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ needs.api.outputs.api_url }}
-      - uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Upload to the Storage static website
+          NEXT_PUBLIC_API_BASE_URL: ${{ env.API_URL }}
+      - name: Upload the web app
         run: |
-          az storage blob upload-batch --account-name "${{ vars.WEB_STORAGE_ACCOUNT }}" --auth-mode login             -d '$web' -s apps/web/out --overwrite
+          az storage blob upload-batch --account-name "$WEB_ACCOUNT" --auth-mode key -d '$web' -s apps/web/out \
+            --overwrite -o none --only-show-errors
+
+      - name: Smoke test (wakes a scaled-to-zero API)
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors --max-time 120 "$API_URL/api/health"
+          image=$(az containerapp show -g "$RESOURCE_GROUP" -n "$CONTAINER_APP" --query "properties.template.containers[0].image" -o tsv)
+          echo; echo "running image: $image"
+          test "$image" = "$IMAGE:$SHA"

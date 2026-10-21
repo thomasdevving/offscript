@@ -107,11 +107,27 @@ app is uploaded by the script.
 
 * `ci.yml` (push/PR): ruff + pytest, OpenAPI/TypeScript contract drift check, typecheck, Vitest,
   Next build, Playwright end-to-end against the real stack.
-* `deploy.yml` (manual, for setups with an Azure registry and OIDC): `az acr build`, `az containerapp update`, smoke test, static
-  build with the API URL and upload to the Storage static website. Configure secrets
-  `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` and variables `ACR_NAME`,
-  `CONTAINER_APP_NAME`, `RESOURCE_GROUP`, `WEB_STORAGE_ACCOUNT` (the workflow identity needs
-  Storage Blob Data Contributor on that account).
+* `image.yml` (every push to `main`): builds the API image and publishes
+  `ghcr.io/thomasdevving/parallel-api:<commit>` and `:latest`.
+* `deploy.yml` (**automatic**, after CI passes on `main`; also runnable by hand): waits for that
+  commit's image, rolls it out with `az containerapp update`, builds the web app against the
+  deployed API, uploads it to the Storage static website and smoke-tests `/api/health`. A push to
+  `main` is live a few minutes later; a red CI run deploys nothing.
+
+How GitHub signs in to Azure (no secrets stored anywhere): a user-assigned managed identity
+`offscript-github-deploy` in `parallel-rg` has a **federated credential** that trusts only GitHub
+Actions tokens for `repo:thomasdevving/parallel:ref:refs/heads/main`, and the **Contributor** role
+on `parallel-rg` only. The workflow's client/tenant/subscription IDs are identifiers, not secrets.
+To set this up for another subscription:
+
+```bash
+az identity create -g <rg> -n offscript-github-deploy
+az identity federated-credential create -g <rg> --identity-name offscript-github-deploy -n github-main   --issuer https://token.actions.githubusercontent.com --audiences api://AzureADTokenExchange   --subject repo:<owner>/<repo>:ref:refs/heads/main
+az role assignment create --assignee-object-id <principalId> --assignee-principal-type ServicePrincipal   --role Contributor --scope <resource group id>
+```
+
+then put the identity's client ID and your tenant/subscription IDs in `deploy.yml`. Infrastructure
+changes (Bicep) are not applied automatically: run `scripts/deploy_azure.sh` for those.
 
 ## 3. Judge access checklist
 
