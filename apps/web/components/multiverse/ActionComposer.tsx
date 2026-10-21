@@ -109,7 +109,7 @@ export default function ActionComposer() {
             </div>
           )}
           <button type="button" disabled={!v?.ok || busy} onClick={() => void mv.submit()} data-testid="submit-action"
-            className="w-full rounded-lg bg-leaf-600 py-2 text-sm font-bold text-white hover:bg-leaf-500 disabled:opacity-40">
+            className="notch w-full bg-leaf-600 py-2 text-sm font-bold tracking-wide text-white hover:bg-leaf-500 disabled:opacity-40">
             {busy ? "Agents planning…" : "Simulate this branch"}
           </button>
           {s.interaction === "assisted" && (

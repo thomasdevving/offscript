@@ -14,7 +14,7 @@ function Btn(props: { onClick: () => void; label: string; children: React.ReactN
       aria-label={props.label}
       title={props.label}
       data-testid={props.testId}
-      className={`inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-sm font-semibold transition ${
+      className={`inline-flex h-9 min-w-9 items-center justify-center rounded-sm px-2 text-sm font-semibold transition ${
         props.primary ? "w-11 h-11 bg-white text-slate-950 shadow-lg shadow-leaf-900/40 hover:bg-leaf-100" : "text-slate-300 hover:bg-white/10 hover:text-white"
       }`}
     >
@@ -52,7 +52,7 @@ export function MatchTimeline() {
               actions.control({ type: "seek", t_ms: (d.outcome_time_ms ?? d.sim_time_ms) + 200 });
               void actions.selectDecision(d.decision_point_id);
             }}
-            className={`absolute top-[6px] h-3 w-3 -translate-x-1/2 rounded-full ring-2 ring-ink transition ${sel ? "scale-125 bg-white shadow-[0_0_10px] shadow-sage-400" : seen ? "bg-sage-400" : "bg-slate-600 hover:bg-slate-400"}`}
+            className={`absolute top-[6px] h-3 w-3 -translate-x-1/2 rotate-45 ring-2 ring-ink transition ${sel ? "scale-[1.35] bg-white shadow-[0_0_10px] shadow-sage-400" : seen ? "bg-sage-400" : "bg-slate-600 hover:bg-slate-400"}`}
             style={{ left: `${left}%` }}
             aria-label={`${L.decisions}: ${d.actor_name} ${clock(d.match_clock_ms)}`}
             title={`${clock(d.match_clock_ms)} ${d.actor_name}`}
@@ -60,7 +60,7 @@ export function MatchTimeline() {
         );
       })}
       {goals.map((g, i) => (
-        <span key={i} className="absolute top-[5px] h-3.5 w-1 -translate-x-1/2 rounded-full bg-emerald-400" style={{ left: `${(g.sim_time_ms / dur) * 100}%` }} />
+        <span key={i} className="absolute top-[5px] h-3.5 w-[3px] -translate-x-1/2 bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400" style={{ left: `${(g.sim_time_ms / dur) * 100}%` }} />
       ))}
     </div>
   );

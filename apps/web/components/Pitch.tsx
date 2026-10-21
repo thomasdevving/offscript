@@ -94,7 +94,7 @@ function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }
         strokeDasharray={dash} opacity={a.kind === "alternative" ? 0.85 : 1} />
       <polygon points={`${x2},${y2} ${left[0]},${left[1]} ${right[0]},${right[1]}`} fill={color} />
       <g transform={`translate(${mx},${my - 1.6})`}>
-        <rect x={-0.2} y={-1.25} width={a.label.length * 0.62 + 1.4} height={1.9} rx={0.5}
+        <rect x={-0.2} y={-1.25} width={a.label.length * 0.62 + 1.4} height={1.9} rx={0.12}
           fill="rgba(2,6,23,0.85)" stroke={color} strokeWidth={0.1} />
         <text x={0.5} y={0.15} fontSize={1.15} fill={color} fontWeight={600}>
           {a.rank != null ? `${a.rank}. ` : ""}{a.label}
@@ -134,10 +134,10 @@ export default function Pitch(p: Props) {
           <stop offset="100%" stopColor="rgba(0,0,0,0.45)" />
         </radialGradient>
       </defs>
-      <rect x={-3} y={-3} width={L + 6} height={W + 6} fill="#0a2419" rx={1.5} />
+      <rect x={-3} y={-3} width={L + 6} height={W + 6} fill="#0a2419" />
       <rect x={0} y={0} width={L} height={W} fill="url(#stripes)" />
       <rect x={0} y={0} width={L} height={W} fill="url(#vignette)" />
-      <rect x={-2.6} y={-2.6} width={L + 5.2} height={W + 5.2} rx={1.4} fill="none" stroke={tintStroke} strokeWidth={0.5} />
+      <rect x={-2.6} y={-2.6} width={L + 5.2} height={W + 5.2} fill="none" stroke={tintStroke} strokeWidth={0.5} />
       <Markings />
       {p.lanes?.map((ln, i) => (
         <line key={`lane-${i}`} x1={ln.from[0]} y1={ln.from[1]} x2={ln.to[0]} y2={ln.to[1]}

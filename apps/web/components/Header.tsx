@@ -33,6 +33,7 @@ export default function Header() {
   const connColor = s.conn === "open" ? "bg-emerald-400" : s.conn === "connecting" ? "bg-amber-400" : "bg-slate-500";
   return (
     <header className="sticky top-0 z-30 border-b border-white/[0.05] bg-ink/75 backdrop-blur-xl">
+      <span aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-leaf-400/50 to-transparent" />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
         <Logo />
         <nav role="tablist" aria-label="View" className="flex rounded-xl bg-white/[0.04] p-0.5" data-testid="view-tabs">

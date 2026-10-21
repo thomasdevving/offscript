@@ -43,6 +43,15 @@
   --color-frozen: #cfe2b4;
   --color-sim: #8fca7c;
   --color-real: #f8fafc;
+  /* Squared-off radius scale: instrument-panel corners, not pills. Dots keep rounded-full. */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius: 2px;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
   --animate-pop: pop 0.35s ease-out;
@@ -85,90 +94,143 @@ body {
 }
 
 @layer components {
-  /* Quiet glass surface: one consistent container style instead of many bordered boxes. */
+  /* Instrument panel: hairline frame, a lit top edge and leaf corner brackets drawn as backgrounds
+     (no extra DOM, so any element can be a panel). */
   .glass {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+    --bracket: rgba(143, 202, 124, 0.55);
+    position: relative;
+    background:
+      linear-gradient(var(--bracket), var(--bracket)) top left / 10px 1px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) top left / 1px 10px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom right / 10px 1px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom right / 1px 10px no-repeat,
+      linear-gradient(90deg, transparent, rgba(143, 202, 124, 0.22) 30%, transparent 75%) top / 100% 1px no-repeat,
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012));
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 1rem;
+    border-radius: 2px;
     backdrop-filter: blur(14px);
   }
+  /* Broadcast frame for the pitch: four corner ticks around a flat stage. */
+  .frame {
+    --bracket: rgba(207, 226, 180, 0.7);
+    background:
+      linear-gradient(var(--bracket), var(--bracket)) top left / 18px 2px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) top left / 2px 18px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) top right / 18px 2px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) top right / 2px 18px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom left / 18px 2px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom left / 2px 18px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom right / 18px 2px no-repeat,
+      linear-gradient(var(--bracket), var(--bracket)) bottom right / 2px 18px no-repeat,
+      rgba(255, 255, 255, 0.015);
+  }
+  /* Section label with an index tick, read like a channel on a console. */
   .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #64748b;
+    color: #6a786d;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    background: #5f9c5e;
+    box-shadow: 0 0 8px rgba(130, 187, 116, 0.6);
   }
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    border-radius: 999px;
-    padding: 0.15rem 0.55rem;
+    border-radius: 1px;
+    border-left: 2px solid currentColor;
+    padding: 0.15rem 0.5rem;
     font-size: 10.5px;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.01em;
+    background: rgba(255, 255, 255, 0.045);
     color: #cbd5e1;
   }
+  /* Segment with an underline indicator instead of a filled pill. */
   .tab {
-    border-radius: 0.5rem;
+    position: relative;
+    border-radius: 1px;
     padding: 0.3rem 0.7rem;
     font-size: 12px;
     font-weight: 600;
-    color: #94a3b8;
-    transition: background 0.15s, color 0.15s;
+    color: #95a398;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   }
-  .tab:hover { color: #f8fafc; }
+  .tab:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.03); }
   .tab[aria-selected="true"], .tab[aria-checked="true"], .tab[aria-pressed="true"] {
-    background: rgba(255, 255, 255, 0.09);
+    background: rgba(143, 202, 124, 0.08);
     color: #f8fafc;
+    box-shadow: inset 0 -2px 0 #8fca7c;
   }
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    border-radius: 0.6rem;
+    border-radius: 2px;
     padding: 0.4rem 0.75rem;
     font-size: 12px;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     color: #e2e8f0;
-    transition: background 0.15s;
+    transition: background 0.15s, box-shadow 0.15s, color 0.15s;
   }
-  .btn:hover { background: rgba(255, 255, 255, 0.11); }
+  .btn:hover { background: rgba(255, 255, 255, 0.09); box-shadow: inset 0 0 0 1px rgba(143, 202, 124, 0.35); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary { background: #4a8150; color: white; }
-  .btn-primary:hover { background: #d4ee8f; }
+  /* Primary actions get notched corners: the one shape on screen that is not a rectangle. */
+  .notch {
+    border-radius: 0;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  .btn-primary {
+    background: #4a8150;
+    color: white;
+    box-shadow: none;
+    border-radius: 0;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  .btn-primary:hover { background: #8fca7c; color: #040906; box-shadow: none; }
   .num { font-variant-numeric: tabular-nums; }
 }
 
 input[type="range"].timeline {
   appearance: none;
-  height: 3px;
-  border-radius: 999px;
+  height: 2px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.1);
   accent-color: #8fca7c;
 }
 input[type="range"].timeline::-webkit-slider-thumb {
   appearance: none;
-  width: 13px;
-  height: 13px;
-  border-radius: 999px;
+  width: 4px;
+  height: 16px;
+  border-radius: 0;
   background: #f8fafc;
-  box-shadow: 0 0 0 4px rgba(130, 187, 116, 0.28);
+  box-shadow: 0 0 0 3px rgba(130, 187, 116, 0.28), 0 0 12px rgba(143, 202, 124, 0.6);
   cursor: pointer;
 }
 input[type="range"].timeline::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
+  width: 4px;
+  height: 16px;
+  border-radius: 0;
   background: #f8fafc;
   border: none;
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 0; }
 ::-webkit-scrollbar-track { background: transparent; }
 
 :focus-visible {

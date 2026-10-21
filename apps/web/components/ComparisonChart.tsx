@@ -40,7 +40,7 @@ export default function ComparisonChart(props: {
             <text x={labelW - 6} y={y + 12} fontSize={9} textAnchor="end" fill="#cbd5e1">
               {cleanLabel(c.label).slice(0, 24)}{c.is_actual ? " *" : ""}
             </text>
-            <rect x={labelW} y={y + 3} width={Math.max(1, x(est.value) - labelW)} height={12} rx={2} fill={color} opacity={0.85}
+            <rect x={labelW} y={y + 3} width={Math.max(1, x(est.value) - labelW)} height={12} fill={color} opacity={0.85}
               {...(c.is_actual ? { stroke: "#f8fafc", strokeDasharray: "2 1.5" } : {})} />
             <line x1={x(est.ci95_low)} x2={x(est.ci95_high)} y1={y + 9} y2={y + 9} stroke="#f8fafc" strokeWidth={1.2} />
             <line x1={x(est.ci95_low)} x2={x(est.ci95_low)} y1={y + 5} y2={y + 13} stroke="#f8fafc" strokeWidth={1.2} />

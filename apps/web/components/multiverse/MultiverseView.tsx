@@ -124,13 +124,13 @@ function PlayBar() {
   return (
     <div className="glass flex items-center gap-3 px-3 py-2">
       <button type="button" onClick={() => mv.setPlay({ playing: !st.playing, playT: st.playT >= path.duration_ms ? 0 : st.playT })}
-        className="h-10 w-10 rounded-full bg-white text-sm font-bold text-slate-950 shadow-lg shadow-leaf-900/40 hover:bg-leaf-100" aria-label={st.playing ? "Pause" : "Play branch"}>{st.playing ? "❚❚" : "▶"}</button>
-      <button type="button" onClick={() => mv.setPlay({ playT: 0, playing: true })} className="h-9 w-9 rounded-full text-sm text-slate-300 hover:bg-white/10" aria-label="Replay branch from the decision">↺</button>
+        className="h-10 w-10 rounded-sm bg-white text-sm font-bold text-slate-950 shadow-lg shadow-leaf-900/40 hover:bg-leaf-100" aria-label={st.playing ? "Pause" : "Play branch"}>{st.playing ? "❚❚" : "▶"}</button>
+      <button type="button" onClick={() => mv.setPlay({ playT: 0, playing: true })} className="h-9 w-9 rounded-sm text-sm text-slate-300 hover:bg-white/10" aria-label="Replay branch from the decision">↺</button>
       <div className="relative flex-1">
         <input type="range" min={0} max={path.duration_ms} step={50} value={st.playT} aria-label="Scrub branch"
           onChange={(e) => mv.setPlay({ playT: Number(e.target.value), playing: false })} className="timeline w-full" />
         {path.boundaries.map((b) => (
-          <span key={b.node_id} className="absolute top-[3px] h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-sage-400 ring-2 ring-ink" style={{ left: `${(b.t_ms / path.duration_ms) * 100}%` }} title={b.label} />
+          <span key={b.node_id} className="absolute top-[3px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-sage-400 ring-2 ring-ink" style={{ left: `${(b.t_ms / path.duration_ms) * 100}%` }} title={b.label} />
         ))}
       </div>
       <span className="font-mono text-xs text-slate-300">+{(st.playT / 1000).toFixed(1)}s</span>
@@ -184,7 +184,7 @@ export default function MultiverseView() {
           <h1 className="text-2xl font-black tracking-tight text-white">Football Multiverse</h1>
           <p className="text-sm text-slate-400">{node ? `${clock(node.match_clock_ms)} · ${node.label}${node.outcome_label ? ` → ${node.outcome_label.replace(/_/g, " ").toLowerCase()}` : ""}` : ""}</p>
         </div>
-        <div className="mx-auto w-full max-w-[max(520px,calc((100vh-470px)*1.5))] overflow-hidden rounded-2xl bg-white/[0.02] p-1.5 shadow-2xl shadow-black/60 ring-1 ring-white/[0.06]"><Stage /></div>
+        <div className="mx-auto w-full max-w-[max(520px,calc((100vh-470px)*1.5))] frame overflow-hidden p-2 shadow-2xl shadow-black/60"><Stage /></div>
         <PlayBar />
         {st.error && <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert">{st.error}</p>}
         <section className="glass p-3" aria-label="Multiverse map">

@@ -107,7 +107,7 @@ export default function Dashboard() {
                 <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-400">{scenario.description}</p>
               </div>
             )}
-            <div className="mx-auto w-full max-w-[max(560px,calc((100vh-300px)*1.5))] overflow-hidden rounded-2xl bg-white/[0.02] p-1.5 shadow-2xl shadow-black/60 ring-1 ring-white/[0.06]">
+            <div className="mx-auto w-full max-w-[max(560px,calc((100vh-300px)*1.5))] frame overflow-hidden p-2 shadow-2xl shadow-black/60">
               <PitchStage />
             </div>
             <WhatIfControls />

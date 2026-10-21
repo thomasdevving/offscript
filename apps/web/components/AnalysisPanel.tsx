@@ -352,7 +352,7 @@ export default function AnalysisPanel() {
         )}
         <button type="button" data-testid="explore-multiverse"
           onClick={() => { actions.setView("multiverse"); void mv.open(d.decision_point_id, d.match_id); }}
-          className="w-full rounded-xl bg-gradient-to-r from-leaf-600 to-sage-600 py-2.5 text-sm font-bold text-white shadow-lg shadow-sage-900/30 transition hover:brightness-110">
+          className="notch w-full bg-gradient-to-r from-leaf-600 to-sage-600 py-2.5 text-sm font-bold tracking-wide text-white transition hover:brightness-110">
           {s.lang === "en" ? "Take the decision yourself in the Multiverse →" : "Neem de beslissing zelf in het Multiverse →"}
         </button>
       </section>
