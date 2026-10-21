@@ -1,10 +1,15 @@
 "use client";
 
+import { Space_Grotesk, Unbounded } from "next/font/google";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import BrandMark from "../BrandMark";
 
 type Lang = "en" | "nl";
+
+// Landing-only type: a wide geometric display face for headlines, a grotesk for body copy.
+const display = Unbounded({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const body = Space_Grotesk({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 const COPY = {
   en: {
@@ -193,7 +198,7 @@ export default function Landing() {
   }, [lang]);
 
   return (
-    <div className="landing min-h-screen overflow-x-hidden">
+    <div className={`landing ${display.variable} ${body.variable} min-h-screen overflow-x-hidden`}>
       <header className="relative z-20 mx-auto flex max-w-[1400px] items-center gap-4 px-5 py-4">
         <div className="flex items-center gap-2">
           <BrandMark size={30} id="land" />
@@ -212,7 +217,7 @@ export default function Landing() {
       <section className="relative mx-auto grid max-w-[1400px] items-center gap-6 px-5 pb-10 pt-4 lg:min-h-[calc(100vh-72px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="relative z-10 max-w-xl animate-rise">
           <p className="eyebrow">{C.eyebrow}</p>
-          <h1 className="mt-4 text-[clamp(2.4rem,4.8vw,4.2rem)] font-black leading-[0.95] tracking-tight text-white">
+          <h1 className="mt-4 text-[clamp(2rem,4.2vw,3.7rem)] font-extrabold leading-[1.02] text-white">
             {C.title[0]}<br /><span className="extrude text-leaf-300">{C.title[1]}</span>
           </h1>
           <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-slate-400">{C.sub}</p>

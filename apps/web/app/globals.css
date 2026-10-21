@@ -249,6 +249,13 @@ input[type="range"].timeline::-moz-range-thumb {
    Landing page: a CSS-3D "multiverse" — one frozen pitch with parallel futures stacked above it.
    --------------------------------------------------------------------------------------------- */
 @layer components {
+  .landing {
+    font-family: var(--font-body), var(--font-sans);
+  }
+  .landing :is(h1, h2, h3) {
+    font-family: var(--font-display), var(--font-sans);
+    letter-spacing: -0.02em;
+  }
   .scene {
     --rx: 0deg;
     --ry: 0deg;
