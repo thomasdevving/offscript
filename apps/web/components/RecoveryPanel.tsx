@@ -1,6 +1,6 @@
 "use client";
 
-import type { FaultInjection } from "@parallel/contracts";
+import type { FaultInjection } from "@offscript/contracts";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 

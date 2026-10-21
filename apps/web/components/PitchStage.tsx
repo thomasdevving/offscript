@@ -1,6 +1,6 @@
 "use client";
 
-import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@parallel/contracts";
+import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@offscript/contracts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ballPath, interpolate, type RenderFrame } from "@/lib/frames";
 import { clock, cleanLabel, pct } from "@/lib/format";

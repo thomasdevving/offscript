@@ -1,6 +1,6 @@
 "use client";
 
-import type { MultiversePlanning } from "@parallel/contracts";
+import type { MultiversePlanning } from "@offscript/contracts";
 import { pct } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import { useMv } from "@/lib/mvStore";

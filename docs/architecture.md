@@ -1,6 +1,6 @@
 # Architecture
 
-PARALLEL is a monorepo with a Python backend (FastAPI + Microsoft Agent Framework), a static
+OFFSCRIPT is a monorepo with a Python backend (FastAPI + Microsoft Agent Framework), a static
 Next.js frontend, shared contracts generated from the backend's Pydantic models, and Azure
 infrastructure as code.
 

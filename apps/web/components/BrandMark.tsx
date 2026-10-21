@@ -1,5 +1,5 @@
 /**
- * PARALLEL mark: two offset pitch panels (the observed game and its parallel) sharing one set of pitch
+ * OFFSCRIPT mark: two offset pitch panels (the observed game and its alternative) sharing one set of pitch
  * markings, separated by a transparent gap. Vector recreation of the brand logo (also public/icon.svg).
  */
 export const MARK_LEFT = "M30 27 Q27 25.5 27 29 L27 78 Q27 81.5 30 80 L50 69 Q53 67.5 53 64 L53 42 Q53 38.5 50 37 Z";

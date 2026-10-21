@@ -1,4 +1,4 @@
-import type { Overlay } from "@parallel/contracts";
+import type { Overlay } from "@offscript/contracts";
 import { describe, expect, it } from "vitest";
 import { activeOverlay } from "@/lib/overlayEngine";
 

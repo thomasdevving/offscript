@@ -1,4 +1,4 @@
-"""PARALLEL API entry point (FastAPI)."""
+"""OFFSCRIPT API entry point (FastAPI)."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from .services.hub import EventHub
 from .services.metrics import configure_logging
 from .services.store import Store
 
-log = logging.getLogger("parallel")
+log = logging.getLogger("offscript")
 
 
 @dataclass
@@ -41,7 +41,7 @@ def _configure_telemetry(settings: Settings) -> None:
         from azure.monitor.opentelemetry import configure_azure_monitor
 
         configure_azure_monitor(connection_string=settings.applicationinsights_connection_string,
-                                logger_name="parallel")
+                                logger_name="offscript")
         enable_instrumentation()
         log.info("Azure Monitor / OpenTelemetry enabled")
     except Exception as exc:  # telemetry must never break the app
@@ -63,11 +63,11 @@ def create_app(settings: Settings | None = None, preload: list[str] | None = Non
         app.state.services = services
         await asyncio.to_thread(store.load, preload)
         services.ready = True
-        log.info("PARALLEL ready: %d matches, agent mode %s", len(store.matches), services.analyses.provider.mode)
+        log.info("OFFSCRIPT ready: %d matches, agent mode %s", len(store.matches), services.analyses.provider.mode)
         yield
 
     app = FastAPI(
-        title="PARALLEL API",
+        title="OFFSCRIPT API",
         version="1.0.0",
         description="Multi-agent counterfactual football intelligence on synthetic matches. "
                     "All counterfactual numbers are model estimates.",

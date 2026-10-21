@@ -825,7 +825,7 @@ def build_mv_workflow(rt: MvRuntime):
         return lambda s: isinstance(s, MvSignal) and s.route == name
 
     return (
-        WorkflowBuilder(start_executor=atk, max_iterations=40, name="parallel-multiverse-adversarial-planning")
+        WorkflowBuilder(start_executor=atk, max_iterations=40, name="offscript-multiverse-adversarial-planning")
         .add_switch_case_edge_group(atk, [Case(condition=route("defend"), target=dfn), Default(target=pub)])
         .add_switch_case_edge_group(dfn, [Case(condition=route("simulate"), target=sim), Default(target=pub)])
         .add_switch_case_edge_group(sim, [Case(condition=route("revise"), target=atk),

@@ -26,7 +26,7 @@ from ..models.common import new_id, utcnow
 from ..models.workflow import AgentName, AgentStep, AnalysisWorkflowState, ToolCallRecord
 from .policy_client import FailingChatClient, PolicyChatClient, PolicyFn
 
-log = logging.getLogger("parallel.agents")
+log = logging.getLogger("offscript.agents")
 T = TypeVar("T", bound=BaseModel)
 Publish = Callable[[str, dict[str, Any]], Awaitable[None] | None]
 

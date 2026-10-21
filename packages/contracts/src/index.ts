@@ -1,5 +1,5 @@
 /**
- * PARALLEL shared contracts.
+ * OFFSCRIPT shared contracts.
  *
  * Generated from the backend's Pydantic models via FastAPI's OpenAPI schema
  * (`npm run contracts`). Do not edit api.d.ts by hand; CI fails when it is stale.

@@ -1,6 +1,6 @@
 <div align="center">
 
-# PARALLEL
+# OFFSCRIPT
 
 **Every decision creates another game.**
 
@@ -8,16 +8,16 @@ Multi-agent counterfactual football intelligence · Microsoft × Premier League 
 
 </div>
 
-![PARALLEL at the 73rd-minute decision: the observed shot vs a pass to the overlapping winger](docs/images/casual-decision.png)
+![OFFSCRIPT at the 73rd-minute decision: the observed shot vs a pass to the overlapping winger](docs/images/casual-decision.png)
 
-PARALLEL watches a live (synthetic) football match, detects the decisions that matter, and asks the
+OFFSCRIPT watches a live (synthetic) football match, detects the decisions that matter, and asks the
 question fans actually have: **was there a better option?** Five specialised agents built on
 **Microsoft Agent Framework** propose feasible alternatives, run paired Monte Carlo simulations from
 the exact frozen game state, verify every number and claim, and explain the trade-offs to fans,
 analysts and broadcasters in English and Dutch. You can then **watch the alternative play out**,
 always labelled as one sampled continuation of a model, with its uncertainty.
 
-> PARALLEL never claims to know what *would* have happened. Alternatives are estimates from an
+> OFFSCRIPT never claims to know what *would* have happened. Alternatives are estimates from an
 > explicit, uncalibrated simulation model of a synthetic match. See [limitations](docs/limitations.md).
 
 ## What you can do

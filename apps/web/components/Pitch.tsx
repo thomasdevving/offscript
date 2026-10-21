@@ -1,6 +1,6 @@
 "use client";
 
-import type { MatchInfo } from "@parallel/contracts";
+import type { MatchInfo } from "@offscript/contracts";
 import type { ReactNode } from "react";
 import type { RenderFrame } from "@/lib/frames";
 

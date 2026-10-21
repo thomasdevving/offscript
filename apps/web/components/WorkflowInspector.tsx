@@ -1,6 +1,6 @@
 "use client";
 
-import type { AgentStep, CounterfactualAnalysis } from "@parallel/contracts";
+import type { AgentStep, CounterfactualAnalysis } from "@offscript/contracts";
 import { useState } from "react";
 import { t } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";

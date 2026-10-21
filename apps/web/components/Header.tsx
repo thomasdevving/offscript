@@ -1,6 +1,6 @@
 "use client";
 
-import type { Language, ViewerMode } from "@parallel/contracts";
+import type { Language, ViewerMode } from "@offscript/contracts";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 import BrandMark from "./BrandMark";
@@ -8,9 +8,9 @@ import ThemeToggle from "./ThemeToggle";
 
 export function Logo() {
   return (
-    <a href="/" className="flex items-center gap-2" aria-label="PARALLEL home">
+    <a href="/" className="flex items-center gap-2" aria-label="OFFSCRIPT home">
       <BrandMark size={30} id="hdr" />
-      <span className="text-[15px] font-black tracking-[0.32em] text-white">PARALLEL</span>
+      <span className="text-[15px] font-black tracking-[0.32em] text-white">OFFSCRIPT</span>
     </a>
   );
 }

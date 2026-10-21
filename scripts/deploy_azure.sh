@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploys PARALLEL to Azure in one go: infrastructure (Bicep) with the API on Container Apps, and the
+# Deploys OFFSCRIPT to Azure in one go: infrastructure (Bicep) with the API on Container Apps, and the
 # static web app on a Storage static website. The API image is built by GitHub Actions
 # (.github/workflows/image.yml) and pulled from GitHub Container Registry: no Docker or Azure
 # registry needed.

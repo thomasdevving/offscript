@@ -1,4 +1,4 @@
-import type { Language } from "@parallel/contracts";
+import type { Language } from "@offscript/contracts";
 
 export function pct(v: number | null | undefined, lang: Language = "en", digits = 1): string {
   if (v == null || Number.isNaN(v)) return "-";

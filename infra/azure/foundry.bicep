@@ -1,4 +1,4 @@
-// Microsoft Foundry for PARALLEL: an AI Services account with project management, one project, one
+// Microsoft Foundry for OFFSCRIPT: an AI Services account with project management, one project, one
 // model deployment, and data-plane access for the API's managed identity. Keyless (local auth off).
 
 param location string
@@ -32,7 +32,7 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
   location: location
   identity: { type: 'SystemAssigned' }
   properties: {
-    displayName: 'PARALLEL'
+    displayName: 'OFFSCRIPT'
     description: 'Agents for multi-agent counterfactual football intelligence'
   }
 }

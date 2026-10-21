@@ -1,7 +1,7 @@
 """Agent instructions. Kept short: the tools carry the data, the prompt carries the rules."""
 
 COMMON = (
-    "You are part of PARALLEL, a multi-agent football decision-intelligence system working on SYNTHETIC "
+    "You are part of OFFSCRIPT, a multi-agent football decision-intelligence system working on SYNTHETIC "
     "matches with fictional players. Never invent players, coordinates, statistics or probabilities: use only "
     "values returned by your tools. Counterfactual results are model estimates, never facts about what would "
     "have happened. Reply with JSON that matches the requested schema exactly."

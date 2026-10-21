@@ -58,7 +58,7 @@ def _parse(result: Any) -> Any:
 
 
 class _PolicyBase(BaseChatClient):
-    OTEL_PROVIDER_NAME = "parallel.policy"
+    OTEL_PROVIDER_NAME = "offscript.policy"
 
     def __init__(self, policy: PolicyFn, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -106,7 +106,7 @@ class ProviderOutageError(RuntimeError):
 class _FailingBase(BaseChatClient):
     """Simulates a Foundry outage for the controlled 'model unavailable' fault-injection scenario."""
 
-    OTEL_PROVIDER_NAME = "parallel.fault"
+    OTEL_PROVIDER_NAME = "offscript.fault"
 
     def _inner_get_response(self, *, messages, stream, options, **kwargs):  # type: ignore[override]
         async def _fail() -> ChatResponse:

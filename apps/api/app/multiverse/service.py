@@ -47,7 +47,7 @@ from ..verification.evidence import pct
 from .core import CellEvaluator, action_fingerprint
 from .workflow import MvContext, MvRuntime, run_planning
 
-log = logging.getLogger("parallel.multiverse")
+log = logging.getLogger("offscript.multiverse")
 
 
 class MultiverseError(Exception):

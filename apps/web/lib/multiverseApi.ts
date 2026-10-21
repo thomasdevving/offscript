@@ -9,7 +9,7 @@ import type {
   MultiverseJob,
   MultiversePlanning,
   SampleKind,
-} from "@parallel/contracts";
+} from "@offscript/contracts";
 import { API_BASE } from "./config";
 
 export class MvError extends Error {

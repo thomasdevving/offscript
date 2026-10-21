@@ -14,7 +14,7 @@ import type {
   TrackingFrame,
   Trajectory,
   ViewerMode,
-} from "@parallel/contracts";
+} from "@offscript/contracts";
 import { create } from "zustand";
 import { api, type Health, type ScenarioInfo } from "./api";
 import { MatchSocket, type ServerMessage } from "./socket";
@@ -421,7 +421,7 @@ export const actions = {
   setPitchDim(v: "2d" | "3d"): void {
     set({ pitchDim: v });
     try {
-      localStorage.setItem("parallel.pitchDim", v);
+      localStorage.setItem("offscript.pitchDim", v);
     } catch {
       /* storage unavailable */
     }
@@ -430,7 +430,7 @@ export const actions = {
   restorePitchDim(): void {
     try {
       // ?dim=3d in the URL wins (handy for demo links), then the remembered choice.
-      const v = new URLSearchParams(window.location.search).get("dim") ?? localStorage.getItem("parallel.pitchDim");
+      const v = new URLSearchParams(window.location.search).get("dim") ?? localStorage.getItem("offscript.pitchDim");
       if (v === "2d" || v === "3d") set({ pitchDim: v });
     } catch {
       /* storage unavailable */

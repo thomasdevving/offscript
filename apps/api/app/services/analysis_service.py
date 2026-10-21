@@ -30,7 +30,7 @@ from .hub import EventHub
 from .overlays import analysis_overlays
 from .store import Store
 
-log = logging.getLogger("parallel.analysis")
+log = logging.getLogger("offscript.analysis")
 
 
 class AnalysisService:

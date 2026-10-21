@@ -1,4 +1,4 @@
-import type { BranchComparison, BranchNode, MultiverseJob, MultiversePlanning } from "@parallel/contracts";
+import type { BranchComparison, BranchNode, MultiverseJob, MultiversePlanning } from "@offscript/contracts";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ActionComposer from "@/components/multiverse/ActionComposer";

@@ -16,7 +16,7 @@ const COPY = {
   en: {
     eyebrow: "Counterfactual football intelligence",
     title: ["Every decision", "creates another game."],
-    sub: "PARALLEL freezes the moment a player decides, plays every option forward hundreds of times and lets a team of agents explain which future was more promising, with the evidence on the table.",
+    sub: "OFFSCRIPT freezes the moment a player decides, plays every option forward hundreds of times and lets a team of agents explain which future was more promising, with the evidence on the table.",
     live: "Watch the live match",
     multiverse: "Enter the Multiverse",
     open: "Open app",
@@ -70,7 +70,7 @@ const COPY = {
   nl: {
     eyebrow: "Contrafactische voetbalintelligentie",
     title: ["Elke beslissing", "creëert een andere wedstrijd."],
-    sub: "PARALLEL bevriest het moment waarop een speler beslist, speelt elke optie honderden keren vooruit en laat een team van agents uitleggen welke toekomst kansrijker was, met het bewijs op tafel.",
+    sub: "OFFSCRIPT bevriest het moment waarop een speler beslist, speelt elke optie honderden keren vooruit en laat een team van agents uitleggen welke toekomst kansrijker was, met het bewijs op tafel.",
     live: "Bekijk de live wedstrijd",
     multiverse: "Betreed het Multiverse",
     open: "Open app",
@@ -435,7 +435,7 @@ export default function Landing() {
       <header className="relative z-20 mx-auto flex max-w-[1400px] items-center gap-4 px-5 py-4">
         <div className="flex items-center gap-2">
           <BrandMark size={30} id="land" />
-          <span className="text-[15px] font-black tracking-[0.32em] text-white">PARALLEL</span>
+          <span className="text-[15px] font-black tracking-[0.32em] text-white">OFFSCRIPT</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <div role="radiogroup" aria-label="Language" className="flex rounded-sm bg-white/[0.04] p-0.5">

@@ -1,4 +1,4 @@
-import type { TrackingFrame } from "@parallel/contracts";
+import type { TrackingFrame } from "@offscript/contracts";
 import { describe, expect, it } from "vitest";
 import { ballPath, frameIndexAt, interpolate } from "@/lib/frames";
 import { clock, pct, signedPp } from "@/lib/format";

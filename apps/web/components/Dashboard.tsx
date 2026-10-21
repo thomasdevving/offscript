@@ -124,7 +124,7 @@ export default function Dashboard() {
                 : "Synthetische wedstrijd met fictieve teams en spelers. Alternatieven worden gesimuleerd met een expliciet, ongekalibreerd model; het zijn schattingen, geen werkelijkheid."}
             </p>
           </section>
-          <aside className="min-w-0 lg:sticky lg:top-[62px] lg:max-h-[calc(100vh-78px)] lg:overflow-y-auto lg:pr-1" aria-label={L.parallelAnalysis}>
+          <aside className="min-w-0 lg:sticky lg:top-[62px] lg:max-h-[calc(100vh-78px)] lg:overflow-y-auto lg:pr-1" aria-label={L.analysisTitle}>
             <AnalysisPanel />
           </aside>
         </main>

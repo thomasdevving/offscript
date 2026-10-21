@@ -1,11 +1,11 @@
-# PARALLEL - Hackathon submission
+# OFFSCRIPT - Hackathon submission
 
 **Microsoft × Premier League "Inside the Game" Hackathon 2026**
 Target: Grand Prize and Best Multi-Agent System (Best Multi-Agent Orchestration).
 
 ## Elevator pitch
 
-PARALLEL turns a live football event stream into interactive "what-if" intelligence. When a player
+OFFSCRIPT turns a live football event stream into interactive "what-if" intelligence. When a player
 makes a key decision - shoot or pass, risky through ball, dribble under pressure - five specialised
 AI agents built on Microsoft Agent Framework detect the moment, propose feasible alternatives,
 run hundreds of paired Monte Carlo simulations from the exact frozen game state, verify every
@@ -41,7 +41,7 @@ out, and an honest account of uncertainty - in seconds, in a form a broadcast ca
 
 ## Microsoft technologies actually used
 
-| Technology | Use in PARALLEL | Status |
+| Technology | Use in OFFSCRIPT | Status |
 |---|---|---|
 | **Microsoft Agent Framework** (`agent-framework-core` 1.22) | `Agent` per specialist, `@tool` with invocation budgets, function middleware for tool-call tracing, structured outputs, `WorkflowBuilder` with switch-case edges, executors, bounded self-loops, workflow state | Implemented and tested (CI) |
 | **Microsoft Foundry** (`agent-framework-foundry` `FoundryChatClient`, Azure Identity) | Live model for all agents when `FOUNDRY_PROJECT_ENDPOINT`/`FOUNDRY_MODEL` are set; managed identity in Azure; diagnostics endpoint; optional live test | Implemented; **not exercised live in the build environment** (no credentials) - see deployment checklist |
@@ -117,7 +117,7 @@ intervals only, authored demo scenarios, Foundry/Azure not exercised in the buil
 * [ ] Working project access for judges, free of charge until 10 Nov 2026 (deployed URL or clear
       local instructions; no judge credentials needed)
 * [ ] Microsoft technologies listed only as actually used/configured
-* [ ] Synthetic data only; fictional teams/players; original graphics (PARALLEL logo, SVG pitch);
+* [ ] Synthetic data only; fictional teams/players; original graphics (OFFSCRIPT logo, SVG pitch);
       fonts Inter/JetBrains Mono (SIL OFL); dependencies under OSI licences; project MIT-licensed
 * [ ] Original work created during the hackathon period; no sponsor support; not previously awarded
 * [ ] Submitted before **27 Oct 2026, 23:59 PT** (28 Oct, 07:59 CET)

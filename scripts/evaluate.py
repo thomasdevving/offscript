@@ -1,4 +1,4 @@
-"""PARALLEL evaluation harness.
+"""OFFSCRIPT evaluation harness.
 
 Measures (on synthetic data only - internal consistency, not real-world validity):
   1. decision detection recall against scenario labels + false flags on scripted build-up

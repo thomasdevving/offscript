@@ -1,7 +1,7 @@
 [project]
-name = "parallel-api"
+name = "offscript-api"
 version = "0.1.0"
-description = "PARALLEL - multi-agent counterfactual football intelligence (backend)"
+description = "OFFSCRIPT - multi-agent counterfactual football intelligence (backend)"
 readme = "../../README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }

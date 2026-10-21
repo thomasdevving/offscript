@@ -17,7 +17,7 @@ export default function ThemeToggle({ lang = "en" }: { lang?: "en" | "nl" }) {
       onClick={() => {
         document.documentElement.dataset.theme = next;
         try {
-          localStorage.setItem("parallel.theme", next);
+          localStorage.setItem("offscript.theme", next);
         } catch {
           /* storage unavailable */
         }

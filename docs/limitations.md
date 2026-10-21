@@ -3,7 +3,7 @@
 ## Scientific
 
 * **Counterfactuals are unobservable.** Every alternative outcome is an estimate from an explicit,
-  simplified model under stated assumptions. PARALLEL never states what *would* have happened, and
+  simplified model under stated assumptions. OFFSCRIPT never states what *would* have happened, and
   the verifier rejects narratives that do.
 * **Synthetic world, uncalibrated model.** The matches, players and physics are synthetic. The shot
   and pass models were sanity-checked against rules of thumb, not fitted to real data. "Modeled

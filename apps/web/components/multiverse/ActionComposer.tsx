@@ -1,6 +1,6 @@
 "use client";
 
-import type { InteractionMode, SampleKind } from "@parallel/contracts";
+import type { InteractionMode, SampleKind } from "@offscript/contracts";
 import { mv, useMv, type ComposerType } from "@/lib/mvStore";
 
 const MODES: { v: InteractionMode; label: string; hint: string }[] = [

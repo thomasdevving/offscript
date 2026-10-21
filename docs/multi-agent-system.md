@@ -1,6 +1,6 @@
 # Multi-agent system
 
-PARALLEL's analysis is a **Microsoft Agent Framework workflow** (`agent-framework-core` 1.22,
+OFFSCRIPT's analysis is a **Microsoft Agent Framework workflow** (`agent-framework-core` 1.22,
 `agent-framework-foundry` 1.15) of five specialised agents plus a publisher. Each agent is an
 Agent Framework `Agent` with its own instructions, its own allow-listed tools and a Pydantic
 structured-output schema. The agents never compute football numbers themselves; they decide,

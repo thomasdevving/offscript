@@ -10,7 +10,7 @@ import type {
   MultiverseJob,
   MultiversePlanning,
   SampleKind,
-} from "@parallel/contracts";
+} from "@offscript/contracts";
 import { create } from "zustand";
 import { wsUrl } from "./config";
 import { MvError, mvApi, type MvSessionLite, type MvTree, type NodeOptions, type PathFrames } from "./multiverseApi";
@@ -95,7 +95,7 @@ const set = useMv.setState;
 const get = useMv.getState;
 let socket: WebSocket | null = null;
 
-const storageKey = (decisionId: string) => `parallel.mv.${decisionId}`;
+const storageKey = (decisionId: string) => `offscript.mv.${decisionId}`;
 
 function safeStore(k: string, v: string | null) {
   try {

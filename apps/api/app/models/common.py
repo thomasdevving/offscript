@@ -7,7 +7,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 SCHEMA_VERSION = "1.0"
-SIMULATOR_VERSION = "parallel-sim-1.0.0"
+SIMULATOR_VERSION = "offscript-sim-1.0.0"
 
 ViewerMode = Literal["casual", "analyst", "broadcaster"]
 Language = Literal["en", "nl"]

@@ -2457,7 +2457,7 @@
             "type": "integer"
           },
           "simulator_version": {
-            "default": "parallel-sim-1.0.0",
+            "default": "offscript-sim-1.0.0",
             "title": "Simulator Version",
             "type": "string"
           },
@@ -4388,7 +4388,7 @@
             "type": "integer"
           },
           "simulator_version": {
-            "default": "parallel-sim-1.0.0",
+            "default": "offscript-sim-1.0.0",
             "title": "Simulator Version",
             "type": "string"
           },
@@ -4497,7 +4497,7 @@
             "type": "string"
           },
           "simulator_version": {
-            "default": "parallel-sim-1.0.0",
+            "default": "offscript-sim-1.0.0",
             "title": "Simulator Version",
             "type": "string"
           },
@@ -5260,7 +5260,7 @@
   },
   "info": {
     "description": "Multi-agent counterfactual football intelligence on synthetic matches. All counterfactual numbers are model estimates.",
-    "title": "PARALLEL API",
+    "title": "OFFSCRIPT API",
     "version": "1.0.0"
   },
   "openapi": "3.1.0",

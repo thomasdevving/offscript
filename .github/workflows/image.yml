@@ -33,7 +33,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/parallel-api:${{ github.sha }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.description=PARALLEL API (FastAPI + Microsoft Agent Framework)
+            org.opencontainers.image.description=OFFSCRIPT API (FastAPI + Microsoft Agent Framework)
             org.opencontainers.image.licenses=MIT
           cache-from: type=gha
           cache-to: type=gha,mode=max

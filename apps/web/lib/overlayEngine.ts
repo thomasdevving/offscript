@@ -1,4 +1,4 @@
-import type { Language, MatchEvent, Overlay, ViewerMode } from "@parallel/contracts";
+import type { Language, MatchEvent, Overlay, ViewerMode } from "@offscript/contracts";
 
 /**
  * Picks the overlay to show at simulation time `t` for a viewer.

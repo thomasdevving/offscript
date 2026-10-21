@@ -10,7 +10,7 @@ import type {
   Overlay,
   Recap,
   Trajectory,
-} from "@parallel/contracts";
+} from "@offscript/contracts";
 import { API_BASE } from "./config";
 
 export class ApiError extends Error {

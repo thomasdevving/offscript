@@ -1,4 +1,4 @@
-// PARALLEL - Azure infrastructure
+// OFFSCRIPT - Azure infrastructure
 //
 //  * Log Analytics + workspace-based Application Insights (telemetry, OpenTelemetry traces)
 //  * API image from GitHub Container Registry (public, built by .github/workflows/image.yml); optionally

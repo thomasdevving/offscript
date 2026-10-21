@@ -4,7 +4,7 @@ Compares three ways of answering "what should the player do here?" on every labe
 synthetic scenarios (internal consistency of the model only - not real-world validity):
 
   A. Single decision   - rank the generated options by modelled xG within the horizon against the
-                         baseline (balanced) defence. This is what the original PARALLEL analysis does.
+                         baseline (balanced) defence. This is what the original OFFSCRIPT analysis does.
   B. Branching         - second-order value: realise sampled successor states of the top-2 A options and
                          let the attacker re-decide at the next decision (best next option chosen on one
                          seed, valued on an independent seed to avoid winner's-curse bias).
@@ -56,7 +56,7 @@ def pc(x: float) -> str:
 async def run(quick: bool) -> dict:
     n = 40 if quick else 80
     k_succ = 4 if quick else 8
-    tmp = Path(tempfile.mkdtemp(prefix="parallel-mv-eval-"))
+    tmp = Path(tempfile.mkdtemp(prefix="offscript-mv-eval-"))
     settings = Settings(agent_mode="policy", use_analysis_cache=False, data_dir=tmp, scenarios_dir=ROOT / "scenarios",
                         multiverse_cell_rollouts=n, multiverse_max_cell_rollouts=n, max_concurrent_analyses=4)
     store = Store(settings.scenarios_dir, settings.data_dir)

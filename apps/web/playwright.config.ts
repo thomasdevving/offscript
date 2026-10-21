@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 
 const localVenv = path.resolve(process.cwd(), "..", "api", ".venv", process.platform === "win32" ? "Scripts/python.exe" : "bin/python");
-const PY = process.env.PARALLEL_PYTHON ?? `"${localVenv}"`;
+const PY = process.env.OFFSCRIPT_PYTHON ?? `"${localVenv}"`;
 
 /**
  * End-to-end tests drive the real stack: FastAPI backend (deterministic policy agents, so no

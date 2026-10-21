@@ -43,7 +43,7 @@ Source: `apps/api/app/multiverse/`, `apps/api/app/simulation/defense.py`,
 
 ## Adversarial planning workflow
 
-An Agent Framework workflow (`parallel-multiverse-adversarial-planning`, `max_iterations=40`):
+An Agent Framework workflow (`offscript-multiverse-adversarial-planning`, `max_iterations=40`):
 
 ```mermaid
 stateDiagram-v2

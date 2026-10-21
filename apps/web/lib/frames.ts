@@ -1,4 +1,4 @@
-import type { TrackingFrame } from "@parallel/contracts";
+import type { TrackingFrame } from "@offscript/contracts";
 
 export interface RenderFrame {
   t_ms: number;

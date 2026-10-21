@@ -1,6 +1,6 @@
 "use client";
 
-import type { MatchEvent } from "@parallel/contracts";
+import type { MatchEvent } from "@offscript/contracts";
 import { useState } from "react";
 import { clock, pct } from "@/lib/format";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";

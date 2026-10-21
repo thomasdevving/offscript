@@ -909,7 +909,7 @@ def build_workflow(rt: AnalysisRuntime):
         return lambda s: isinstance(s, Signal) and s.route == name
 
     return (
-        WorkflowBuilder(start_executor=decision, max_iterations=40, name="parallel-counterfactual-analysis",
+        WorkflowBuilder(start_executor=decision, max_iterations=40, name="offscript-counterfactual-analysis",
                         description="Decision -> Strategy -> Simulation -> Verification -> Explanation -> Publish")
         .add_switch_case_edge_group(decision, [Case(condition=route("strategy"), target=strategy),
                                                Default(target=publisher)])

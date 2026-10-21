@@ -68,7 +68,7 @@ horizon with possession retained. At most 8 actions per rollout.
   differences. These intervals describe Monte Carlo sampling error **only**.
 * **Verdicts** (best alternative vs observed action): `more_promising` / `less_promising` when the
   paired interval excludes zero, `similar` when it lies within ±3 percentage points, otherwise
-  `inconclusive`. PARALLEL never declares a winner the evidence does not support.
+  `inconclusive`. OFFSCRIPT never declares a winner the evidence does not support.
 * **Representative trajectory**: the medoid of the modal outcome in (end time, final ball x/y,
   number of actions) space - not the most favourable rollout. Other outcomes can be viewed as
   examples. Trajectories are re-simulated from their seed on demand, which doubles as a

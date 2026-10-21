@@ -15,10 +15,10 @@ SHOT_OUTCOMES = {EventType.GOAL: ("scored", "scoorde"), EventType.SHOT_SAVED: ("
                  EventType.SHOT_MISSED: ("went wide", "ging naast")}
 
 DISCLAIMER = {
-    "en": "Synthetic match with fictional teams. Counterfactual insights are estimates from PARALLEL's simulation model "
+    "en": "Synthetic match with fictional teams. Counterfactual insights are estimates from OFFSCRIPT's simulation model "
           "under stated assumptions, not statements about what would have happened.",
     "nl": "Synthetische wedstrijd met fictieve teams. Alternatieve scenario's zijn schattingen van het simulatiemodel "
-          "van PARALLEL onder vermelde aannames, geen uitspraken over wat er gebeurd zou zijn.",
+          "van OFFSCRIPT onder vermelde aannames, geen uitspraken over wat er gebeurd zou zijn.",
 }
 
 
@@ -144,7 +144,7 @@ def build_recap(md: MatchData, analyses: list[CounterfactualAnalysis], language:
                  f"({h.shots} vs {a_.shots})."]
         story += [f"{k.match_clock}: {k.text}" for k in goals] or ["No goals in this segment."]
         if insights:
-            story.append(f"PARALLEL analysed {len(insights)} key decision(s): " + insights[0].text)
+            story.append(f"OFFSCRIPT analysed {len(insights)} key decision(s): " + insights[0].text)
         if perf:
             story.append(f"Standout: {perf[0].summary}")
         ana_head = f"Analyst recap {start}-{end}: {score_line}"
@@ -165,7 +165,7 @@ def build_recap(md: MatchData, analyses: list[CounterfactualAnalysis], language:
                  f"({h.shots} tegen {a_.shots})."]
         story += [f"{k.match_clock}: {k.text}" for k in goals] or ["Geen doelpunten in dit fragment."]
         if insights:
-            story.append(f"PARALLEL analyseerde {len(insights)} sleutelbeslissing(en): " + insights[0].text)
+            story.append(f"OFFSCRIPT analyseerde {len(insights)} sleutelbeslissing(en): " + insights[0].text)
         if perf:
             story.append(f"Uitblinker: {perf[0].summary}")
         ana_head = f"Analistenverslag {start}-{end}: {score_line}"

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ActionResult, CounterfactualAnalysis, DecisionPoint, Language, Narrative, Overlay,
-  PairwiseComparison } from "@parallel/contracts";
+  PairwiseComparison } from "@offscript/contracts";
 import { useEffect, useState } from "react";
 import { clock, cleanLabel, pct, signedPp } from "@/lib/format";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";
@@ -55,10 +55,10 @@ function DecisionHeader({ d }: { d: DecisionPoint }) {
 }
 
 /**
- * "Parallel futures": every option is a branch growing from the same frozen moment. Branch length is
+ * "Possible futures": every option is a branch growing from the same frozen moment. Branch length is
  * the modelled P(goal within horizon); analysts also see the 95% interval as a whisker.
  */
-function ParallelFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Map<string, ActionResult>; comps: Map<string, PairwiseComparison> }) {
+function PossibleFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Map<string, ActionResult>; comps: Map<string, PairwiseComparison> }) {
   const s = useApp();
   const L = t(s.lang);
   const H = a.simulation?.config.horizon_s ?? 10;
@@ -256,7 +256,7 @@ function BroadcasterView({ a, overlays }: { a: CounterfactualAnalysis; overlays:
       {n && (
         <div className="overflow-hidden rounded-xl shadow-lg">
           <div className="flex">
-            <div className="flex items-center bg-gradient-to-b from-leaf-500 to-sage-600 px-2.5 text-[10px] font-black tracking-widest text-white">PARALLEL</div>
+            <div className="flex items-center bg-gradient-to-b from-leaf-500 to-sage-600 px-2.5 text-[10px] font-black tracking-widest text-white">OFFSCRIPT</div>
             <div className="flex-1 bg-slate-950 px-3 py-2">
               <div className="text-sm font-extrabold uppercase text-white">{n.headline}</div>
               <div className="text-xs text-leaf-100" data-testid="caption">{n.caption}</div>
@@ -301,7 +301,7 @@ export default function AnalysisPanel() {
   if (!d) {
     return (
       <div className="glass p-5">
-        <h2 className="eyebrow">{L.parallelAnalysis}</h2>
+        <h2 className="eyebrow">{L.analysisTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-300">{L.noDecision}</p>
         <p className="mt-4 text-[11px] text-slate-500">{L.keyboard}</p>
       </div>
@@ -319,9 +319,9 @@ export default function AnalysisPanel() {
   ];
   return (
     <div className="space-y-3">
-      <section className="glass space-y-4 p-4" aria-label={L.parallelAnalysis} data-testid="analysis-panel">
+      <section className="glass space-y-4 p-4" aria-label={L.analysisTitle} data-testid="analysis-panel">
         <div className="flex items-center justify-between">
-          <h2 className="eyebrow">{L.parallelAnalysis}</h2>
+          <h2 className="eyebrow">{L.analysisTitle}</h2>
           {s.recovery && (
             <button type="button" onClick={() => useApp.setState({ recovery: null, recoveryFault: null })} className="btn px-2 py-0.5 text-[11px]">
               ← {s.lang === "en" ? "main analysis" : "hoofdanalyse"}
@@ -345,7 +345,7 @@ export default function AnalysisPanel() {
                 {L.verdict[overall]}
               </div>
             )}
-            <ParallelFutures a={a} res={res} comps={comps} />
+            <PossibleFutures a={a} res={res} comps={comps} />
             {s.mode === "analyst" && <AnalystTable a={a} res={res} comps={comps} />}
             {s.mode === "broadcaster" && <BroadcasterView a={a} overlays={s.overlays} />}
           </>
@@ -358,7 +358,7 @@ export default function AnalysisPanel() {
       </section>
       {a && (
         <section className="glass p-3">
-          <div role="tablist" aria-label={L.parallelAnalysis} className="mb-3 flex gap-0.5 rounded-xl bg-white/[0.03] p-0.5">
+          <div role="tablist" aria-label={L.analysisTitle} className="mb-3 flex gap-0.5 rounded-xl bg-white/[0.03] p-0.5">
             {tabs.map((x) => (
               <button key={x.id} type="button" role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}
                 className="tab flex-1" data-testid={`rail-tab-${x.id}`}>{x.label}</button>

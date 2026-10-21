@@ -1,6 +1,6 @@
 "use client";
 
-import type { TrackingFrame } from "@parallel/contracts";
+import type { TrackingFrame } from "@offscript/contracts";
 import { useEffect, useRef } from "react";
 import { interpolate } from "@/lib/frames";
 import { pct } from "@/lib/format";

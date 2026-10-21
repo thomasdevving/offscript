@@ -26,7 +26,7 @@ from ..synthetic_data.scenarios import ScenarioDefinition, generate, load_scenar
 from . import metrics
 from .overlays import event_overlays
 
-log = logging.getLogger("parallel.store")
+log = logging.getLogger("offscript.store")
 
 
 @dataclass

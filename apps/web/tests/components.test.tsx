@@ -1,4 +1,4 @@
-import type { CounterfactualAnalysis, DecisionPoint, MatchInfo } from "@parallel/contracts";
+import type { CounterfactualAnalysis, DecisionPoint, MatchInfo } from "@offscript/contracts";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import AnalysisPanel from "@/components/AnalysisPanel";

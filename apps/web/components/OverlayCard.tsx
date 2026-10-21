@@ -1,6 +1,6 @@
 "use client";
 
-import type { Overlay } from "@parallel/contracts";
+import type { Overlay } from "@offscript/contracts";
 
 /** Renders one machine-readable overlay instruction on top of the pitch. */
 export default function OverlayCard({ overlay }: { overlay: Overlay }) {
@@ -19,7 +19,7 @@ export default function OverlayCard({ overlay }: { overlay: Overlay }) {
     return (
       <div className="pointer-events-none absolute inset-x-4 bottom-4 z-20" role="status" aria-live="polite" data-testid="overlay">
         <div className="animate-slide flex items-stretch overflow-hidden rounded-lg shadow-2xl">
-          <div className="flex items-center bg-leaf-600 px-3 text-xs font-black uppercase tracking-widest text-white">PARALLEL</div>
+          <div className="flex items-center bg-leaf-600 px-3 text-xs font-black uppercase tracking-widest text-white">OFFSCRIPT</div>
           <div className="flex-1 bg-slate-950/95 px-4 py-2">
             <div className="text-sm font-extrabold uppercase tracking-wide text-white">{overlay.headline}</div>
             <div className="text-sm text-leaf-100">{overlay.caption ?? overlay.narrative}</div>

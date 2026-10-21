@@ -1,6 +1,6 @@
 "use client";
 
-import type { MatchStateSnapshot, TrackingFrame } from "@parallel/contracts";
+import type { MatchStateSnapshot, TrackingFrame } from "@offscript/contracts";
 import { useEffect, useMemo, useRef } from "react";
 import { interpolate, type RenderFrame } from "@/lib/frames";
 import { clock, pct } from "@/lib/format";

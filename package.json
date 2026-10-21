@@ -1,8 +1,8 @@
 {
-  "name": "parallel",
+  "name": "offscript",
   "private": true,
   "version": "1.0.0",
-  "description": "PARALLEL - multi-agent counterfactual football intelligence",
+  "description": "OFFSCRIPT - multi-agent counterfactual football intelligence",
   "workspaces": ["apps/web", "packages/contracts"],
   "scripts": {
     "dev:web": "npm run dev -w apps/web",

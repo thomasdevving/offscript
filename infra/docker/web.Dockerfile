@@ -1,4 +1,4 @@
-# PARALLEL web - static Next.js export served by nginx (local/demo; Azure uses Static Web Apps)
+# OFFSCRIPT web - static Next.js export served by nginx (local/demo; Azure uses Static Web Apps)
 FROM node:24-alpine AS build
 WORKDIR /repo
 COPY package.json package-lock.json ./

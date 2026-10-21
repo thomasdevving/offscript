@@ -73,7 +73,7 @@ jobs:
       - run: npx playwright test
         working-directory: apps/web
         env:
-          PARALLEL_PYTHON: python
+          OFFSCRIPT_PYTHON: python
           CI: "true"
       - uses: actions/upload-artifact@v5
         if: failure()

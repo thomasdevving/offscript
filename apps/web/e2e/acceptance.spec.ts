@@ -11,7 +11,7 @@ test("shoot-or-pass end to end", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /73' - The decision that changed the attack/ })).toBeVisible();
   await expect(page.getByTestId("agent-mode")).toContainText("Agents");
 
-  // Play at 4x until PARALLEL detects the decision and auto-pauses.
+  // Play at 4x until OFFSCRIPT detects the decision and auto-pauses.
   await page.getByRole("button", { name: "4×" }).click();
   await page.getByTestId("play-toggle").click();
   await expect(page.getByTestId("event-feed")).toContainText("Shot");

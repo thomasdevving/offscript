@@ -1,6 +1,6 @@
 "use client";
 
-import type { ActionResult, CandidateAction, Language } from "@parallel/contracts";
+import type { ActionResult, CandidateAction, Language } from "@offscript/contracts";
 import { cleanLabel, pct } from "@/lib/format";
 
 /** Horizontal bars of P(goal within horizon) with 95% Wilson whiskers (custom SVG, no chart library). */

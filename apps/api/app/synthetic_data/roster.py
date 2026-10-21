@@ -1,4 +1,4 @@
-"""Fictional teams and players. Every name and colour here is invented for PARALLEL."""
+"""Fictional teams and players. Every name and colour here is invented for OFFSCRIPT."""
 
 from __future__ import annotations
 

@@ -1752,7 +1752,7 @@ export interface components {
             sim_time_ms: number;
             /**
              * Simulator Version
-             * @default parallel-sim-1.0.0
+             * @default offscript-sim-1.0.0
              */
             simulator_version: string;
             /** Snapshot Id */
@@ -2604,7 +2604,7 @@ export interface components {
             seed: number;
             /**
              * Simulator Version
-             * @default parallel-sim-1.0.0
+             * @default offscript-sim-1.0.0
              */
             simulator_version: string;
             /**
@@ -2650,7 +2650,7 @@ export interface components {
             simulation_run_id: string;
             /**
              * Simulator Version
-             * @default parallel-sim-1.0.0
+             * @default offscript-sim-1.0.0
              */
             simulator_version: string;
             /** Snapshot Id */
