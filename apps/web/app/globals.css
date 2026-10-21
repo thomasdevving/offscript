@@ -589,3 +589,20 @@ input[type="range"].timeline::-moz-range-thumb {
 :root[data-theme="light"] [role="tree"] text, :root[data-theme="light"] [data-testid="mv-steps"] text { fill: #2b4f33; }
 :root[data-theme="light"] .text-amber-200\/90 { color: #b45309; }
 :root[data-theme="light"] .bg-black\/40 { background: rgba(30, 58, 38, 0.05); }
+
+/* Landing: the agent relay. */
+@layer components {
+  .relay-station .cube-wrap { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s; }
+  .relay-station.is-on .cube-wrap { transform: translateY(-8px) scale(1.18); filter: drop-shadow(0 0 16px rgba(143, 202, 124, 0.75)); }
+  .relay-station.is-on .cube { animation-duration: 4s; }
+  .relay-station.is-done .cube-wrap { filter: saturate(0.6); opacity: 0.75; }
+  .relay-station:hover .cube-wrap { transform: translateY(-4px); }
+  .relay-bar { transform-origin: left; animation: grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .relay-check { animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+}
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+:root[data-theme="light"] .relay-station.is-on .cube-wrap { filter: drop-shadow(0 6px 14px rgba(58, 103, 66, 0.45)); }
+@media (max-width: 640px) {
+  .relay-station .cube-wrap { transform: scale(0.62); margin: -14px 0; }
+  .relay-station.is-on .cube-wrap { transform: scale(0.8); }
+}

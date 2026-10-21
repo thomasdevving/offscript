@@ -43,6 +43,18 @@ const COPY = {
     play: "Play",
     agentsEyebrow: "The agent team",
     agentsTitle: "Five specialists, one pipeline.",
+    agentsSub: "Watch one real run on the 73' decision: each agent does its part, hands the baton on, and nothing reaches the screen before it is verified.",
+    relayFoot: "Real run of the 73' scenario · deterministic planner · 6 agent runs · 7 tool calls",
+    relay: [
+      { ms: "49 ms", handoff: "analyse (high priority)", body: "Castellane shoots from 23 m while Mbeki-Larsen is free on the right. Three triggers fire, so the moment is worth a full analysis.",
+        tags: ["Shot while a teammate was available", "High-value attacking possession", "Decision under pressure"] },
+      { ms: "112 ms", handoff: "2 alternatives + observed action", body: "From the frozen snapshot it proposes only options that are actually on: the pass to Mbeki-Larsen and the pass to Kestrel, next to the shot that was taken." },
+      { ms: "7.2 s", handoff: "200 rollouts/option ready", body: "Every option is played forward 200 times from the same frozen state with paired random seeds, so the options are compared fairly." },
+      { ms: "8 ms", handoff: "analysis verified", body: "It recomputes the figures and checks every claim against the evidence table. Anything the numbers do not support is rejected.",
+        checks: ["Every candidate is feasible from the snapshot", "Figures match the simulation results", "Claims match the evidence table"] },
+      { ms: "5 ms", handoff: "6 narratives drafted", body: "The verified result becomes three stories, for fans, analysts and broadcast, in English and Dutch, and goes back for one more check." },
+    ],
+    modes: ["Fan", "Analyst", "Broadcast"],
     agents: [
       ["Decision", "spots the moment that mattered"],
       ["Strategy", "proposes the realistic options"],
@@ -85,6 +97,18 @@ const COPY = {
     play: "Afspelen",
     agentsEyebrow: "Het agentteam",
     agentsTitle: "Vijf specialisten, één pijplijn.",
+    agentsSub: "Bekijk één echte run op de 73'-beslissing: elke agent doet zijn deel, geeft het stokje door, en niets komt in beeld voordat het geverifieerd is.",
+    relayFoot: "Echte run van het 73'-scenario · deterministische planner · 6 agent-runs · 7 tool-aanroepen",
+    relay: [
+      { ms: "49 ms", handoff: "analyseren (hoge prioriteit)", body: "Castellane schiet van 23 m terwijl Mbeki-Larsen rechts vrij staat. Drie triggers slaan aan, dus het moment krijgt een volledige analyse.",
+        tags: ["Schot terwijl een medespeler vrij stond", "Waardevol aanvalsbezit", "Beslissing onder druk"] },
+      { ms: "112 ms", handoff: "2 alternatieven + echte actie", body: "Vanuit de bevroren momentopname stelt hij alleen opties voor die echt kunnen: de pass naar Mbeki-Larsen en de pass naar Kestrel, naast het schot dat genomen werd." },
+      { ms: "7,2 s", handoff: "200 simulaties per optie klaar", body: "Elke optie wordt 200 keer vooruitgespeeld vanuit dezelfde bevroren situatie met gepaarde toevalsgetallen, zodat de opties eerlijk vergeleken worden." },
+      { ms: "8 ms", handoff: "analyse geverifieerd", body: "Hij rekent de cijfers na en toetst elke bewering aan de bewijstabel. Wat de cijfers niet steunen, wordt afgewezen.",
+        checks: ["Elke kandidaat is uitvoerbaar vanuit de momentopname", "Cijfers kloppen met de simulatieresultaten", "Beweringen kloppen met de bewijstabel"] },
+      { ms: "5 ms", handoff: "6 verhalen geschreven", body: "Het geverifieerde resultaat wordt drie verhalen, voor fans, analisten en omroep, in het Engels en Nederlands, en gaat nog één keer langs de controle." },
+    ],
+    modes: ["Fan", "Analist", "Omroep"],
     agents: [
       ["Decision", "vindt het moment dat ertoe deed"],
       ["Strategy", "stelt de realistische opties voor"],
@@ -277,6 +301,121 @@ function Cube({ label, i }: { label: string; i: number }) {
   );
 }
 
+/** What each agent produced on the 73' decision, drawn small. */
+function RelayArt({ i, C }: { i: number; C: (typeof COPY)[Lang] }) {
+  const step = C.relay[i];
+  if (i === 0) {
+    return (
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:items-center">
+        <MiniPitch crop players extra={<>
+          <circle cx={22.8} cy={37} r={3.2} fill="none" stroke="#facc15" strokeWidth={0.6} />
+          <circle cx={11.8} cy={20.5} r={3.2} fill="none" stroke="#d4ee8f" strokeWidth={0.6} strokeDasharray="1 0.8" />
+        </>} />
+        <ul className="space-y-1.5">{"tags" in step && step.tags.map((t) => <li key={t} className="chip text-leaf-300">{t}</li>)}</ul>
+      </div>
+    );
+  }
+  if (i === 1) {
+    return (
+      <MiniPitch crop extra={<>
+        <path d={SHOT_PATH} stroke="#f8fafc" strokeWidth={0.6} strokeDasharray="1.4 1" fill="none" />
+        <path d={PASS_PATH} stroke="#d4ee8f" strokeWidth={0.7} fill="none" className="draw-path" pathLength={100} />
+        <path d="M 22.8 37 Q 22 50 14 54" stroke="#cfe2b4" strokeWidth={0.6} strokeDasharray="0.8 0.7" fill="none" />
+      </>} />
+    );
+  }
+  if (i === 2) {
+    const bars: [string, number, string][] = [["Shoot · actual", 0, "0.0%"], ["Pass to Mbeki-Larsen", 0.02, "2.0%"], ["Pass to Kestrel", 0, "0.0%"]];
+    return (
+      <div className="space-y-2.5">
+        {bars.map(([k, v, l], j) => (
+          <div key={k} className="grid grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)_3rem] items-center gap-3 text-[12px]">
+            <span className="truncate text-slate-300">{k}</span>
+            <span className="h-2.5 bg-white/[0.06]"><span key={i} className="relay-bar block h-full bg-leaf-400" style={{ width: `${Math.max(2, (v / 0.025) * 100)}%`, animationDelay: `${j * 120}ms` }} /></span>
+            <span className="text-right font-mono text-white">{l}</span>
+          </div>
+        ))}
+        <p className="font-mono text-[10px] text-slate-500">P(goal within 10 s) · 200 paired rollouts each</p>
+      </div>
+    );
+  }
+  if (i === 3) {
+    return (
+      <ul className="space-y-2">
+        {"checks" in step && step.checks.map((c, j) => (
+          <li key={c} className="relay-check flex items-center gap-2 text-[12.5px] text-slate-200" style={{ animationDelay: `${j * 220}ms` }}>
+            <span className="grid h-5 w-5 shrink-0 place-items-center bg-leaf-500 text-[11px] font-bold text-white">✓</span>{c}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return (
+    <div className="grid gap-2 sm:grid-cols-3">
+      {[
+        ["Was there a better option?", "Under our simulation model, a pass to Mbeki-Larsen led to a goal within 10 seconds in 2.0% of 200 simulated continuations."],
+        ["Pass to Mbeki-Larsen", "+2.0 pp [+0.1, +3.9] vs the shot · more promising under the model"],
+        ["THE OTHER OPTION", "Model: pass to Mbeki-Larsen 2.0% vs 0.0% for the shot (200 sims)"],
+      ].map(([h, b], j) => (
+        <div key={h} className="relay-check bg-white/[0.04] p-2.5 ring-1 ring-white/[0.06]" style={{ animationDelay: `${j * 160}ms` }}>
+          <div className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-leaf-300">{C.modes[j]}</div>
+          <div className="mt-1 text-[12px] font-bold text-white">{h}</div>
+          <div className="mt-0.5 text-[11px] leading-snug text-slate-400">{b}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The agent relay: five stations on one track, a baton moving between them, and below it what the
+ * active agent did on the 73' decision. Advances on its own; click a station to take over.
+ */
+function AgentRelay({ C }: { C: (typeof COPY)[Lang] }) {
+  const [active, setActive] = useState(0);
+  const [held, setHeld] = useState(false);
+  useEffect(() => {
+    if (held) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % C.agents.length), 3600);
+    return () => clearInterval(id);
+  }, [held, C.agents.length]);
+  const step = C.relay[active];
+  const n = C.agents.length;
+  return (
+    <div className="mt-12" onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)} data-testid="agent-relay">
+      <ol className="relative grid grid-cols-5 gap-2">
+        <span className="absolute left-[10%] right-[10%] top-[44px] hidden h-px bg-white/10 sm:block" aria-hidden />
+        <span className="absolute left-[10%] top-[44px] hidden h-px bg-leaf-400 transition-all duration-700 sm:block" style={{ width: `${(active / (n - 1)) * 80}%` }} aria-hidden />
+        {C.agents.map(([name, role], i) => (
+          <li key={name} className="relative flex flex-col items-center text-center">
+            <button type="button" onClick={() => { setActive(i); setHeld(true); }} aria-pressed={active === i}
+              className={`relay-station flex flex-col items-center ${active === i ? "is-on" : i < active ? "is-done" : ""}`} data-testid={`relay-${i}`}>
+              <Cube label={name} i={i} />
+              <span className={`mt-2 text-[10.5px] font-black sm:mt-6 sm:text-sm ${active === i ? "text-leaf-300" : "text-white"}`}>{name}<span className="hidden sm:inline"> Agent</span></span>
+              <span className="mt-1 hidden max-w-[16rem] text-[12px] leading-snug text-slate-500 sm:block">{role}</span>
+              <span className={`mt-2 font-mono text-[10px] ${active === i ? "text-amber-300" : "text-slate-600"}`}>{C.relay[i].ms}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div key={active} className="glass mt-8 grid animate-rise gap-6 p-5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:p-6" aria-live="polite">
+        <div>
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-slate-500">
+            <span className="grid h-6 w-6 place-items-center bg-leaf-500/15 text-[11px] font-bold text-leaf-300 ring-1 ring-leaf-400/40">{String(active + 1).padStart(2, "0")}</span>
+            {C.agents[active][0]} Agent · {step.ms}
+          </div>
+          <p className="mt-3 text-[15px] leading-relaxed text-slate-200">{step.body}</p>
+          <div className="mt-4 inline-flex items-center gap-2 bg-white/[0.04] px-2.5 py-1.5 font-mono text-[11px] text-leaf-300 ring-1 ring-white/[0.06]">
+            <span className="text-slate-500">handoff</span> → {active < n - 1 ? C.agents[active + 1][0].toLowerCase() : C.agents[3][0].toLowerCase()}: {step.handoff}
+          </div>
+        </div>
+        <RelayArt i={active} C={C} />
+      </div>
+      <p className="mt-3 text-center font-mono text-[10px] text-slate-500">{C.relayFoot}</p>
+    </div>
+  );
+}
+
 export default function Landing() {
   const [lang, setLang] = useState<Lang>("en");
   const [playKey, setPlayKey] = useState(0);
@@ -357,16 +496,8 @@ export default function Landing() {
       <section className="relative mx-auto max-w-[1400px] px-5 py-20">
         <p className="eyebrow">{C.agentsEyebrow}</p>
         <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{C.agentsTitle}</h2>
-        <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
-          <span className="absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-leaf-400/40 to-transparent lg:block" aria-hidden />
-          {C.agents.map(([name, role], i) => (
-            <li key={name} className="relative flex flex-col items-center text-center">
-              <Cube label={name} i={i} />
-              <span className="mt-6 text-sm font-black text-white">{name} Agent</span>
-              <span className="mt-1 max-w-[16rem] text-[12px] leading-snug text-slate-500">{role}</span>
-            </li>
-          ))}
-        </ol>
+        <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-slate-400">{C.agentsSub}</p>
+        <AgentRelay C={C} />
       </section>
 
       <section className="section-band">
