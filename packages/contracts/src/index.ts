@@ -37,6 +37,9 @@ export type ToolCallRecord = S["ToolCallRecord"];
 export type HandoffRecord = S["HandoffRecord"];
 export type Recap = S["Recap"];
 export type TeamStats = S["TeamStats"];
+export type DecisionValueReport = S["DecisionValueReport"];
+export type DecisionValueItem = S["DecisionValueItem"];
+export type DecisionValueAggregate = S["DecisionValueAggregate"];
 
 export type ViewerMode = "casual" | "analyst" | "broadcaster";
 export type Language = "en" | "nl";

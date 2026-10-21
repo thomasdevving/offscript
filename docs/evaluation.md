@@ -24,9 +24,11 @@ agents, 200 rollouts per option).
 | Same decision re-analysed / trajectory replayed / scenario regenerated → identical | **yes / yes / yes** |
 | Monte Carlo P(turnover) 95% interval width at 50 → 500 rollouts | 23.7% → 7.9% (≈ 1/√n) |
 | State update per event (p50 / p95) | ~0.001 / 0.004 ms |
-| Decision-detector work per event (p50 / p95) | ~0.001 / 5.5 ms (features only on on-ball actions) |
-| Simulation, 3 options × 200 rollouts (p50 / p95) | ~2.6 / 3.9 s |
-| End-to-end analysis incl. all agents, policy mode (p50 / p95) | ~2.6 / 4.0 s |
+| Decision-detector work per event (p50 / p95) | ~0.001 / 6.1 ms (features only on on-ball actions) |
+| Simulation, 3 options × 200 rollouts (p50 / p95) | ~2.9 / 4.1 s |
+| End-to-end analysis incl. all agents, policy mode (p50 / p95) | ~2.9 / 4.1 s |
+| Decision Value Added, procedural 10-min segment (18 decisions, all verified) | **−6.5 pp** modelled goal chance left in total (95% interval −10.3 to −2.7 pp); 11 decisions at 0, 1 with a clearly better alternative |
+| DVA selection effect: in-sample vs held-out on fresh rollouts (24 decisions) | **−14.5 pp** vs **−10.5 pp** (held-out 95% interval −16.3 to −4.7 pp) |
 
 Latency with a live Foundry model adds model round-trips (up to 6 agent calls per analysis, each
 bounded by `FOUNDRY_TIMEOUT_S`); it was not measured in this environment.
@@ -59,6 +61,58 @@ Latencies were measured on the development laptop while other test processes wer
 are upper bounds for an idle machine. B's second-order value restarts the 10 s horizon at the
 successor state; it is a ranking signal, not an additive gain.
 
+## Decision Value Added (DVA)
+
+A match-level metric built only from verified decision analyses (`app/services/decision_value.py`,
+`GET /api/matches/{id}/decision-value`; `POST …/decision-value/analyze` first analyses every detected
+decision that has no analysis yet, cache first). Shown in the match centre ("Decision value" tab) and
+in the recap.
+
+**Definition.** For one analysed decision, with the primary metric P(goal within H s):
+
+    DVA = P(goal | chosen action) − P(goal | best available option under the model)
+
+The best option is the candidate with the highest estimated P(goal), the chosen action included.
+With *b* the highest-scoring alternative and *d* the paired mean of goal(chosen) − goal(*b*) over the
+common-random-number rollouts, DVA = min(0, *d*): **0** when the chosen action was the model's best
+option, negative otherwise ("modelled goal chance left on the table"). The 95% interval is the
+paired-difference interval of *d* mapped through min(0, ·); because that map is monotone, the
+interval keeps its coverage for the decision's true model DVA given *b*. A decision has a *clearly
+better alternative* when the whole paired interval lies below 0.
+
+**Aggregates** (per player, per team, per match) over *n* decisions: sum = Σ DVAᵢ, mean = sum / *n*.
+Their 95% interval is sum ± 1.96·√(Σ seᵢ²), with seᵢ = (paired interval width) / 3.92 taken from the
+*unclipped* paired interval (clipping cannot increase variance), decisions treated as independent
+(an approximation: all snapshots of a synthetic match share its seed, so random streams are reused
+across decisions), and the upper end capped at 0. Only verified, fault-free analyses of
+detected decisions count (manual analyst picks are excluded); fewer than **3** decisions is reported
+as "not enough decisions" with no numbers. Intervals cover Monte Carlo error only, and the
+model-dependence caveats in [limitations.md](limitations.md) apply in full.
+
+**Evaluation** (section 10 of [evaluation_results.md](evaluation_results.md)) computes DVA over every
+detected decision of the four scenarios and the procedural 10-minute segment, and measures the
+selection effect: since *b* is picked from the same rollouts it is scored on, in-sample DVA leans
+negative. The chosen action and *b* are re-simulated with fresh random streams (seed + 7919) and the
+held-out paired differences are summed for comparison.
+
+Latest run (200 paired rollouts per option, policy-mode agents):
+
+| Match | Decisions analysed | DVA = 0 | Clear misses | DVA sum (95% interval) |
+|---|---|---|---|---|
+| Four scenarios (2 + 2 + 1 + 1 decisions) | 6 | 3 | 2 | not enough decisions per match |
+| Procedural 10-minute segment | 18/18 | 11 | 1 | −6.5 pp (−10.3 to −2.7), mean −0.4 pp per decision |
+
+Per player in the procedural segment only two players reach 3 decisions: Luca Ferreira-Holm −2.0 pp
+(−3.9 to −0.1) and Dario Kestrel −0.5 pp (−2.2 to 0.0); the other nine are "not enough decisions".
+
+Selection effect over all 24 detected decisions: in-sample DVA sums to **−14.5 pp** (10 decisions
+below 0). Re-simulated on fresh random streams, the same chosen-vs-alternative pairs sum to
+**−10.5 pp** (95% interval −16.3 to −4.7 pp; 9 below 0, only 1 with its whole interval below 0).
+So roughly a quarter of the in-sample total is selection noise. The rest survives fresh rollouts in
+aggregate, but almost no single decision is individually distinguishable from zero. All snapshots of
+a synthetic match share its seed (one distinct seed per match), so the independence assumed by the
+combined interval is approximate.
+
 ## Method
 
 1. **Detection**: each scenario has a labelled decision event (`labels` in its JSON). The detector
@@ -83,11 +137,11 @@ successor state; it is a ranking signal, not an additive gain.
 
 | Suite | Command | Scope |
 |---|---|---|
-| Backend (pytest) | `cd apps/api && pytest -q` | geometry, schemas, state engine (dedupe/reorder/replay), simulator properties (speed bounds, reproducibility, defender reaction, monotonic pressure effects), Monte Carlo (Wilson, CRN, convergence, time budget, cancellation), validation, detection, verification, full agent workflow + every recovery path + bounded retries + non-overridable verification, cache labelling, API and WebSocket |
+| Backend (pytest) | `cd apps/api && pytest -q` | geometry, schemas, state engine (dedupe/reorder/replay), simulator properties (speed bounds, reproducibility, defender reaction, monotonic pressure effects), Monte Carlo (Wilson, CRN, convergence, time budget, cancellation), validation, detection, verification, full agent workflow + every recovery path + bounded retries + non-overridable verification, cache labelling, API and WebSocket; Decision Value Added (signs, min(0, ·) interval mapping, quadrature aggregation, cap at 0, minimum-sample rule, analysis selection, on-demand endpoint) |
 | Backend Multiverse (pytest) | `cd apps/api && pytest -q tests/test_multiverse.py tests/test_multiverse_api.py` | defensive strategy validation (every error code), baseline defence = original engine, cover-lane effect, conditional shot estimator vs binary goals, cell cache, deterministic transitions that never mutate the parent, rollout selection kinds, branching/rewind/fork/compare/persistence, invalid actions rejected (not rewritten), assisted/autonomous/limits, cancellation, tampered matrix rejected, speed bounds under every strategy, full REST flow |
 | Optional live Foundry | `pytest -m foundry` | runs the workflow against the configured deployment (skipped without credentials) |
-| Frontend unit (Vitest) | `npm run test -w apps/web` | overlay scheduling/expiry/priority, frame interpolation, i18n parity, viewer-mode rendering, workflow inspector, chart, pitch; Multiverse decision tree (kinds, selection, pending node), agent battle + response matrix (from a real planning fixture), failed verification never shown as verified, action composer in manual/assisted/autonomous modes, observed node read-only, split-screen comparison |
-| End-to-end (Playwright) | `npm run e2e` | real Chromium + real backend: the acceptance flow (play → detect → verified analysis → modes → what-if → inspector → recovery → overlay JSON → Dutch → recap → scenario switch) and keyboard navigation; the Multiverse flow (decision → user pass → adversarial planning → branch → second decision → rewind → sibling dribble → compare → agents/verification inspected → canonical match unchanged) |
+| Frontend unit (Vitest) | `npm run test -w apps/web` | overlay scheduling/expiry/priority, frame interpolation, i18n parity, viewer-mode rendering, workflow inspector, chart, pitch; Multiverse decision tree (kinds, selection, pending node), agent battle + response matrix (from a real planning fixture), failed verification never shown as verified, action composer in manual/assisted/autonomous modes, observed node read-only, split-screen comparison; Decision value one-liners per viewer mode, per-player table with intervals, "not enough decisions", analyse-remaining action |
+| End-to-end (Playwright) | `npm run e2e` | real Chromium + real backend: the acceptance flow (play → detect → verified analysis → modes → what-if → inspector → recovery → overlay JSON → Dutch → recap → scenario switch), decision value (analyse every detected decision → per-player table), and keyboard navigation; the Multiverse flow (decision → user pass → adversarial planning → branch → second decision → rewind → sibling dribble → compare → agents/verification inspected → canonical match unchanged) |
 
 Bugs found by these suites during development (and fixed) included: retry loops that did not
 terminate because workflow state was copied between supersteps; players snapped onto the ball (a

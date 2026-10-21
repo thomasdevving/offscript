@@ -3,6 +3,7 @@
 import type {
   CounterfactualAnalysis,
   DecisionPoint,
+  DecisionValueReport,
   FaultInjection,
   Language,
   MatchEvent,
@@ -83,6 +84,10 @@ export interface AppState {
   recap: Recap | null;
   recapOpen: boolean;
   recapLoading: boolean;
+  /** Decision Value Added report for the current match (verified analyses only). */
+  decisionValue: DecisionValueReport | null;
+  decisionValueLoading: boolean;
+  decisionValueError: string | null;
   inspectorOpen: boolean;
   /** Pitch rendering: flat tactical board or the 3D replay. Shared by the live view and the Multiverse. */
   pitchDim: "2d" | "3d";
@@ -130,6 +135,9 @@ export const useApp = create<AppState>(() => ({
   recap: null,
   recapOpen: false,
   recapLoading: false,
+  decisionValue: null,
+  decisionValueLoading: false,
+  decisionValueError: null,
   inspectorOpen: true,
   pitchDim: "2d",
   appView: "live",
@@ -140,6 +148,16 @@ const get = useApp.getState;
 let socket: MatchSocket | null = null;
 const polling = new Set<string>();
 const MAX_FRAMES = 900;
+let dvTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Re-reads the Decision Value report shortly after analyses finish (only once it has been opened). */
+function scheduleDecisionValueRefresh(delayMs = 600): void {
+  if (!get().decisionValue || dvTimer) return;
+  dvTimer = setTimeout(() => {
+    dvTimer = null;
+    void actions.loadDecisionValue(true);
+  }, delayMs);
+}
 
 // ------------------------------------------------------------------ socket messages
 function onMessage(msg: ServerMessage): void {
@@ -216,7 +234,10 @@ function onMessage(msg: ServerMessage): void {
           void actions.refreshAnalysis(id);
         }
       }
-      if (msg.type === "analysis_completed") void actions.refreshOverlays();
+      if (msg.type === "analysis_completed") {
+        void actions.refreshOverlays();
+        scheduleDecisionValueRefresh();
+      }
       break;
     }
     case "ended":
@@ -253,7 +274,7 @@ export const actions = {
     set({
       scenarioId, matchId: sc.match_id, match: null, decisions: [], detected: [], feed: [], seenEvents: [], frames: [],
       selectedDecisionId: null, snapshot: null, selectedActionId: null, whatIf: initialWhatIf, view: "observed",
-      overlays: [], recovery: null, recoveryFault: null, recap: null, playback: initialPlayback, stats: null,
+      overlays: [], recovery: null, recoveryFault: null, recap: null, decisionValue: null, decisionValueError: null, playback: initialPlayback, stats: null,
     });
     const [match, decisions, overlays] = await Promise.all([
       api.match(sc.match_id), api.decisions(sc.match_id), api.overlays(sc.match_id),
@@ -463,6 +484,37 @@ export const actions = {
   },
   closeRecap(): void {
     set({ recapOpen: false });
+  },
+
+  async loadDecisionValue(quiet = false): Promise<void> {
+    const id = get().matchId;
+    if (!id) return;
+    if (!quiet) set({ decisionValueLoading: true, decisionValueError: null });
+    try {
+      const r = await api.decisionValue(id);
+      if (get().matchId === id) set({ decisionValue: r, decisionValueError: null });
+      if (r.decisions_pending > 0) scheduleDecisionValueRefresh(1500);
+    } catch (e) {
+      if (get().matchId === id) set({ decisionValueError: (e as Error).message });
+    } finally {
+      if (!quiet) set({ decisionValueLoading: false });
+    }
+  },
+
+  /** Analyse every detected decision that has no analysis yet (cache first), then follow progress. */
+  async analyseAllDecisions(): Promise<void> {
+    const id = get().matchId;
+    if (!id) return;
+    set({ decisionValueLoading: true, decisionValueError: null });
+    try {
+      const r = await api.analyseAllDecisions(id);
+      if (get().matchId === id) set({ decisionValue: r });
+      if (r.decisions_pending > 0) scheduleDecisionValueRefresh(1500);
+    } catch (e) {
+      set({ decisionValueError: (e as Error).message });
+    } finally {
+      set({ decisionValueLoading: false });
+    }
   },
 };
 

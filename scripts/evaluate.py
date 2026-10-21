@@ -10,6 +10,7 @@ Measures (on synthetic data only - internal consistency, not real-world validity
   7. Monte Carlo convergence (interval width vs rollouts)
   8. latency (p50/p95) for ingest, detection, simulation, agents, end-to-end
   9. simulator sanity (shot model by distance, pass completion in procedural play)
+ 10. Decision Value Added per match, and its selection effect measured on fresh rollouts
 
 Writes docs/evaluation_results.json and docs/evaluation_results.md.
 Usage: python scripts/evaluate.py [--quick]
@@ -39,6 +40,7 @@ from app.models.events import EventType  # noqa: E402
 from app.models.simulation import SimulationConfig  # noqa: E402
 from app.services import metrics  # noqa: E402
 from app.services.analysis_service import AnalysisService  # noqa: E402
+from app.services.decision_value import Z95, build_report, decision_value  # noqa: E402
 from app.services.hub import EventHub  # noqa: E402
 from app.services.store import Store  # noqa: E402
 from app.simulation.candidates import generate_candidates, validate_candidate  # noqa: E402
@@ -187,6 +189,9 @@ async def main(quick: bool) -> dict:
         "first_attempt_rejections": sum(1 for a in base_analyses.values() if a.workflow.explanation_retries),
         "all_numbers_grounded": clean_flagged == 0}
 
+    # 10. Decision Value Added -------------------------------------------------------------------
+    out["decision_value"] = dva_section(store, base_analyses)
+
     # 6. Reproducibility ----------------------------------------------------------------------
     dp0 = labelled[0]
     a1 = base_analyses[dp0.decision_point_id]
@@ -254,6 +259,61 @@ async def main(quick: bool) -> dict:
     return out
 
 
+HELD_OUT_SEED_OFFSET = 7919
+
+
+def dva_section(store: Store, analyses: dict) -> dict:
+    """DVA per match, plus a held-out check of the selection effect.
+
+    In-sample DVA picks the best alternative from the same rollouts it is scored on, so it leans
+    negative (winner's curse). For every decision the chosen action and that alternative are
+    re-simulated with fresh random streams (seed + offset); the held-out paired difference
+    chosen - alternative is free of the selection effect.
+    """
+    rows, held = [], []
+    for md in store.matches.values():
+        rep = build_report(md, analyses.values(), min_decisions=3)
+        m = rep.match
+        rows.append({"match": md.definition.scenario_id, "detected": rep.decisions_detected,
+                     "analysed": rep.decisions_analysed, "zero_dva": sum(1 for i in rep.decisions if i.dva == 0),
+                     "clear_misses": m.clear_misses, "dva_sum": m.dva_sum,
+                     "dva_sum_ci95": [m.dva_sum_ci95_low, m.dva_sum_ci95_high], "dva_mean": m.dva_mean,
+                     "enough": m.enough_decisions,
+                     "unique_seeds": len({md.snapshots[d.snapshot_id].seed for d in md.decisions}),
+                     "players": [{"player": p.name, "n": p.n_decisions, "dva_sum": p.dva_sum,
+                                  "ci95": [p.dva_sum_ci95_low, p.dva_sum_ci95_high]} for p in rep.players]})
+        for dp in md.decisions:
+            a = analyses.get(dp.decision_point_id)
+            it = decision_value(a, dp) if a is not None else None
+            if it is None:
+                continue
+            snap = md.snapshots[dp.snapshot_id]
+            pair = [c for c in a.candidates if c.action_id in (it.chosen_action_id, it.best_alternative_action_id)]
+            pair.sort(key=lambda c: c.action_id != it.chosen_action_id)
+            cfg = SimulationConfig(horizon_s=a.simulation.config.horizon_s, rollouts=it.n_rollouts,
+                                   seed=snap.seed + HELD_OUT_SEED_OFFSET, time_budget_s=120)
+            c = evaluate_actions(snap, md.roster, pair, cfg, baseline_action_id=it.chosen_action_id).comparisons[0]
+            held.append({"decision": dp.decision_point_id, "in_sample_dva": it.dva, "in_sample_diff": it.paired_diff,
+                         "held_out_diff": round(-c.diff_p_goal, 6),
+                         "held_out_ci95": [round(-c.diff_ci95_high, 6), round(-c.diff_ci95_low, 6)]})
+    se = math.sqrt(sum(((h["held_out_ci95"][1] - h["held_out_ci95"][0]) / (2 * Z95)) ** 2 for h in held))
+    ho = sum(h["held_out_diff"] for h in held)
+    return {"rows": rows, "held_out": held, "summary": {
+        "decisions": len(held),
+        "in_sample_dva_sum": round(sum(h["in_sample_dva"] for h in held), 6),
+        "in_sample_diff_sum": round(sum(h["in_sample_diff"] for h in held), 6),
+        "held_out_diff_sum": round(ho, 6),
+        "held_out_diff_sum_ci95": [round(ho - Z95 * se, 6), round(ho + Z95 * se, 6)],
+        "held_out_dva_sum": round(sum(min(0.0, h["held_out_diff"]) for h in held), 6),
+        "in_sample_negative": sum(1 for h in held if h["in_sample_dva"] < 0),
+        "held_out_negative": sum(1 for h in held if h["held_out_diff"] < 0),
+        "held_out_clearly_negative": sum(1 for h in held if h["held_out_ci95"][1] < 0)}}
+
+
+def pp(x: float | None) -> str:
+    return "-" if x is None else f"{100 * x:+.1f} pp"
+
+
 def to_markdown(r: dict) -> str:
     L = ["# Evaluation results (generated)", "",
          f"Generated by `scripts/evaluate.py` at {r['generated_at']}. Synthetic data only: these numbers measure internal "
@@ -309,7 +369,47 @@ def to_markdown(r: dict) -> str:
     L += [f"| {k} | {pct(v)} |" for k, v in s["unpressured_central_shot_goal_probability"].items()]
     L += ["", f"Procedural play ({s['procedural_minutes']} min): pass completion {pct(s['procedural_pass_completion'])}, "
           f"{s['procedural_shots_per_10_min']} shots.", ""]
+    dv = r.get("decision_value")
+    if dv:
+        L += dva_markdown(dv)
     return "\n".join(L) + "\n"
+
+
+def dva_markdown(dv: dict) -> list[str]:
+    sm = dv["summary"]
+    L = ["## 10. Decision Value Added (DVA)", "",
+         "DVA per decision = P(goal | chosen) - P(goal | best option under the model), from each verified analysis' "
+         "paired rollouts (definition in docs/evaluation.md). Totals sum over every detected decision; 95% intervals "
+         "cover Monte Carlo error only; fewer than 3 decisions = not enough decisions.", "",
+         "| Match | Detected | Analysed | DVA = 0 | Clear misses | DVA sum | 95% interval | Mean per decision | Distinct snapshot seeds |",
+         "|---|---|---|---|---|---|---|---|---|"]
+    for row in dv["rows"]:
+        ci = row["dva_sum_ci95"]
+        nums = (f"{pp(row['dva_sum'])} | {pp(ci[0])} to {pp(ci[1])} | {pp(row['dva_mean'])}" if row["enough"]
+                else "not enough decisions | - | -")
+        L.append(f"| {row['match']} | {row['detected']} | {row['analysed']} | {row['zero_dva']} | {row['clear_misses']} | "
+                 f"{nums} | {row['unique_seeds']} |")
+    proc = next((x for x in dv["rows"] if x["match"] == "procedural_segment"), None)
+    if proc:
+        L += ["", "Procedural 10-minute segment, per player:", "", "| Player | Decisions | DVA sum | 95% interval |",
+              "|---|---|---|---|"]
+        for p in proc["players"]:
+            nums = (f"{pp(p['dva_sum'])} | {pp(p['ci95'][0])} to {pp(p['ci95'][1])}" if p["dva_sum"] is not None
+                    else "not enough decisions | -")
+            L.append(f"| {p['player']} | {p['n']} | {nums} |")
+    ci = sm["held_out_diff_sum_ci95"]
+    L += ["", "**Selection effect, measured.** The best alternative is picked from the same rollouts it is scored on. "
+          f"Re-simulating the chosen action and that alternative with fresh random streams for all {sm['decisions']} "
+          "decisions:", "",
+          f"- In-sample DVA sum: **{pp(sm['in_sample_dva_sum'])}** ({sm['in_sample_negative']} decisions below 0)",
+          f"- Held-out paired difference chosen - alternative, summed: **{pp(sm['held_out_diff_sum'])}** "
+          f"(95% interval {pp(ci[0])} to {pp(ci[1])}; {sm['held_out_negative']} decisions below 0, "
+          f"{sm['held_out_clearly_negative']} with the whole interval below 0)",
+          f"- Held-out DVA sum (min(0, .) per decision): {pp(sm['held_out_dva_sum'])}", "",
+          "The in-sample total leans negative because of the selection; the held-out sum of differences is free of it "
+          "for the selected alternatives. Read single-decision and small-sample DVA as a pointer to moments worth "
+          "reviewing, not as a player rating.", ""]
+    return L
 
 
 if __name__ == "__main__":

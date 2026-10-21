@@ -262,6 +262,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/matches/{match_id}/decision-value": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Decision Value
+         * @description Decision Value Added per player, team and match from the verified analyses that exist so far.
+         */
+        get: operations["decision_value_api_matches__match_id__decision_value_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/matches/{match_id}/decision-value/analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decision Value Analyze
+         * @description Start analyses (cache first) for every detected decision that has none, then report; poll the GET.
+         */
+        post: operations["decision_value_analyze_api_matches__match_id__decision_value_analyze_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/matches/{match_id}/decisions": {
         parameters: {
             query?: never;
@@ -1447,6 +1487,159 @@ export interface components {
          * @enum {string}
          */
         DecisionTrigger: "SHOT_WITH_TEAMMATE_AVAILABLE" | "DIFFICULT_PASS" | "HIGH_VALUE_POSSESSION" | "MULTIPLE_OPTIONS" | "DANGEROUS_TURNOVER" | "DECISION_UNDER_PRESSURE" | "MISSED_FORWARD_PASS";
+        /** DecisionValueAggregate */
+        DecisionValueAggregate: {
+            /**
+             * Clear Misses
+             * @description Decisions with a clearly better alternative under the model
+             * @default 0
+             */
+            clear_misses: number;
+            /** Dva Mean */
+            dva_mean?: number | null;
+            /** Dva Mean Ci95 High */
+            dva_mean_ci95_high?: number | null;
+            /** Dva Mean Ci95 Low */
+            dva_mean_ci95_low?: number | null;
+            /** Dva Sum */
+            dva_sum?: number | null;
+            /** Dva Sum Ci95 High */
+            dva_sum_ci95_high?: number | null;
+            /** Dva Sum Ci95 Low */
+            dva_sum_ci95_low?: number | null;
+            /**
+             * Enough Decisions
+             * @description False below the minimum sample; sums, means and intervals are then withheld
+             */
+            enough_decisions: boolean;
+            /**
+             * Key
+             * @description Player id, team id or match id
+             */
+            key: string;
+            /** N Decisions */
+            n_decisions: number;
+            /** Name */
+            name: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "player" | "team" | "match";
+            /** Team Id */
+            team_id?: string | null;
+        };
+        /**
+         * DecisionValueItem
+         * @description Decision Value Added of one analysed decision (probabilities, not percentages).
+         */
+        DecisionValueItem: {
+            /** Alternatives */
+            alternatives: number;
+            /** Analysis Id */
+            analysis_id: string;
+            /**
+             * Best Action Id
+             * @description Option with the highest estimated P(goal); the chosen action when no alternative scored higher
+             */
+            best_action_id: string;
+            /**
+             * Best Alternative Action Id
+             * @description Highest-scoring option other than the chosen action
+             */
+            best_alternative_action_id: string;
+            /** Best Label */
+            best_label: string;
+            /** Best P Goal */
+            best_p_goal: number;
+            /** Chosen Action Id */
+            chosen_action_id: string;
+            /** Chosen Label */
+            chosen_label: string;
+            /** Chosen P Goal */
+            chosen_p_goal: number;
+            /**
+             * Ci95 High
+             * @description min(0, paired_ci95_high)
+             */
+            ci95_high: number;
+            /**
+             * Ci95 Low
+             * @description min(0, paired_ci95_low)
+             */
+            ci95_low: number;
+            /**
+             * Clearly Better Alternative
+             * @description The paired 95% interval of the best alternative lies entirely above the chosen action
+             */
+            clearly_better_alternative: boolean;
+            /** Decision Point Id */
+            decision_point_id: string;
+            /**
+             * Dva
+             * @description min(0, paired_diff) = P(goal | chosen) - P(goal | best option)
+             */
+            dva: number;
+            /** Match Clock Ms */
+            match_clock_ms: number;
+            /** N Rollouts */
+            n_rollouts: number;
+            /** Paired Ci95 High */
+            paired_ci95_high: number;
+            /** Paired Ci95 Low */
+            paired_ci95_low: number;
+            /**
+             * Paired Diff
+             * @description Paired mean of goal(chosen) - goal(best alternative) over rollouts
+             */
+            paired_diff: number;
+            /** Player Id */
+            player_id: string;
+            /** Player Name */
+            player_name: string;
+            /** Team Id */
+            team_id: string;
+        };
+        /** DecisionValueReport */
+        DecisionValueReport: {
+            /** Decisions */
+            decisions: components["schemas"]["DecisionValueItem"][];
+            /**
+             * Decisions Analysed
+             * @description Detected or manual decisions with a verified analysis
+             */
+            decisions_analysed: number;
+            /** Decisions Detected */
+            decisions_detected: number;
+            /**
+             * Decisions Pending
+             * @description Decisions whose analysis is still pending or running
+             */
+            decisions_pending: number;
+            /** Disclaimer */
+            disclaimer: string;
+            /** Generated At */
+            generated_at: string;
+            /** Horizon S */
+            horizon_s?: number | null;
+            match: components["schemas"]["DecisionValueAggregate"];
+            /** Match Id */
+            match_id: string;
+            /** Method */
+            method: string;
+            /**
+             * Metric
+             * @default p_goal_within_horizon
+             * @constant
+             */
+            metric: "p_goal_within_horizon";
+            /** Min Decisions */
+            min_decisions: number;
+            /** Players */
+            players: components["schemas"]["DecisionValueAggregate"][];
+            /** Teams */
+            teams: components["schemas"]["DecisionValueAggregate"][];
+        };
         /** DefenseProposal */
         DefenseProposal: {
             /** Proposal Id */
@@ -3439,6 +3632,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MatchInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decision_value_api_matches__match_id__decision_value_get: {
+        parameters: {
+            query?: {
+                min_decisions?: number;
+            };
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionValueReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decision_value_analyze_api_matches__match_id__decision_value_analyze_post: {
+        parameters: {
+            query?: {
+                min_decisions?: number;
+            };
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionValueReport"];
                 };
             };
             /** @description Validation Error */

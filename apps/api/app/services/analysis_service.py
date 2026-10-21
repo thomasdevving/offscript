@@ -119,6 +119,14 @@ class AnalysisService:
                                              "decision_point_id": decision_id, "correlation_id": corr})
         return analysis
 
+    async def analyse_match(self, match_id: str) -> list[CounterfactualAnalysis]:
+        """Start (or reuse from cache) an analysis for every detected decision without a usable one."""
+        md = self.store.matches[match_id]
+        live = {a.decision_point_id for a in self.store.analyses.values()
+                if a.match_id == match_id and not a.fault_injection and a.status in ("pending", "running", "verified")}
+        return [await self.start(dp.decision_point_id, AnalyzeRequest())
+                for dp in md.decisions if dp.decision_point_id not in live]
+
     def _register(self, a: CounterfactualAnalysis, decision: DecisionPoint, key: str | None) -> None:
         with self.store.lock:
             self.store.analyses[a.analysis_id] = a

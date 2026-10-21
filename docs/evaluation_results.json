@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20 04:52:03",
+  "generated_at": "2026-10-21 21:55:19",
   "quick": false,
   "detection": {
     "rows": [
@@ -433,6 +433,495 @@
     "first_attempt_rejections": 0,
     "all_numbers_grounded": true
   },
+  "decision_value": {
+    "rows": [
+      {
+        "match": "shoot_vs_pass",
+        "detected": 2,
+        "analysed": 2,
+        "zero_dva": 0,
+        "clear_misses": 1,
+        "dva_sum": null,
+        "dva_sum_ci95": [
+          null,
+          null
+        ],
+        "dva_mean": null,
+        "enough": false,
+        "unique_seeds": 1,
+        "players": [
+          {
+            "player": "Ravi Castellane",
+            "n": 2,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "match": "risky_through_ball",
+        "detected": 2,
+        "analysed": 2,
+        "zero_dva": 2,
+        "clear_misses": 0,
+        "dva_sum": null,
+        "dva_sum_ci95": [
+          null,
+          null
+        ],
+        "dva_mean": null,
+        "enough": false,
+        "unique_seeds": 1,
+        "players": [
+          {
+            "player": "Nico Albescu",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Oskar Renner",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "match": "counterattack",
+        "detected": 1,
+        "analysed": 1,
+        "zero_dva": 0,
+        "clear_misses": 1,
+        "dva_sum": null,
+        "dva_sum_ci95": [
+          null,
+          null
+        ],
+        "dva_mean": null,
+        "enough": false,
+        "unique_seeds": 1,
+        "players": [
+          {
+            "player": "Ade Valcourt",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "match": "defensive_pressure",
+        "detected": 1,
+        "analysed": 1,
+        "zero_dva": 1,
+        "clear_misses": 0,
+        "dva_sum": null,
+        "dva_sum_ci95": [
+          null,
+          null
+        ],
+        "dva_mean": null,
+        "enough": false,
+        "unique_seeds": 1,
+        "players": [
+          {
+            "player": "Samir El-Haddou",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "match": "procedural_segment",
+        "detected": 18,
+        "analysed": 18,
+        "zero_dva": 11,
+        "clear_misses": 1,
+        "dva_sum": -0.065,
+        "dva_sum_ci95": [
+          -0.102841,
+          -0.027159
+        ],
+        "dva_mean": -0.003611,
+        "enough": true,
+        "unique_seeds": 1,
+        "players": [
+          {
+            "player": "Luca Ferreira-Holm",
+            "n": 3,
+            "dva_sum": -0.02,
+            "ci95": [
+              -0.039452,
+              -0.000548
+            ]
+          },
+          {
+            "player": "Dario Kestrel",
+            "n": 3,
+            "dva_sum": -0.005,
+            "ci95": [
+              -0.022002,
+              0.0
+            ]
+          },
+          {
+            "player": "Ade Valcourt",
+            "n": 2,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Leon Varga",
+            "n": 2,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Theo Mbeki-Larsen",
+            "n": 2,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Finn Achterberg",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Ilias Marchetti",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Jasper Thornquist",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Nico Albescu",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Sander Quist",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          },
+          {
+            "player": "Viktor Saelens",
+            "n": 1,
+            "dva_sum": null,
+            "ci95": [
+              null,
+              null
+            ]
+          }
+        ]
+      }
+    ],
+    "held_out": [
+      {
+        "decision": "demo-match-073-dp-001",
+        "in_sample_dva": -0.02,
+        "in_sample_diff": -0.02,
+        "held_out_diff": -0.025,
+        "held_out_ci95": [
+          -0.05076,
+          0.00076
+        ]
+      },
+      {
+        "decision": "demo-match-073-dp-002",
+        "in_sample_dva": -0.01,
+        "in_sample_diff": -0.01,
+        "held_out_diff": 0.005,
+        "held_out_ci95": [
+          -0.027577,
+          0.037577
+        ]
+      },
+      {
+        "decision": "demo-match-031-dp-001",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "demo-match-031-dp-002",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "demo-match-058-dp-001",
+        "in_sample_dva": -0.05,
+        "in_sample_diff": -0.05,
+        "held_out_diff": -0.02,
+        "held_out_ci95": [
+          -0.039452,
+          -0.000548
+        ]
+      },
+      {
+        "decision": "demo-match-012-dp-001",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.005,
+        "held_out_diff": -0.015,
+        "held_out_ci95": [
+          -0.031889,
+          0.001889
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-001",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.005,
+        "held_out_ci95": [
+          -0.0148,
+          0.0048
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-002",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-003",
+        "in_sample_dva": -0.005,
+        "in_sample_diff": -0.005,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-004",
+        "in_sample_dva": -0.02,
+        "in_sample_diff": -0.02,
+        "held_out_diff": -0.01,
+        "held_out_ci95": [
+          -0.023824,
+          0.003824
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-005",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-006",
+        "in_sample_dva": -0.005,
+        "in_sample_diff": -0.005,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-007",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.005,
+        "held_out_ci95": [
+          -0.0148,
+          0.0048
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-008",
+        "in_sample_dva": -0.005,
+        "in_sample_diff": -0.005,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-009",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-010",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-011",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-012",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-013",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-014",
+        "in_sample_dva": -0.015,
+        "in_sample_diff": -0.015,
+        "held_out_diff": -0.005,
+        "held_out_ci95": [
+          -0.0148,
+          0.0048
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-015",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.01,
+        "held_out_ci95": [
+          -0.023824,
+          0.003824
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-016",
+        "in_sample_dva": -0.01,
+        "in_sample_diff": -0.01,
+        "held_out_diff": -0.015,
+        "held_out_ci95": [
+          -0.031889,
+          0.001889
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-017",
+        "in_sample_dva": -0.005,
+        "in_sample_diff": -0.005,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      },
+      {
+        "decision": "procedural-match-2026-dp-018",
+        "in_sample_dva": 0.0,
+        "in_sample_diff": 0.0,
+        "held_out_diff": -0.0,
+        "held_out_ci95": [
+          -0.0,
+          -0.0
+        ]
+      }
+    ],
+    "summary": {
+      "decisions": 24,
+      "in_sample_dva_sum": -0.145,
+      "in_sample_diff_sum": -0.14,
+      "held_out_diff_sum": -0.105,
+      "held_out_diff_sum_ci95": [
+        -0.162828,
+        -0.047172
+      ],
+      "held_out_dva_sum": -0.11,
+      "in_sample_negative": 10,
+      "held_out_negative": 9,
+      "held_out_clearly_negative": 1
+    }
+  },
   "reproducibility": {
     "identical_results": true,
     "identical_trajectory": true,
@@ -445,7 +934,7 @@
       "turnover_ci_width": 0.23682,
       "p_goal": 0.04,
       "goal_ci_width": 0.12356400000000001,
-      "seconds_for_2_options": 0.27
+      "seconds_for_2_options": 0.29
     },
     {
       "rollouts": 100,
@@ -453,7 +942,7 @@
       "turnover_ci_width": 0.17690199999999998,
       "p_goal": 0.02,
       "goal_ci_width": 0.06451100000000001,
-      "seconds_for_2_options": 0.43
+      "seconds_for_2_options": 0.47
     },
     {
       "rollouts": 200,
@@ -461,7 +950,7 @@
       "turnover_ci_width": 0.12288900000000003,
       "p_goal": 0.02,
       "goal_ci_width": 0.042484,
-      "seconds_for_2_options": 0.74
+      "seconds_for_2_options": 0.82
     },
     {
       "rollouts": 500,
@@ -469,65 +958,65 @@
       "turnover_ci_width": 0.07865300000000003,
       "p_goal": 0.01,
       "goal_ci_width": 0.018914,
-      "seconds_for_2_options": 1.73
+      "seconds_for_2_options": 1.88
     }
   ],
   "latency": {
     "agent.decision_agent": {
       "count": 37,
-      "p50_ms": 2.09,
-      "p95_ms": 2.478,
-      "max_ms": 23.16,
-      "mean_ms": 2.703
+      "p50_ms": 2.37,
+      "p95_ms": 3.256,
+      "max_ms": 23.45,
+      "mean_ms": 2.973
     },
     "agent.explanation_agent": {
       "count": 40,
-      "p50_ms": 3.02,
-      "p95_ms": 3.575,
-      "max_ms": 4.08,
-      "mean_ms": 3.048
+      "p50_ms": 3.07,
+      "p95_ms": 3.971,
+      "max_ms": 5.35,
+      "mean_ms": 3.225
     },
     "agent.simulation_agent": {
       "count": 37,
-      "p50_ms": 2601.4,
-      "p95_ms": 3922.636,
-      "max_ms": 4936.88,
-      "mean_ms": 2613.147
+      "p50_ms": 2857.45,
+      "p95_ms": 4063.592,
+      "max_ms": 5201.51,
+      "mean_ms": 2734.212
     },
     "agent.strategy_agent": {
       "count": 40,
-      "p50_ms": 7.815,
-      "p95_ms": 74.686,
-      "max_ms": 75.01,
-      "mean_ms": 30.55
+      "p50_ms": 8.565,
+      "p95_ms": 84.078,
+      "max_ms": 93.9,
+      "mean_ms": 33.3
     },
     "agent.verification_agent": {
       "count": 77,
-      "p50_ms": 6.73,
-      "p95_ms": 14.162,
-      "max_ms": 25.75,
-      "mean_ms": 7.165
+      "p50_ms": 6.91,
+      "p95_ms": 16.934,
+      "max_ms": 29.33,
+      "mean_ms": 7.697
     },
     "analysis.end_to_end": {
       "count": 37,
-      "p50_ms": 2636.961,
-      "p95_ms": 3969.565,
-      "max_ms": 5062.005,
-      "mean_ms": 2681.907
+      "p50_ms": 2898.648,
+      "p95_ms": 4111.33,
+      "max_ms": 5337.772,
+      "mean_ms": 2808.437
     },
     "detector.on_event": {
       "count": 1929,
       "p50_ms": 0.001,
-      "p95_ms": 5.519,
-      "max_ms": 115.043,
-      "mean_ms": 2.129
+      "p95_ms": 6.099,
+      "max_ms": 116.582,
+      "mean_ms": 2.253
     },
     "eval.analysis_wall": {
       "count": 3,
-      "p50_ms": 2282.769,
-      "p95_ms": 3100.652,
-      "max_ms": 3191.528,
-      "mean_ms": 2391.476
+      "p50_ms": 2318.685,
+      "p95_ms": 3165.376,
+      "max_ms": 3259.453,
+      "mean_ms": 2433.612
     },
     "ingest.event_to_state": {
       "count": 1929,
@@ -538,24 +1027,24 @@
     },
     "simulation.run": {
       "count": 37,
-      "p50_ms": 2599.0,
-      "p95_ms": 3920.34,
-      "max_ms": 4934.9,
-      "mean_ms": 2587.022
+      "p50_ms": 2855.2,
+      "p95_ms": 4060.84,
+      "max_ms": 5198.5,
+      "mean_ms": 2707.243
     },
     "tool.run_simulation": {
       "count": 40,
-      "p50_ms": 2560.25,
-      "p95_ms": 3868.133,
-      "max_ms": 4935.2,
-      "mean_ms": 2415.228
+      "p50_ms": 2647.415,
+      "p95_ms": 4028.649,
+      "max_ms": 5198.91,
+      "mean_ms": 2526.839
     },
     "tool.run_verification_checks": {
       "count": 37,
-      "p50_ms": 3.12,
-      "p95_ms": 17.132,
-      "max_ms": 24.27,
-      "mean_ms": 5.809
+      "p50_ms": 3.07,
+      "p95_ms": 19.162,
+      "max_ms": 27.58,
+      "mean_ms": 6.212
     }
   },
   "simulator_sanity": {

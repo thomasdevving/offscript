@@ -1650,6 +1650,356 @@
         "title": "DecisionTrigger",
         "type": "string"
       },
+      "DecisionValueAggregate": {
+        "additionalProperties": false,
+        "properties": {
+          "clear_misses": {
+            "default": 0,
+            "description": "Decisions with a clearly better alternative under the model",
+            "title": "Clear Misses",
+            "type": "integer"
+          },
+          "dva_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Mean"
+          },
+          "dva_mean_ci95_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Mean Ci95 High"
+          },
+          "dva_mean_ci95_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Mean Ci95 Low"
+          },
+          "dva_sum": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Sum"
+          },
+          "dva_sum_ci95_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Sum Ci95 High"
+          },
+          "dva_sum_ci95_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dva Sum Ci95 Low"
+          },
+          "enough_decisions": {
+            "description": "False below the minimum sample; sums, means and intervals are then withheld",
+            "title": "Enough Decisions",
+            "type": "boolean"
+          },
+          "key": {
+            "description": "Player id, team id or match id",
+            "title": "Key",
+            "type": "string"
+          },
+          "n_decisions": {
+            "title": "N Decisions",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "player",
+              "team",
+              "match"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "team_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          }
+        },
+        "required": [
+          "scope",
+          "key",
+          "name",
+          "n_decisions",
+          "enough_decisions"
+        ],
+        "title": "DecisionValueAggregate",
+        "type": "object"
+      },
+      "DecisionValueItem": {
+        "additionalProperties": false,
+        "description": "Decision Value Added of one analysed decision (probabilities, not percentages).",
+        "properties": {
+          "alternatives": {
+            "title": "Alternatives",
+            "type": "integer"
+          },
+          "analysis_id": {
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "best_action_id": {
+            "description": "Option with the highest estimated P(goal); the chosen action when no alternative scored higher",
+            "title": "Best Action Id",
+            "type": "string"
+          },
+          "best_alternative_action_id": {
+            "description": "Highest-scoring option other than the chosen action",
+            "title": "Best Alternative Action Id",
+            "type": "string"
+          },
+          "best_label": {
+            "title": "Best Label",
+            "type": "string"
+          },
+          "best_p_goal": {
+            "title": "Best P Goal",
+            "type": "number"
+          },
+          "chosen_action_id": {
+            "title": "Chosen Action Id",
+            "type": "string"
+          },
+          "chosen_label": {
+            "title": "Chosen Label",
+            "type": "string"
+          },
+          "chosen_p_goal": {
+            "title": "Chosen P Goal",
+            "type": "number"
+          },
+          "ci95_high": {
+            "description": "min(0, paired_ci95_high)",
+            "maximum": 0.0,
+            "title": "Ci95 High",
+            "type": "number"
+          },
+          "ci95_low": {
+            "description": "min(0, paired_ci95_low)",
+            "maximum": 0.0,
+            "title": "Ci95 Low",
+            "type": "number"
+          },
+          "clearly_better_alternative": {
+            "description": "The paired 95% interval of the best alternative lies entirely above the chosen action",
+            "title": "Clearly Better Alternative",
+            "type": "boolean"
+          },
+          "decision_point_id": {
+            "title": "Decision Point Id",
+            "type": "string"
+          },
+          "dva": {
+            "description": "min(0, paired_diff) = P(goal | chosen) - P(goal | best option)",
+            "maximum": 0.0,
+            "title": "Dva",
+            "type": "number"
+          },
+          "match_clock_ms": {
+            "title": "Match Clock Ms",
+            "type": "integer"
+          },
+          "n_rollouts": {
+            "title": "N Rollouts",
+            "type": "integer"
+          },
+          "paired_ci95_high": {
+            "title": "Paired Ci95 High",
+            "type": "number"
+          },
+          "paired_ci95_low": {
+            "title": "Paired Ci95 Low",
+            "type": "number"
+          },
+          "paired_diff": {
+            "description": "Paired mean of goal(chosen) - goal(best alternative) over rollouts",
+            "title": "Paired Diff",
+            "type": "number"
+          },
+          "player_id": {
+            "title": "Player Id",
+            "type": "string"
+          },
+          "player_name": {
+            "title": "Player Name",
+            "type": "string"
+          },
+          "team_id": {
+            "title": "Team Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision_point_id",
+          "analysis_id",
+          "match_clock_ms",
+          "player_id",
+          "player_name",
+          "team_id",
+          "chosen_action_id",
+          "chosen_label",
+          "chosen_p_goal",
+          "best_action_id",
+          "best_label",
+          "best_p_goal",
+          "best_alternative_action_id",
+          "paired_diff",
+          "paired_ci95_low",
+          "paired_ci95_high",
+          "dva",
+          "ci95_low",
+          "ci95_high",
+          "clearly_better_alternative",
+          "alternatives",
+          "n_rollouts"
+        ],
+        "title": "DecisionValueItem",
+        "type": "object"
+      },
+      "DecisionValueReport": {
+        "additionalProperties": false,
+        "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionValueItem"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "decisions_analysed": {
+            "description": "Detected or manual decisions with a verified analysis",
+            "title": "Decisions Analysed",
+            "type": "integer"
+          },
+          "decisions_detected": {
+            "title": "Decisions Detected",
+            "type": "integer"
+          },
+          "decisions_pending": {
+            "description": "Decisions whose analysis is still pending or running",
+            "title": "Decisions Pending",
+            "type": "integer"
+          },
+          "disclaimer": {
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "horizon_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon S"
+          },
+          "match": {
+            "$ref": "#/components/schemas/DecisionValueAggregate"
+          },
+          "match_id": {
+            "title": "Match Id",
+            "type": "string"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "metric": {
+            "const": "p_goal_within_horizon",
+            "default": "p_goal_within_horizon",
+            "title": "Metric",
+            "type": "string"
+          },
+          "min_decisions": {
+            "title": "Min Decisions",
+            "type": "integer"
+          },
+          "players": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionValueAggregate"
+            },
+            "title": "Players",
+            "type": "array"
+          },
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionValueAggregate"
+            },
+            "title": "Teams",
+            "type": "array"
+          }
+        },
+        "required": [
+          "match_id",
+          "generated_at",
+          "min_decisions",
+          "decisions_detected",
+          "decisions_analysed",
+          "decisions_pending",
+          "decisions",
+          "players",
+          "teams",
+          "match",
+          "method",
+          "disclaimer"
+        ],
+        "title": "DecisionValueReport",
+        "type": "object"
+      },
       "DefenseProposal": {
         "additionalProperties": false,
         "properties": {
@@ -5858,6 +6208,110 @@
           }
         },
         "summary": "Match"
+      }
+    },
+    "/api/matches/{match_id}/decision-value": {
+      "get": {
+        "description": "Decision Value Added per player, team and match from the verified analyses that exist so far.",
+        "operationId": "decision_value_api_matches__match_id__decision_value_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_decisions",
+            "required": false,
+            "schema": {
+              "default": 3,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Min Decisions",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionValueReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decision Value"
+      }
+    },
+    "/api/matches/{match_id}/decision-value/analyze": {
+      "post": {
+        "description": "Start analyses (cache first) for every detected decision that has none, then report; poll the GET.",
+        "operationId": "decision_value_analyze_api_matches__match_id__decision_value_analyze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "match_id",
+            "required": true,
+            "schema": {
+              "title": "Match Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_decisions",
+            "required": false,
+            "schema": {
+              "default": 3,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Min Decisions",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionValueReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decision Value Analyze"
       }
     },
     "/api/matches/{match_id}/decisions": {

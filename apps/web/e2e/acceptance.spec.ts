@@ -64,11 +64,26 @@ test("shoot-or-pass end to end", async ({ page }) => {
   // Recap.
   await page.getByTestId("open-recap").click();
   await expect(page.getByTestId("recap")).toContainText("Harbour City FC");
+  await expect(page.getByTestId("recap").getByTestId("decision-value")).toContainText("detected decisions analysed and verified");
   await page.getByRole("button", { name: "Close" }).click();
 
   // Switch scenario.
   await page.getByTestId("scenario-select").selectOption("risky_through_ball");
   await expect(page.getByRole("heading", { name: /risky through ball/ })).toBeVisible();
+});
+
+test("decision value: analyse every detected decision, then per-player table", async ({ page }) => {
+  await page.goto("/app/?scenario=risky_through_ball");
+  await expect(page.getByText("Live", { exact: true })).toBeVisible();
+  await page.getByTestId("tab-decision-value").click();
+  const dv = page.getByTestId("decision-value");
+  await expect(dv).toContainText("detected decisions analysed and verified");
+  if (await page.getByTestId("dva-analyse-all").isVisible()) await page.getByTestId("dva-analyse-all").click();
+  await expect(dv).toContainText(/(\d+) of \1 detected decisions analysed and verified/, { timeout: 90_000 });
+  await expect(page.getByTestId("dva-table")).toBeVisible();
+  // Two detected decisions in this scenario: below the 3-decision minimum, so no totals are shown.
+  await expect(page.getByTestId("dva-oneliner")).toContainText("Not enough analysed decisions");
+  await expect(page.getByTestId("dva-not-enough").first()).toBeVisible();
 });
 
 test("keyboard and decision timeline navigation", async ({ page }) => {

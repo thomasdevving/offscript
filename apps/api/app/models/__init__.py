@@ -2,6 +2,7 @@
 
 from .analysis import AnalyzeRequest, CounterfactualAnalysis, ModelInfo, SimulateRequest
 from .common import SCHEMA_VERSION, SIMULATOR_VERSION, Language, ViewerMode
+from .decision_value import DecisionValueAggregate, DecisionValueItem, DecisionValueReport
 from .decisions import CandidateAction, DecisionFeatures, DecisionPoint, DecisionTrigger
 from .events import EventDetails, EventType, MatchEvent, TrackingFrame
 from .match import MatchInfo, MatchSummary, Player, SimulationSettings, Team
@@ -33,6 +34,9 @@ __all__ = [
     "CounterfactualAnalysis",
     "DecisionFeatures",
     "DecisionPoint",
+    "DecisionValueAggregate",
+    "DecisionValueItem",
+    "DecisionValueReport",
     "DecisionTrigger",
     "EventDetails",
     "EventType",

@@ -12,6 +12,7 @@ from ..analytics.detector import compute_features, triage_score
 from ..config import get_settings
 from ..models.analysis import AnalyzeRequest, CounterfactualAnalysis, SimulateRequest
 from ..models.common import SCHEMA_VERSION, SIMULATOR_VERSION, Language
+from ..models.decision_value import DecisionValueReport
 from ..models.decisions import DecisionPoint
 from ..models.events import ACTION_EVENTS, EventType, MatchEvent, TrackingFrame
 from ..models.match import MatchInfo, MatchSummary
@@ -23,6 +24,8 @@ from ..models.stats import MatchStateView
 from ..models.verification import EvidenceItem
 from ..models.workflow import AnalysisWorkflowState
 from ..services import metrics
+from ..services.decision_value import MIN_DECISIONS
+from ..services.decision_value import build_report as build_decision_value
 from ..services.recap import build_recap
 from ..simulation.candidates import actual_action_from_event
 
@@ -379,6 +382,32 @@ async def trajectory(request: Request, analysis_id: str, action_id: str,
         raise HTTPException(404, "Unknown analysis or action, or no simulation yet") from exc
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+# ------------------------------------------------------------------------------- decision value added
+def _decision_value(request: Request, match_id: str, min_decisions: int) -> DecisionValueReport:
+    md = _match(request, match_id)
+    store = _svc(request).store
+    mine = [a for a in list(store.analyses.values()) if a.match_id == match_id]
+    pending = [a.decision_point_id for a in mine if a.status in ("pending", "running") and not a.fault_injection]
+    return build_decision_value(md, mine, pending, min_decisions)
+
+
+@router.get("/matches/{match_id}/decision-value", response_model=DecisionValueReport)
+def decision_value(request: Request, match_id: str,
+                   min_decisions: int = Query(MIN_DECISIONS, ge=1, le=50)) -> DecisionValueReport:
+    """Decision Value Added per player, team and match from the verified analyses that exist so far."""
+    return _decision_value(request, match_id, min_decisions)
+
+
+@router.post("/matches/{match_id}/decision-value/analyze", response_model=DecisionValueReport, status_code=202)
+async def decision_value_analyze(request: Request, match_id: str,
+                                 min_decisions: int = Query(MIN_DECISIONS, ge=1, le=50)) -> DecisionValueReport:
+    """Start analyses (cache first) for every detected decision that has none, then report; poll the GET."""
+    _match(request, match_id)
+    analyze_limiter.check(request)
+    await _svc(request).analyses.analyse_match(match_id)
+    return _decision_value(request, match_id, min_decisions)
 
 
 # ------------------------------------------------------------------------------- recap

@@ -13,6 +13,8 @@
   precisely the model's own number is estimated, not whether the model is right.
 * **Small probabilities.** Goals within 10 seconds are rare (often 0-5%). With 200 rollouts many
   comparisons are honestly `similar` or `inconclusive`; the Simulation Agent can escalate to 500.
+  Paired-difference intervals use a normal approximation, which is optimistic when only a handful
+  of rollouts end in a goal.
 * **Simplifications.** Ground passes only (no lofted balls or crosses as distinct actions), no
   rebounds or set-piece routines, offside approximated as a limit on runs (not adjudicated), no
   fatigue dynamics inside a rollout, rule-based (not learned) team behaviour, goalkeeper does not
@@ -23,6 +25,28 @@
   nothing about the analysis result is scripted.
 * **Detection is heuristic.** Recall on the four labelled scenario decisions is 3/4 (the counter-attack
   dribble is missed at the default threshold); analysts can request analysis of any on-ball action.
+
+* **Decision Value Added (DVA) is only as good as the model.** It measures how far each chosen
+  action falls short of the best option *the model found among the candidates it generated*. A
+  better action the candidate generator never proposed counts as nothing; a model that misjudges a
+  pass type misjudges every DVA built on it. DVA = 0 means "the model's best option", not "the right
+  decision". Its intervals cover Monte Carlo error only, never model error.
+* **DVA leans negative.** The best alternative is chosen from the same rollouts it is scored on, so
+  noise that happens to favour an alternative is counted as value left on the table (the winner's
+  curse). This is worst for rare goals: one simulated goal out of 200 is already "0.5 pp". The
+  per-decision interval is conditional on that choice and does not include this effect; the
+  evaluation measures it by re-simulating on fresh random streams (section 10 of
+  [evaluation_results.md](evaluation_results.md)). A team total whose interval excludes zero is
+  therefore not, on its own, evidence of poor decisions.
+* **DVA aggregates are rough.** Totals add paired standard errors in quadrature, treating decisions
+  as independent and using a normal approximation that is poor when goals are this rare. They are
+  not fully independent: every snapshot of a synthetic match carries the match seed, so rollout *i*
+  of every decision draws from the same random stream (different states consume it differently,
+  but errors can correlate), and the combined interval may be too narrow. Sums depend on how many
+  decisions the detector flags, so players with more on-ball time accumulate more; below 3 analysed
+  decisions no numbers are shown. Only detected decisions count (manual analyst picks are excluded so
+  that cherry-picked moments cannot move the totals). It is a pointer to moments worth reviewing,
+  not a player rating.
 
 * **Football Multiverse.** Defensive strategies are modelled as changed defender targets, reaction
   times and tackle probabilities, not as learned team behaviour. The response matrix covers only

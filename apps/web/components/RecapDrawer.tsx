@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { pct } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
+import DecisionValue from "./DecisionValue";
 
 export default function RecapDrawer() {
   const s = useApp();
@@ -63,6 +64,8 @@ export default function RecapDrawer() {
                 </ul>
               </>
             )}
+            <h4 className="mt-5 text-xs font-bold uppercase tracking-widest text-slate-400">{L.decisionValue}</h4>
+            <div className="mt-1"><DecisionValue compact={tab === "casual"} /></div>
             <h4 className="mt-5 text-xs font-bold uppercase tracking-widest text-slate-400">Key moments</h4>
             <ul className="mt-1 space-y-1 text-xs text-slate-300">
               {r.key_events.map((k, i) => <li key={i}><span className="font-mono text-slate-500">{k.match_clock}</span> {k.text}</li>)}

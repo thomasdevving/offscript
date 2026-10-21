@@ -3,6 +3,7 @@ import type {
   AnalyzeRequest,
   CounterfactualAnalysis,
   DecisionPoint,
+  DecisionValueReport,
   MatchEvent,
   MatchInfo,
   MatchStateSnapshot,
@@ -78,6 +79,9 @@ export const api = {
     req<Trajectory>(`/api/analyses/${id}/trajectories/${encodeURIComponent(actionId)}${rollout != null ? `?rollout=${rollout}` : ""}`),
   overlays: (matchId: string) => req<Overlay[]>(`/api/matches/${matchId}/overlays`),
   analysisOverlays: (id: string) => req<Overlay[]>(`/api/analyses/${id}/overlays`),
+  decisionValue: (matchId: string) => req<DecisionValueReport>(`/api/matches/${matchId}/decision-value`),
+  analyseAllDecisions: (matchId: string) =>
+    req<DecisionValueReport>(`/api/matches/${matchId}/decision-value/analyze`, { method: "POST" }),
   recap: (matchId: string, language: string) =>
     req<Recap>(`/api/matches/${matchId}/recap?language=${language}`, { method: "POST" }),
 };

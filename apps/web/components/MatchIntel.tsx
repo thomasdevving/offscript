@@ -3,6 +3,7 @@
 import type { MatchEvent } from "@offscript/contracts";
 import { useState } from "react";
 import { clock, pct } from "@/lib/format";
+import DecisionValue from "./DecisionValue";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 
@@ -151,7 +152,7 @@ function StatsPanel() {
 export function MatchCentre() {
   const s = useApp();
   const L = t(s.lang);
-  const [tab, setTab] = useState<"feed" | "stats">("feed");
+  const [tab, setTab] = useState<"feed" | "stats" | "value">("feed");
   return (
     <section className="glass p-3" aria-label={L.matchCentre}>
       <div className="mb-2 flex items-center gap-2">
@@ -159,10 +160,12 @@ export function MatchCentre() {
         <div role="tablist" className="ml-auto flex gap-0.5">
           <button type="button" role="tab" aria-selected={tab === "feed"} onClick={() => setTab("feed")} className="tab">{L.feed}</button>
           <button type="button" role="tab" aria-selected={tab === "stats"} onClick={() => setTab("stats")} className="tab">{L.stats}</button>
+          <button type="button" role="tab" aria-selected={tab === "value"} onClick={() => setTab("value")} className="tab" data-testid="tab-decision-value">{L.decisionValue}</button>
         </div>
       </div>
       <div hidden={tab !== "feed"}><EventFeed /></div>
       <div hidden={tab !== "stats"}><StatsPanel /></div>
+      {tab === "value" && <DecisionValue />}
     </section>
   );
 }
