@@ -76,7 +76,7 @@ const COPY = {
     ],
     ctaTitle: "Take the decision yourself.",
     ctaBody: "Pick a moment, choose your own pass or shot, and watch the defence respond in a branch of the match that never happened.",
-    labels: { actual: "Actual · shoot", alt1: "Pass · model favours", alt2: "Pass to Kestrel" },
+    labels: { actual: "Original · shot, blocked", alt1: "Pass · model favours", alt2: "Pass to Kestrel" },
     note: "Synthetic matches with fictional teams and players. Simulated outcomes are model estimates, not what would have happened.",
   },
   nl: {
@@ -142,7 +142,7 @@ const COPY = {
     ],
     ctaTitle: "Neem de beslissing zelf.",
     ctaBody: "Kies een moment, bepaal je eigen pass of schot en zie de verdediging reageren in een tak van de wedstrijd die nooit heeft plaatsgevonden.",
-    labels: { actual: "Echt · schot", alt1: "Pass · model kiest", alt2: "Pass naar Kestrel" },
+    labels: { actual: "Origineel · schot, geblokt", alt1: "Pass · model kiest", alt2: "Pass naar Kestrel" },
     note: "Synthetische wedstrijden met fictieve teams en spelers. Gesimuleerde uitkomsten zijn modelschattingen, geen werkelijkheid.",
   },
 } as const;
@@ -153,6 +153,8 @@ const APP = "/app/?scenario=shoot_vs_pass";
 const HOME = [[24, 37, 9], [33, 22, 7], [30, 52, 11], [46, 30, 8], [48, 44, 6], [60, 20, 2], [58, 54, 4], [80, 34, 1]] as const;
 const AWAY = [[12, 36, 1], [19, 30, 4], [19, 42, 5], [27, 33, 8], [36, 26, 10], [37, 49, 7], [40, 14, 11]] as const;
 const DECISION: [number, number] = [26, 36];
+// Where the original shot was blocked, on its way to goal.
+const BLOCK: [number, number] = [14.5, 35.1];
 
 function Markings({ glow }: { glow?: boolean }) {
   return (
@@ -295,15 +297,29 @@ function Pin({ x, y, n, team }: { x: number; y: number; n: number; team: "home" 
   );
 }
 
-function BranchLayer({ z, d, end, label, tone, delay }: { z: number; d: string; end: [number, number]; label: string; tone: string; delay: number }) {
+/**
+ * One parallel future: a translucent copy of the same frozen moment, floating above the real pitch.
+ * Every player is repeated as a flat dot at the same pitch coordinates, so the branch's pass runs
+ * between this layer's own players; a drop line ties the receiver to the same player on the real
+ * pitch below, moving in step with the layer's drift.
+ */
+function BranchLayer({ z, d, end, receiver, label, tone, delay }: {
+  z: number; d: string; end: [number, number]; receiver: readonly [number, number, ...number[]]; label: string; tone: string; delay: number;
+}) {
+  const vars = { "--z": `${z}px`, animationDelay: `${delay}s` } as React.CSSProperties;
   return (
-    <div className="layer branch" style={{ "--z": `${z}px`, animationDelay: `${delay}s` } as React.CSSProperties}>
+    <div className="layer branch" style={vars}>
       <svg viewBox="-1 -1 107 70" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
         <Markings glow />
+        {HOME.map(([x, y, n]) => <circle key={`h${n}`} className="ghost-dot" cx={x} cy={y} r={0.95} fill="#38bdf8" />)}
+        {AWAY.map(([x, y, n]) => <circle key={`a${n}`} className="ghost-dot" cx={x} cy={y} r={0.95} fill="#f59e0b" />)}
+        <circle cx={receiver[0]} cy={receiver[1]} r={2} fill="none" stroke={tone} strokeWidth={0.35} />
         <path d={d} fill="none" stroke={tone} strokeWidth={0.8} strokeDasharray="1.6 1.1" className="branch-path" />
         <circle cx={DECISION[0]} cy={DECISION[1]} r={1.6} fill="none" stroke={tone} strokeWidth={0.4} />
         <circle cx={end[0]} cy={end[1]} r={1.1} fill={tone} />
       </svg>
+      {/* Drop line from this layer's receiver down to the same player on the real pitch. */}
+      <span className="drop" style={{ ...pos(receiver[0], receiver[1]), ...vars, borderColor: tone }} />
       <div className="anchor3d" style={pos(end[0], end[1])}>
         <span className="billboard tag3d" style={{ borderColor: tone, color: tone }}>{label}</span>
       </div>
@@ -334,18 +350,23 @@ function MultiverseScene({ lang }: { lang: Lang }) {
         <div className="layer base">
           <svg viewBox="-1 -1 107 70" className="absolute inset-0 h-full w-full" aria-hidden>
             <Markings />
-            <line x1={DECISION[0]} y1={DECISION[1]} x2={2} y2={34} stroke="#f8fafc" strokeWidth={0.6} strokeDasharray="1.4 1" opacity={0.9} />
+            {/* The original decision, kept quiet: the shot that was taken and where it was blocked. */}
+            <g className="original" opacity={0.7}>
+              <line x1={DECISION[0]} y1={DECISION[1]} x2={BLOCK[0]} y2={BLOCK[1]} stroke="#f8fafc" strokeWidth={0.45} strokeDasharray="1.2 0.9" />
+              <path d={`M ${BLOCK[0] - 1} ${BLOCK[1] - 1} l 2 2 M ${BLOCK[0] + 1} ${BLOCK[1] - 1} l -2 2`} stroke="#f8fafc" strokeWidth={0.5} />
+            </g>
+            <circle cx={DECISION[0]} cy={DECISION[1]} r={2.3} fill="none" stroke="#f8fafc" strokeWidth={0.35} opacity={0.6} className="decision-ring" />
           </svg>
           {HOME.map(([x, y, n]) => <Pin key={`h${n}`} x={x} y={y} n={n} team="home" />)}
           {AWAY.map(([x, y, n]) => <Pin key={`a${n}`} x={x} y={y} n={n} team="away" />)}
-          <div className="anchor3d" style={pos(8, 25)}>
-            <span className="billboard tag3d border-white/60 text-white">{L.actual} · 0.0%</span>
+          <div className="anchor3d" style={pos(9, 50)}>
+            <span className="billboard tag3d tag-original">{L.actual} · 0.0%</span>
           </div>
           {/* The time beam: every future grows out of the same frozen moment. */}
           <span className="beam" style={pos(DECISION[0], DECISION[1])} />
         </div>
-        <BranchLayer z={120} d={`M ${DECISION[0]} ${DECISION[1]} Q 30 18 33 22 L 8 31`} end={[8, 31]} label={`${L.alt1} · 2.0%`} tone="#8fca7c" delay={0} />
-        <BranchLayer z={230} d={`M ${DECISION[0]} ${DECISION[1]} Q 22 46 30 52`} end={[30, 52]} label={`${L.alt2} · 0.0%`} tone="#cfe2b4" delay={1.2} />
+        <BranchLayer z={120} d={`M ${DECISION[0]} ${DECISION[1]} Q 30 18 33 22 L 8 31`} end={[8, 31]} receiver={HOME[1]} label={`${L.alt1} · 2.0%`} tone="#8fca7c" delay={0} />
+        <BranchLayer z={230} d={`M ${DECISION[0]} ${DECISION[1]} Q 22 46 30 52`} end={[30, 52]} receiver={HOME[2]} label={`${L.alt2} · 0.0%`} tone="#cfe2b4" delay={1.2} />
       </div>
     </div>
   );
