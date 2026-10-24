@@ -17,8 +17,8 @@ export interface StressStory {
 export function stressStory(a: CounterfactualAnalysis, fault: FaultInjection): StressStory {
   const wf = a.workflow;
   const ok = a.status === "verified";
-  const result = ok ? `Result: verified${a.model.degraded ? " (degraded)" : ""}; the real analysis was never touched.`
-    : `Result: ${a.status}; the real analysis was never touched.`;
+  const result = ok ? `Verified${a.model.degraded ? " (degraded)" : ""}; the real analysis was never touched.`
+    : `Status: ${a.status}; the real analysis was never touched.`;
   if (fault === "invalid_candidate") {
     const rej = wf.rejected_candidates[0];
     const again = wf.steps.filter((s) => s.agent === "strategy_agent").length > 1;
