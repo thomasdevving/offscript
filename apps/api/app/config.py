@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     # The Explanation Agent writes 6 narratives (3 viewer modes x EN/NL) in one structured output.
     foundry_explanation_max_output_tokens: int = 4000
     foundry_explanation_timeout_s: float = 75.0
+    # Live budget for Multiverse agents whose tools run simulations (response matrix, transition replay).
+    multiverse_live_tool_timeout_s: float = 150.0
     agent_max_tool_calls: int = 6
 
     # --- Simulation ----------------------------------------------------------
@@ -57,7 +59,7 @@ class Settings(BaseSettings):
     multiverse_max_children: int = 6
     multiverse_max_nodes: int = 40
     multiverse_max_sessions: int = 200
-    multiverse_timeout_s: float = 180.0
+    multiverse_timeout_s: float = 420.0
 
     # --- Storage / web ------------------------------------------------------
     data_dir: Path = Field(default=API_ROOT / "data")

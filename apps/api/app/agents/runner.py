@@ -11,6 +11,7 @@ Every tool call is recorded by Agent Framework function middleware into the work
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 import re
@@ -38,6 +39,13 @@ class AgentFailure(RuntimeError):
 def _summarize(value: Any, limit: int = 1800) -> Any:
     if value is None:
         return None
+    # A tool cancelled mid-run (e.g. the agent's time budget ran out) leaves its unfinished coroutine
+    # as the result: never store it (the trace must stay copyable and JSON-serialisable).
+    if asyncio.iscoroutine(value):
+        value.close()
+        return {"cancelled": "the tool call did not finish (agent time budget)"}
+    if inspect.isawaitable(value):
+        return {"cancelled": "the tool call did not finish (agent time budget)"}
     if isinstance(value, BaseModel):
         value = value.model_dump(mode="json")
     if hasattr(value, "text") and not isinstance(value, dict | list | str):
@@ -149,16 +157,19 @@ class AgentRunner:
             status = "ok"
             try:
                 await call_next()
-            except Exception:
+            except (Exception, asyncio.CancelledError):
                 status = "error"
                 raise
             finally:
                 args = context.arguments
                 if isinstance(args, BaseModel):
                     args = args.model_dump(mode="json")
+                args = dict(args or {}) if isinstance(args, dict) else {"value": str(args)}
+                # Keep the recorded arguments plain JSON whatever the client passed in.
+                args = json.loads(json.dumps(args, default=str))
                 rec = ToolCallRecord(
                     call_id=new_id("tool"), tool_name=context.function.name,
-                    arguments=dict(args or {}) if isinstance(args, dict) else {"value": str(args)},
+                    arguments=args,
                     result_summary=_summarize(context.result), status=status,
                     duration_ms=round((time.perf_counter() - t0) * 1000, 2), started_at=started,
                 )
@@ -177,7 +188,12 @@ class AgentRunner:
         output_model: type[T],
         policy: PolicyFn,
         attempt: int = 1,
+        live_timeout_s: float | None = None,
     ) -> tuple[T, AgentStep]:
+        """Run one agent step: live model first (if configured), then the labelled policy planner.
+
+        `live_timeout_s` overrides the live time budget for agents whose tools themselves take long
+        (e.g. a Monte Carlo response matrix); the budget covers model calls and tool execution."""
         step = AgentStep(step_id=new_id("step"), agent=agent, task=task, attempt=attempt,
                          started_at=utcnow().isoformat(), model="pending")
         self.state.steps.append(step)
@@ -203,7 +219,8 @@ class AgentRunner:
                 ag = Agent(client=client, name=agent, instructions=instructions, tools=tools,
                            middleware=[self._recorder(step)],
                            default_options={"max_tokens": max_tokens} if is_live else None)
-                live_timeout = self.settings.foundry_explanation_timeout_s if long_output else self.settings.foundry_timeout_s
+                live_timeout = live_timeout_s or (self.settings.foundry_explanation_timeout_s if long_output
+                                                  else self.settings.foundry_timeout_s)
                 timeout = live_timeout if is_live else max(60.0, self.settings.simulation_time_budget_s * 3)
                 resp = await asyncio.wait_for(ag.run(prompt, options={"response_format": output_model}), timeout)
                 try:

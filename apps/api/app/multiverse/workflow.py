@@ -576,7 +576,8 @@ class SimulationAgentExecutor(Executor):
         try:
             out, step = await rt.runner.run("simulation_agent", f"Round {ctx.round}: response matrix",
                                             mp.SIMULATION, simulation_tools(rt), prompt, MatrixReport,
-                                            simulation_policy, ctx.round)
+                                            simulation_policy, ctx.round,
+                                            live_timeout_s=ctx.settings.multiverse_live_tool_timeout_s)
         except AgentFailure as exc:
             ctx.planning.errors.append(f"simulation_agent: {exc}")
             await rt.send(wctx, MvSignal("publish", "simulation failed"), "simulation_agent", "publisher")
@@ -701,7 +702,8 @@ class MvVerificationExecutor(Executor):
         try:
             out, step = await rt.runner.run("verification_agent", f"Verify {phase}", prompts.VERIFICATION,
                                             verification_tools(rt), prompt, VerificationDecision,
-                                            mv_verification_policy, attempt)
+                                            mv_verification_policy, attempt,
+                                            live_timeout_s=ctx.settings.multiverse_live_tool_timeout_s)
         except AgentFailure as exc:
             ctx.planning.errors.append(f"verification_agent: {exc}")
             await rt.send(wctx, MvSignal("publish", "verification failed"), "verification_agent", "publisher")
