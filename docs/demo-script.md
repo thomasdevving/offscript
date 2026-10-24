@@ -1,39 +1,99 @@
-# Two-minute demo video script (draft)
+# OFFSCRIPT demo script (1:54)
 
-Target length: **1:50** (hard limit: under 2:00). Record at 1920×1080, browser zoom 90%, dark OS
-theme. Use the deployed URL (or local) with the **73' scenario**. All numbers on screen come from
-the running system - do not overlay numbers in editing.
+Video: screen recording `OFFSCRIPT-demo.webm` (1920×1080, 30 fps, no audio; not in the repository). Recorded on the live site with the agents
+running on Microsoft Foundry; waiting time (agents thinking) is cut out. Put your webcam in the
+**bottom-left corner** (max ~18% of the width): the important action is in the middle (pitch) and on
+the right (analysis panel).
 
-| Time | Screen | Voice-over |
-|---|---|---|
-| 0:00-0:12 | Close-up of the pitch: Castellane drives at the box and shoots - blocked. | "Football analytics tells you what happened. A shot, from 23 metres, blocked. But what if you could explore what *should* have happened?" |
-| 0:12-0:27 | Full app, header with OFFSCRIPT + tagline; press play from the start at 2×; event feed ticking. | "OFFSCRIPT is a multi-agent football intelligence system. It ingests a live synthetic event stream, keeps match state, and detects the decisions that matter." |
-| 0:27-0:50 | Auto-pause at the decision: frozen state, arrows for the options; agent pipeline chips turn green; casual cards appear. | "Five specialised agents on Microsoft Agent Framework take over: one decides this moment is worth analysing, a strategy agent proposes feasible alternatives, a simulation agent runs two hundred paired Monte Carlo rollouts from the exact same frozen state..." |
-| 0:50-1:08 | Click "Pass to Mbeki-Larsen" → simulated continuation plays; banner "Simulated alternative - one sampled continuation". | "...and I can watch one representative continuation. Under the model, the pass led to a goal in 2% of simulations, the shot in none - it was blocked 70% of the time. A small edge, and OFFSCRIPT says exactly how sure it is." |
-| 1:08-1:30 | Open agent workflow inspector; expand Simulation Agent tool call; click "Recovery demo → Contradictory claim": Verification rejects 19% claim, Explanation retries. | "Every number is traceable. A verification agent checks the maths and every claim; here I inject a false probability - it's rejected and the explanation agent rewrites it. Models run on Microsoft Foundry, with a labelled deterministic fallback if the model is unavailable." |
-| 1:30-1:45 | Switch Casual → Tactical analyst (intervals, chart, evidence) → Broadcaster (lower third + JSON) → NL. | "The same analysis becomes a fan story, an analyst breakdown with intervals and assumptions, or timestamped broadcast overlay instructions - in English or Dutch." |
-| 1:45-1:55 | Logo + tagline; small text: Microsoft Agent Framework · Microsoft Foundry · Azure Container Apps · Azure Storage · Application Insights. | "One match. Countless decisions. Every decision creates another game." |
+Pace: about 2.5 words per second, a little faster than normal conversation. **Bold** = stress.
+`/` = short breath. The lines are timed to the video; if you run ahead, simply pause briefly.
 
-> Before recording, replace the Foundry/Azure line with what is actually configured (e.g. drop
-> "Microsoft Foundry" if the deployment runs in policy mode). The app's header shows the true agent mode.
+---
 
-## Recommended recording sequence
+### 0:00 - 0:10 · Landing page
+*On screen: the OFFSCRIPT home page; the floating "possible futures" above the pitch; "How it works".*
 
-1. Warm up: open the app once, play the 73' scenario to the decision so the analysis is cached
-   (it will show "Replayed from cache" - fine, it is real cached output), or record live for the
-   agent animation.
-2. Restart (↺), set speed 2×, enable *Pause at decisions* and *Auto-analyse*.
-3. Record the sequence above in one take; cut only dead time.
-4. Separate take for the recovery demo (it starts a new, clearly labelled analysis).
-5. Upload to YouTube/Vimeo as public/unlisted-but-public, English title and description.
+> This is **OFFSCRIPT**. / Football stats tell you what happened. / We answer the question every fan
+> shouts at the TV: / **was there a better option?**
 
-## Optional Football Multiverse segment (replaces 1:08-1:30 if preferred)
+### 0:10 - 0:22 · Live match → frozen decision
+*On screen: the live match plays at 2×, the decision is detected and frozen, the analysis appears.*
 
-| Time | Screen | Voice-over |
-|---|---|---|
-| 0:00-0:08 | Click **Explore in the Multiverse**; the decision tree shows the frozen decision and the actual shot (ACTUAL). | "Now I take the decision myself." |
-| 0:08-0:18 | *Pass to player* → click Mbeki-Larsen → "feasible" → *Simulate this branch*; the ghost node shows the agents planning. | "An attacking agent and a defending agent plan against each other on the simulator." |
-| 0:18-0:30 | The branch plays; orange arrow "cover lane"; narrative: the defence's best answer lowers the modelled chance from 1.4% to 1.0%. Switch to Tactical analyst: rounds and the response matrix. | "The defence's best answer is to cover the lane. Every cell is paired Monte Carlo; nothing is invented by a model." |
-| 0:30-0:40 | Rewind, pick a dribble, then *Compare with* → split screen plays both branches in sync. | "Rewind, branch again, compare. Every decision creates another game." |
+> We follow a live match. / The moment a player makes a decision that matters, OFFSCRIPT **freezes**
+> it, / and five AI agents on **Microsoft Foundry** go to work.
 
-Numbers in this segment depend on the run; read them from the screen, do not script them.
+### 0:22 - 0:28 · Watch the alternative
+*On screen: click "Pass to Mbeki-Larsen", the simulated continuation plays.*
+
+> The shot: **zero** percent. / The pass: **two** percent. / And you can watch it play out.
+
+### 0:28 - 0:43 · Three viewer modes
+*On screen: Tactical analyst (intervals, table) → Evidence → Broadcaster (lower third + JSON).*
+
+> Same analysis, **three audiences**. / Fans get the story. / Analysts get intervals and every piece
+> of evidence. / Broadcasters get a ready-made lower third / and machine-readable overlay
+> instructions.
+
+### 0:43 - 0:54 · Agents you can audit
+*On screen: the Agents tab with every agent step; "Contradictory claim" fault injected; trace.*
+
+> Every number comes from the simulator, **never** the model. / Inject a fault on purpose: / it
+> recovers, / and you see every agent, every tool call, every check.
+
+### 0:54 - 1:04 · 3D and Player view
+*On screen: 3D broadcast camera → Tactical → Player view behind Castellane.*
+
+> In 3D: / the broadcast camera, / a tactical view, / and the **player's view**: / exactly what he saw
+> when he decided to shoot.
+
+### 1:04 - 1:20 · The Multiverse: take the decision yourself
+*On screen: Multiverse, "Pass to player" → click Mbeki-Larsen → simulate → branch plays, "cover lane".*
+
+> Now the **Multiverse**: / *you* take the decision. / I choose the pass. / An attacking and a
+> defending agent now play **against each other**, / and the defence's best answer is to cover the
+> passing lane.
+
+### 1:20 - 1:26 · Agent battle
+*On screen: Tactical analyst: three planning rounds and the response matrix.*
+
+> Three rounds of strategy, / every combination simulated, / **twelve** live model calls, all checks
+> passed.
+
+### 1:26 - 1:40 · Rewind, fork, compare
+*On screen: back to the decision → dribble → new branch → split screen next to what really happened.*
+
+> Rewind to the **same frozen moment**, / try a dribble instead, / and compare any two futures side
+> by side, / against what **really** happened.
+
+### 1:40 - 1:46 · Decision Value Added
+*On screen: a full 10-minute match, "Decision value" tab with the per-player table.*
+
+> Over a whole match, that becomes a **new stat**: / Decision Value Added.
+
+### 1:46 - 1:54 · Close
+*On screen: "Who it is for", then "Take the decision yourself."*
+
+> Goal chance left on the table, per player. / For broadcasters, analysts, fans and coaches. /
+> **OFFSCRIPT**: / every decision creates another game.
+
+---
+
+## Facts behind the lines (so you can say them with confidence)
+
+* All teams, players and matches are **synthetic**; every percentage is a **model estimate**
+  ("under our model"), not what would really have happened. The site itself says so everywhere.
+* "Five AI agents on Microsoft Foundry": Decision, Strategy, Simulation, Verification and
+  Explanation agents, Microsoft Agent Framework, live on a `gpt-4.1-mini` deployment in Microsoft
+  Foundry (Azure).
+* 0:22: shot 0.0%, pass to Mbeki-Larsen 2.0% modelled goal chance within 10 seconds, 200 paired
+  simulations each.
+* 1:04: the defending agent's best answer was "Cover lane to Mbeki-Larsen"; this branch: 12 live
+  model calls, 3 planning rounds, verified 12/12 checks.
+* 1:40: in the 10-minute match, 18 of 18 decisions were analysed and verified.
+
+## Before you hit record
+
+* Speak the script once out loud against the video (it plays in any browser, VLC or Resolve). If
+  your editor does not accept WebM, convert it to MP4 with HandBrake (free).
+* Want a different order or more time for a scene? Say so: the recording is a script, so a new
+  version takes 10 minutes.
