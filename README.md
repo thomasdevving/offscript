@@ -18,38 +18,52 @@ OFFSCRIPT watches a live (synthetic) football match, detects the decisions that 
 question fans actually have: **was there a better option?** Five specialised agents built on
 **Microsoft Agent Framework** propose feasible alternatives, run paired Monte Carlo simulations from
 the exact frozen game state, verify every number and claim, and explain the trade-offs to fans,
-analysts and broadcasters in English and Dutch. You can then **watch the alternative play out**,
-always labelled as one sampled continuation of a model, with its uncertainty.
+analysts and broadcasters. You can then **watch the alternative play out** in 2D or 3D, always
+labelled as one sampled continuation of a model, with its uncertainty, or **take the decision
+yourself** in the Football Multiverse and let an attacking and a defending agent fight over it.
 
 > OFFSCRIPT never claims to know what *would* have happened. Alternatives are estimates from an
 > explicit, uncalibrated simulation model of a synthetic match. See [limitations](docs/limitations.md).
 
 ## What you can do
 
-* **Watch a live synthetic match**: server-paced event stream over WebSocket, animated SVG pitch,
+* **Watch a live synthetic match**: server-paced event stream over WebSocket, animated pitch,
   live event feed, statistics (observed vs modeled values kept apart).
 * **Decisions are detected automatically** from the pre-decision snapshot (no future information);
-  playback pauses at the frozen decision state with the options drawn on the pitch.
+  playback pauses at the frozen decision state with the options drawn on the pitch, labels placed so
+  they never overlap.
 * **Compare options on one metric**: P(goal within 10 s), plus shot and turnover risk, with Wilson
   95% intervals and paired comparisons; verdicts only when the evidence supports them.
-* **Watch the alternative**: a representative simulated continuation (medoid of the modal
-  outcome), scrub it, replay it, or view example rollouts per outcome.
+* **Watch the alternative in 2D or 3D**: a representative simulated continuation (medoid of the
+  modal outcome), scrub it, replay it, or view example rollouts per outcome. The 3D view has
+  broadcast, tactical and player cameras.
 * **Three genuinely different viewer modes**: Casual fan, Tactical analyst (intervals, evidence,
   assumptions, checks), Broadcaster (lower third, timing, priority, machine-readable overlay JSON).
-* **See the agents work**: a workflow inspector with every agent step, tool call, structured output,
-  handoff and retry, plus a **recovery demo** that injects controlled faults.
-* **Match recap** (casual and analyst) grounded in event ids and verified analyses; EN/NL.
+* **See the agents work, live**: while an analysis runs, a live log shows which agent is working,
+  every tool call and every handoff (a live Foundry run takes 30-60 s, so it never looks frozen).
+  Afterwards the workflow inspector keeps every step, structured output and retry.
+* **Stress test: break it on purpose**: sabotage a copy of the analysis (an impossible pass, a false
+  number in the story, an AI model outage, a simulation cut short) and watch a three-step story of
+  what was broken, how the agents caught it and what was published. The real result is never touched.
+* **Decision Value Added (DVA)**: analyse every detected decision of a match and see, per player and
+  per team, how much modeled goal chance was left on the table by not taking the model's best
+  option, with 95% intervals. Players below the decision minimum are folded away, not ranked.
+* **Match recap** (casual and analyst) grounded in event ids and verified analyses.
 * **Football Multiverse**: take the decision yourself. Click a teammate, a space or a dribble target;
   an **attacking agent** and a **defending agent** plan against each other over a bounded response
-  matrix (paired Monte Carlo per action × defence), the chosen continuation becomes a new frozen state,
-  and you decide again. Rewind, fork sibling branches, let the agents recommend (assisted) or play it
-  out (autonomous), and compare two branches side by side. → [docs/multiverse.md](docs/multiverse.md)
+  matrix (paired Monte Carlo per action × defence). While they plan you see each round's proposals
+  and the matrix filling cell by cell. The chosen continuation becomes a new frozen state and you
+  decide again. Rewind, fork sibling branches, let the agents recommend (assisted) or play it out
+  (autonomous), and compare two branches side by side. Analyst mode leads with the key finding and
+  keeps the full write-up one click away. → [docs/multiverse.md](docs/multiverse.md)
 
 | Tactical analyst | What-if playback |
 |---|---|
 | ![Analyst mode](docs/images/analyst-mode.png) | ![Simulated alternative](docs/images/what-if-playback.png) |
-| **Broadcaster** | **Agent recovery** (rejected claim → regenerated) |
-| ![Broadcaster mode](docs/images/broadcaster-mode.png) | ![Agent recovery](docs/images/agent-recovery.png) |
+| **3D view** (broadcast camera, frozen decision) | **Stress test** (false number → caught → rewritten) |
+| ![3D view](docs/images/pitch-3d.png) | ![Stress test](docs/images/agent-recovery.png) |
+| **Broadcaster** | **Decision Value Added** (procedural match, 18 decisions) |
+| ![Broadcaster mode](docs/images/broadcaster-mode.png) | ![Decision Value Added](docs/images/decision-value.png) |
 
 **Football Multiverse**: a user-chosen pass, the defending agent's best answer (cover the lane) and
 the decision tree with the canonical synthetic timeline kept apart.
@@ -115,8 +129,9 @@ flowchart LR
   feasibility, snapshot consistency and reproducibility are re-checked deterministically; narratives
   are checked number by number. The Verification Agent cannot override a failed check.
   → [docs/multi-agent-system.md](docs/multi-agent-system.md)
-* **Live and broadcast-ready.** Microsecond state updates, async analyses with live progress over
-  WebSocket, timestamped overlay instructions with priority and expiry rules.
+* **Live and broadcast-ready.** Microsecond state updates, async analyses that stream every agent
+  start, tool call and handoff over WebSocket, timestamped overlay instructions with priority and
+  expiry rules.
   → [docs/architecture.md](docs/architecture.md)
 
 ## Results (synthetic data, internal consistency - not real-world validity)
@@ -125,7 +140,7 @@ flowchart LR
 |---|---|
 | Detected decisions verified end-to-end | **24/24** (4 scenarios + 10-minute procedural segment) |
 | Injected numeric / narrative corruptions caught | **240/240** / **432/432**, 0/144 false positives |
-| Controlled faults recovered (invalid candidate, contradictory claim, model outage, simulation timeout) | **12/12** |
+| Stress-test faults recovered (impossible pass, false number, model outage, simulation cut short) | **12/12** |
 | Reproducibility (re-analysis, trajectory replay, scenario regeneration) | bit-identical |
 | End-to-end analysis, 3 options × 200 rollouts, policy agents | ~2.6 s p50 |
 | Multiverse: single-decision value optimistic vs the defence's best counter | **0.61 pp** mean; robust choice differs in **1/3** decisions |
@@ -133,8 +148,8 @@ flowchart LR
 
 Full method and numbers: [docs/evaluation.md](docs/evaluation.md) · generated tables:
 [docs/evaluation_results.md](docs/evaluation_results.md). Multiverse (single-decision vs branching vs
-adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Tests: 77 backend
-(pytest), 33 frontend unit (Vitest), 3 end-to-end (Playwright, real browser + real backend).
+adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Tests: 87 backend
+(pytest), 43 frontend unit (Vitest), 8 end-to-end (Playwright, real browser + real backend).
 
 ## Microsoft technologies
 
@@ -149,7 +164,8 @@ adversarial): [docs/multiverse_evaluation.md](docs/multiverse_evaluation.md). Te
 ```
 apps/api        FastAPI backend: simulation, synthetic data, match state, detection, agents,
                 orchestration, verification, narratives, multiverse, services, API (+ tests)
-apps/web        Next.js 16 static app: pitch, timeline, analysis panel, inspector (+ Vitest, Playwright)
+apps/web        Next.js 16 static app: 2D/3D pitch, timeline, analysis, live agent log, stress test,
+                DVA, multiverse (+ Vitest, Playwright)
 packages/contracts  OpenAPI schema + generated TypeScript types (single source: Pydantic models)
 scenarios/      Inspectable scenario definitions (positions, script, seed, labels)
 infra/          Bicep (Azure) and Dockerfiles      scripts/  evaluation, OpenAPI export, cache warm-up

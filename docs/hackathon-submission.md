@@ -83,8 +83,8 @@ The API image is published to GitHub Container Registry rather than an Azure reg
   simulation settings and all verification checks, assumptions.
 * **Broadcaster**: lower-third preview on the pitch, caption, suggested timing/priority/expiry and
   the machine-readable overlay JSON.
-* Agent workflow inspector, controlled recovery demo, match recap (casual/analyst), keyboard
-  controls, reduced-motion support, EN/NL.
+* Live agent log, agent workflow inspector, stress test ("break it on purpose"), Decision Value Added, 3D view, match recap (casual/analyst), keyboard
+  controls, reduced-motion support.
 
 ## Evaluation
 

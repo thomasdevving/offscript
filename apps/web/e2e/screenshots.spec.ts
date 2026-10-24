@@ -39,6 +39,26 @@ test("capture product screenshots", async ({ page }) => {
   const inspector = page.getByTestId("workflow-inspector");
   await inspector.scrollIntoViewIfNeeded();
   await inspector.screenshot({ path: `${OUT}/agent-recovery.png` });
+
+  await page.getByRole("radio", { name: "Casual fan" }).click();
+  await page.getByTestId("dim-3d").click();
+  await expect(page.getByTestId("pitch-3d").locator("canvas")).toBeVisible();
+  await page.waitForTimeout(2500);
+  await page.getByTestId("pitch-3d").screenshot({ path: `${OUT}/pitch-3d.png` });
+  await page.getByTestId("dim-2d").click();
+});
+
+test("capture decision value screenshot", async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.goto("/app/?scenario=procedural_segment");
+  await expect(page.getByText("Live", { exact: true })).toBeVisible();
+  await page.getByTestId("tab-decision-value").click();
+  const dv = page.getByTestId("decision-value");
+  if (await page.getByTestId("dva-analyse-all").isVisible()) await page.getByTestId("dva-analyse-all").click();
+  await expect(dv).toContainText(/(\d+) of \1 detected decisions analysed and verified/, { timeout: 240_000 });
+  await dv.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+  await dv.screenshot({ path: `${OUT}/decision-value.png` });
 });
 
 test("capture multiverse screenshots", async ({ page }) => {
