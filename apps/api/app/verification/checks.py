@@ -217,6 +217,10 @@ def verify_narrative(narrative: Narrative, evidence: list[EvidenceItem], roster:
             # Whole-word match: "Quist" must not match inside "Thornquist".
             if len(nm) > 3 and pid not in allowed_player_ids and re.search(rf"(?<![\w-]){re.escape(nm.lower())}(?![\w-])", low):
                 issues.append(f"Mentions {p.name}, who is not part of this decision")
+    for pid, p in roster.items():
+        # Viewers see names, never internal ids such as "H10".
+        if re.search(rf"(?<![\w-]){re.escape(pid)}(?![\w-])", text):
+            issues.append(f"Uses the internal player id {pid} instead of the name {p.name}")
     refs = {it.ref for it in evidence}
     unknown = [r for r in narrative.evidence_refs if r not in refs]
     if unknown:
