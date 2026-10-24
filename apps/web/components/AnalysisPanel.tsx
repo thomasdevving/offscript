@@ -27,7 +27,7 @@ function StatusBadges({ a }: { a: CounterfactualAnalysis }) {
       {s.mode === "analyst" && <span className="chip">
         {a.model.agent_mode === "foundry" ? `Foundry · ${a.model.deployment} · ${a.model.live_model_calls} live calls` : L.policy}
       </span>}
-      {a.fault_injection.length > 0 && <span className="chip bg-red-500/15 text-red-300">fault: {a.fault_injection.join(", ")}</span>}
+      {a.fault_injection.length > 0 && <span className="chip bg-amber-500/15 text-amber-300">Stress-test copy</span>}
     </div>
   );
 }
@@ -203,30 +203,16 @@ function Evidence({ a, d }: { a: CounterfactualAnalysis; d: DecisionPoint }) {
           {sim && (<>
             <span className="text-slate-500">{L.rollouts}</span><span className="num font-mono">{sim.config.rollouts}{sim.partial ? " (partial)" : ""}</span>
             <span className="text-slate-500">{L.horizon}</span><span className="num font-mono">{sim.config.horizon_s} s</span>
-            <span className="text-slate-500">{L.seed}</span><span className="num font-mono">{sim.config.seed}</span>
-            <span className="text-slate-500">{L.simulator}</span><span className="font-mono">{sim.simulator_version}</span>
-            <span className="text-slate-500">Paired streams (CRN)</span><span className="font-mono">{String(sim.config.common_random_numbers)}</span>
-            <span className="text-slate-500">Run time</span><span className="num font-mono">{sim.duration_ms?.toFixed(0)} ms</span>
           </>)}
         </div>
-        {a.candidates.some((c) => Object.keys(c.features ?? {}).length) && (
-          <div>
-            <div className="mb-1 font-semibold text-slate-200">Option features (noise-free model estimates)</div>
-            {a.candidates.filter((c) => !c.is_actual).map((c) => (
-              <div key={c.action_id} className="font-mono text-[10px] text-slate-400">
-                {cleanLabel(c.label)}: {Object.entries(c.features).filter(([k]) => k !== "heuristic_value").map(([k, v]) => `${k.replace(/_/g, " ")} ${Number(v).toFixed(2)}`).join(" · ")}
-              </div>
-            ))}
-          </div>
-        )}
         {a.verification && (
           <div>
             <div className="mb-1 font-semibold text-slate-200">{L.checks} ({a.verification.checks.filter((c) => c.passed).length}/{a.verification.checks.length})</div>
             <ul className="space-y-0.5">
               {a.verification.checks.map((c) => (
-                <li key={c.check_id} className="flex gap-1.5">
+                <li key={c.check_id} className="flex gap-1.5" title={c.details}>
                   <span className={c.passed ? "text-emerald-400" : c.severity === "error" ? "text-red-400" : "text-amber-400"}>{c.passed ? "✓" : c.severity === "error" ? "✗" : "!"}</span>
-                  <span>{c.name}<span className="text-slate-500"> · {c.details}</span></span>
+                  <span>{c.name}</span>
                 </li>
               ))}
             </ul>
@@ -237,6 +223,7 @@ function Evidence({ a, d }: { a: CounterfactualAnalysis; d: DecisionPoint }) {
           {s.lang === "en"
             ? "Every number shown is a computed field (traceable in the evidence table). Intervals are Monte Carlo error only; the football model itself is synthetic and uncalibrated."
             : "Elk getal is een berekend veld (herleidbaar in de bewijstabel). Intervallen tonen alleen de Monte-Carlo-fout; het voetbalmodel is synthetisch en ongekalibreerd."}
+          {sim && ` Reproducible: seed ${sim.config.seed}, ${sim.simulator_version}.`}
         </p>
       </div>
     </section>
