@@ -29,6 +29,8 @@ export interface LiveItem {
   event: string;
   text: string;
   at: number;
+  /** The raw progress payload (round, actions, strategies, cell values) for the live planning view. */
+  data?: Record<string, unknown>;
 }
 
 interface CompareState {
@@ -147,7 +149,7 @@ function connect(sessionId: string) {
       if (m.event === "attack_proposals") text = `Round ${m.round}: attack ${m.revised ? "revised → " : "→ "}${(m.actions ?? []).join(", ")}`;
       if (m.event === "defense_proposals") text = `Round ${m.round}: defence → ${(m.strategies ?? []).join(", ")}`;
       if (m.event === "tool_call") text = `${String(m.agent).replace("_", " ")} called ${m.tool}`;
-      set({ live: [...get().live, { event: m.event, text, at: Date.now() }].slice(-40) });
+      set({ live: [...get().live, { event: m.event, text, at: Date.now(), data: m }].slice(-120) });
     } catch {
       /* ignore */
     }

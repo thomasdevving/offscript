@@ -28,6 +28,11 @@ export interface ProgressItem {
   agent?: string;
   tool?: string;
   status?: string;
+  task?: string;
+  attempt?: number;
+  from?: string;
+  to?: string;
+  reason?: string;
   at: number;
 }
 
@@ -223,7 +228,7 @@ function onMessage(msg: ServerMessage): void {
       const dpId: string | undefined = msg.decision_point_id;
       if (id) {
         const item: ProgressItem = { event: msg.event ?? msg.type, agent: msg.agent, tool: msg.tool, status: msg.status,
-          at: Date.now() };
+          task: msg.task, attempt: msg.attempt, from: msg.from, to: msg.to, reason: msg.reason, at: Date.now() };
         set({ progress: { ...get().progress, [id]: [...(get().progress[id] || []), item].slice(-60) } });
         if (dpId && (msg.type === "analysis_started" || msg.type === "analysis_completed")) {
           const known = get().analyses[dpId];

@@ -72,6 +72,9 @@ describe("DecisionValue view", () => {
     expect(screen.getByTestId("dva-oneliner")).toHaveTextContent("Castellane's choices left 1.8 pp");
     const table = screen.getByTestId("dva-table");
     expect(within(table).getByText("Ravi Castellane").closest("tr")).toHaveTextContent("1.8 pp (0.4–3.2)");
+    // Players without a value are folded into one line until expanded.
+    expect(within(table).queryByText("Leon Varga")).not.toBeInTheDocument();
+    fireEvent.click(within(table).getByTestId("dva-show-thin"));
     expect(within(table).getByText("Leon Varga").closest("tr")).toHaveTextContent("Not enough decisions");
     expect(within(table).getByText("Harbour City FC")).toBeInTheDocument();
     expect(screen.getByText(/7 of 9 detected decisions analysed and verified/)).toBeInTheDocument();

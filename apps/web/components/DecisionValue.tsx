@@ -1,7 +1,7 @@
 "use client";
 
 import type { DecisionValueAggregate } from "@offscript/contracts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { leftOnTable, oneLiner, pp } from "@/lib/decisionValue";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
@@ -14,6 +14,7 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
   const s = useApp();
   const L = t(s.lang);
   const en = s.lang === "en";
+  const [showThin, setShowThin] = useState(false);
   const r = s.decisionValue && s.decisionValue.match_id === s.matchId ? s.decisionValue : null;
   useEffect(() => {
     if (s.matchId && !r && !s.decisionValueLoading && !s.decisionValueError) void actions.loadDecisionValue();
@@ -97,7 +98,27 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
           </tr>
         </thead>
         <tbody>
-          {r.players.map(row)}
+          {(() => {
+            // Players with too few decisions for a value are folded into one line, unless nobody has a value yet.
+            const rated = r.players.filter((p) => leftOnTable(p, s.lang));
+            const thin = r.players.filter((p) => !leftOnTable(p, s.lang));
+            if (!rated.length || showThin) return r.players.map(row);
+            return (
+              <>
+                {rated.map(row)}
+                {thin.length > 0 && (
+                  <tr className="border-t border-line">
+                    <td colSpan={6} className="py-1">
+                      <button type="button" onClick={() => setShowThin(true)} data-testid="dva-show-thin"
+                        className="text-[11px] text-slate-500 hover:text-slate-300">
+                        {en ? `+ ${thin.length} players with fewer than ${r.min_decisions} decisions` : `+ ${thin.length} spelers met minder dan ${r.min_decisions} beslissingen`}
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </>
+            );
+          })()}
           {!r.players.length && (
             <tr><td colSpan={6} className="py-2 text-slate-500">{en ? "No verified analyses yet." : "Nog geen geverifieerde analyses."}</td></tr>
           )}

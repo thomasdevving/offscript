@@ -5,10 +5,10 @@ import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 
 const FAULTS: { id: FaultInjection; en: string; nl: string }[] = [
-  { id: "invalid_candidate", en: "Invalid alternative", nl: "Ongeldig alternatief" },
-  { id: "contradictory_claim", en: "Contradictory claim", nl: "Tegenstrijdige claim" },
-  { id: "model_unavailable", en: "Model outage", nl: "Model-storing" },
-  { id: "simulation_timeout", en: "Simulation timeout", nl: "Simulatie-timeout" },
+  { id: "invalid_candidate", en: "Impossible pass", nl: "Onmogelijke pass" },
+  { id: "contradictory_claim", en: "False number in the story", nl: "Vals getal in het verhaal" },
+  { id: "model_unavailable", en: "AI model outage", nl: "AI-model valt uit" },
+  { id: "simulation_timeout", en: "Simulation cut short", nl: "Simulatie afgekapt" },
 ];
 
 export default function RecoveryPanel() {

@@ -733,7 +733,10 @@ class VerificationAgentExecutor(Executor):
             await rt.handoff("verification_agent", "publisher", "analysis unavailable")
             await rt.send(ctx, Signal("publish", "rejected"))
             return
-        # narratives phase
+        # narratives phase. Rejected claims are always recorded, whichever route the agent picks: a rewrite
+        # by the Explanation Agent, or (publisher) replacement by a verified template.
+        if rt.ctx.narrative_issues:
+            st.verification_issues = [f"{k}: {'; '.join(v)}" for k, v in rt.ctx.narrative_issues.items()]
         if out.route == "explain" and rt.ctx.narrative_issues and \
                 st.explanation_retries < rt.ctx.settings.max_explanation_retries:
             st.explanation_retries += 1

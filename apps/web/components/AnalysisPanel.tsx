@@ -8,6 +8,7 @@ import { eventLabel, t, triggerLabel } from "@/lib/i18n";
 import { mv } from "@/lib/mvStore";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
 import RecoveryPanel from "./RecoveryPanel";
+import AgentActivity from "./AgentActivity";
 import WorkflowInspector, { AgentPipeline } from "./WorkflowInspector";
 
 function narrativeFor(a: CounterfactualAnalysis, mode: string, lang: Language): Narrative | undefined {
@@ -335,7 +336,7 @@ export default function AnalysisPanel() {
         {s.analysisErrors[d.decision_point_id] && <p className="text-sm text-red-300">{s.analysisErrors[d.decision_point_id]}</p>}
         {a && <StatusBadges a={a} />}
         {a && (running || s.mode !== "casual") && <AgentPipeline a={a} />}
-        {running && <p className="text-sm text-amber-200" aria-live="polite">{L.analysing}…</p>}
+        {running && a && <AgentActivity analysisId={a.analysis_id} />}
         {a?.status === "unavailable" && <p className="rounded-lg bg-white/5 p-2 text-sm text-slate-200">{L.unavailable}: {a.unavailable_reason}</p>}
         {a?.simulation && a.status !== "pending" && a.candidates.length > 0 && (
           <>

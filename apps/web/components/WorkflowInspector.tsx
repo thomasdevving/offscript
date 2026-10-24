@@ -4,6 +4,7 @@ import type { AgentStep, CounterfactualAnalysis } from "@offscript/contracts";
 import { useState } from "react";
 import { t } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";
+import StressTestStory from "./StressTestStory";
 
 const AGENTS = [
   ["decision_agent", "Decision", "Decides if the moment deserves analysis"],
@@ -117,11 +118,7 @@ export default function WorkflowInspector() {
       </button>
       {s.inspectorOpen && (
         <div className="space-y-2 pt-1">
-          {s.recovery && (
-            <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-2 text-[11px] text-red-100">
-              Controlled fault injection: <b>{s.recoveryFault}</b>. {L.recoveryHint}
-            </div>
-          )}
+          {s.recovery && s.recoveryFault && <StressTestStory a={a} fault={s.recoveryFault} />}
           <div className="grid grid-cols-3 gap-2 text-center text-[10px] text-slate-400">
             <div className="rounded-lg bg-white/[0.04] p-1.5"><div className="num font-mono text-sm text-white">{wf.steps.length}</div>agent runs</div>
             <div className="rounded-lg bg-white/[0.04] p-1.5"><div className="num font-mono text-sm text-white">{wf.steps.reduce((n, x) => n + x.tool_calls.length, 0)}</div>tool calls</div>

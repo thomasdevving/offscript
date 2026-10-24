@@ -547,10 +547,23 @@ export default function Pitch3D(p: PitchProps) {
       renderer.render(scene, camera);
       const w = host.clientWidth;
       const h = host.clientHeight;
-      for (const lb of world.current?.labels ?? []) {
+      // Project the labels, then push apart any that would overlap (top-down, in screen space).
+      const placed: { x: number; y: number; w: number; h: number }[] = [];
+      const projected = (world.current?.labels ?? []).map((lb) => {
         const q = lb.at.clone().project(camera);
-        lb.el.style.transform = `translate(${((q.x + 1) / 2) * w}px, ${((1 - q.y) / 2) * h}px) translate(-50%, -100%)`;
-        lb.el.style.visibility = q.z < 1 ? "visible" : "hidden";
+        const lw = lb.el.offsetWidth;
+        const lh = lb.el.offsetHeight;
+        return { lb, x: ((q.x + 1) / 2) * w - lw / 2, y: ((1 - q.y) / 2) * h - lh, w: lw, h: lh, visible: q.z < 1 };
+      }).sort((a, b) => a.y - b.y);
+      for (const p of projected) {
+        for (let guard = 0; guard < 8; guard++) {
+          const hit = placed.find((o) => p.x < o.x + o.w + 4 && o.x < p.x + p.w + 4 && p.y < o.y + o.h + 3 && o.y < p.y + p.h + 3);
+          if (!hit) break;
+          p.y = hit.y + hit.h + 3;
+        }
+        placed.push(p);
+        p.lb.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+        p.lb.el.style.visibility = p.visible ? "visible" : "hidden";
       }
       raf = requestAnimationFrame(tick);
     };

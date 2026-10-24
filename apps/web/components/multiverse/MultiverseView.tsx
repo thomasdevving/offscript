@@ -13,6 +13,7 @@ import ActionComposer from "./ActionComposer";
 import AgentBattle, { PlanningSteps } from "./AgentBattle";
 import CompareModal from "./CompareModal";
 import DecisionTree from "./DecisionTree";
+import LivePlanning from "./LivePlanning";
 
 function useRaf(cb: (dt: number) => void, active: boolean) {
   const ref = useRef(cb);
@@ -29,6 +30,12 @@ function useRaf(cb: (dt: number) => void, active: boolean) {
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, [active]);
+}
+
+/** The first sentence of a narrative (decimals such as "1.4%" do not end a sentence). */
+export function firstSentence(text: string): string {
+  const m = text.match(/^.*?[.!?](?=\s+[A-Z]|$)/s);
+  return (m ? m[0] : text).trim();
 }
 
 function snapFrame(s: MatchStateSnapshot): RenderFrame {
@@ -240,14 +247,26 @@ export default function MultiverseView() {
           <h2 className="eyebrow mb-3">Your decision</h2>
           <ActionComposer />
         </section>
+        {st.job && ["pending", "running"].includes(st.job.status) && <LivePlanning />}
         {shownPlanning && (
           <section className="glass space-y-3 p-3">
             <h2 className="eyebrow">{planning ? "Attack vs defence (this step)" : "Agent recommendation"}</h2>
             {narrative && (
               <article className="rounded-xl bg-white/[0.03] p-2" data-testid="mv-narrative">
                 <h3 className="text-sm font-bold text-white">{narrative.headline}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-slate-200">{app.mode === "broadcaster" ? narrative.caption ?? narrative.body : narrative.body}</p>
-                {app.mode === "analyst" && <ul className="mt-1 list-disc pl-4 text-[11px] text-slate-300">{narrative.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>}
+                {app.mode === "analyst" ? (
+                  // Analysts get the findings and the matrix first; the long text stays one click away.
+                  <>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-200">{firstSentence(narrative.body)}</p>
+                    <details className="mt-1 text-[12px] text-slate-300" data-testid="mv-narrative-more">
+                      <summary className="cursor-pointer font-semibold text-leaf-300">Read the full analysis</summary>
+                      <p className="mt-1 leading-relaxed">{narrative.body}</p>
+                      <ul className="mt-1 list-disc pl-4 text-[11px]">{narrative.bullets.map((b, i) => <li key={i}>{b}</li>)}</ul>
+                    </details>
+                  </>
+                ) : (
+                  <p className="mt-1 text-sm leading-relaxed text-slate-200">{app.mode === "broadcaster" ? narrative.caption ?? narrative.body : narrative.body}</p>
+                )}
               </article>
             )}
             {app.mode === "casual" && shownPlanning.summary ? (
@@ -261,12 +280,6 @@ export default function MultiverseView() {
                 <div className="mt-2"><PlanningSteps p={shownPlanning} /></div>
               </details>
             )}
-          </section>
-        )}
-        {(st.live.length > 0 && st.job && ["pending", "running"].includes(st.job.status)) && (
-          <section className="glass p-3 text-[11px] text-leaf-100 ring-1 ring-leaf-400/20" aria-live="polite" data-testid="mv-live">
-            <h2 className="mb-1 font-bold uppercase tracking-widest text-leaf-300">Live agent activity</h2>
-            <ol className="max-h-48 space-y-0.5 overflow-y-auto">{st.live.slice(-12).map((l, i) => <li key={i}>{l.text}</li>)}</ol>
           </section>
         )}
       </aside>

@@ -65,7 +65,48 @@ function Markings() {
   );
 }
 
-function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }) {
+const labelText = (a: Arrow) => `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
+const labelWidth = (a: Arrow) => labelText(a).length * 0.62 + 1.4;
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * Places every arrow label without overlaps: candidates along the arrow and on either side, best-ranked
+ * arrow first, first free spot that stays on the pitch wins. Returns each label's top-left corner.
+ */
+export function placeLabels(arrows: Arrow[]): Map<string, [number, number]> {
+  const placed: Box[] = [];
+  const out = new Map<string, [number, number]>();
+  const hits = (b: Box) => placed.some((o) => b.x < o.x + o.w + 0.3 && o.x < b.x + b.w + 0.3 && b.y < o.y + o.h + 0.3 && o.y < b.y + b.h + 0.3);
+  const order = [...arrows].sort((p, q) => (p.rank ?? 99) - (q.rank ?? 99));
+  for (const a of order) {
+    const [x1, y1] = a.from;
+    const [x2, y2] = a.to;
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const w = labelWidth(a);
+    const h = 1.9;
+    let pick: Box | null = null;
+    for (const t of [0.62, 0.8, 0.45, 0.95, 0.3]) {
+      for (const off of [1.6, -1.6, 3.4, -3.4]) {
+        const mx = x1 + (x2 - x1) * t + Math.cos(ang + Math.PI / 2) * off;
+        const my = y1 + (y2 - y1) * t + Math.sin(ang + Math.PI / 2) * off;
+        const b = { x: mx - w / 2, y: my - h / 2, w, h };
+        if (b.x < -2.5 || b.x + b.w > 107.5 || b.y < -2.5 || b.y + b.h > 70.5) continue;
+        if (!hits(b)) { pick = b; break; }
+      }
+      if (pick) break;
+    }
+    if (!pick) {
+      // Everything nearby is taken: stack under the lowest label.
+      const low = placed.reduce((m, o) => Math.max(m, o.y + o.h), y1);
+      pick = { x: Math.min(105 - w, Math.max(0, x1 - w / 2)), y: low + 0.4, w, h };
+    }
+    placed.push(pick);
+    out.set(a.id, [pick.x, pick.y]);
+  }
+  return out;
+}
+
+function ArrowShape({ a, onClick, labelAt }: { a: Arrow; onClick?: (id: string) => void; labelAt?: [number, number] }) {
   const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#d4ee8f" : a.kind === "defense" ? "#f97316"
     : a.kind === "recommended" ? "#34d399" : "#cfe2b4";
   const dash = a.kind === "actual" ? "1.2 0.8" : a.kind === "alternative" ? "0.6 0.6" : a.kind === "defense" ? "0.9 0.5" : undefined;
@@ -76,10 +117,8 @@ function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }
   const hy = y2 - Math.sin(ang) * 1.6;
   const left = [hx + Math.cos(ang + Math.PI / 2) * 0.8, hy + Math.sin(ang + Math.PI / 2) * 0.8];
   const right = [hx + Math.cos(ang - Math.PI / 2) * 0.8, hy + Math.sin(ang - Math.PI / 2) * 0.8];
-  // Labels sit 62% along the arrow, nudged sideways per rank so neighbouring labels do not collide.
-  const side = ((a.rank ?? 1) % 2 === 0 ? 1 : -1) * (1.2 + (a.rank ?? 1) * 0.35);
-  const mx = x1 + (x2 - x1) * 0.62 + Math.cos(ang + Math.PI / 2) * side;
-  const my = y1 + (y2 - y1) * 0.62 + Math.sin(ang + Math.PI / 2) * side;
+  // Label position comes from placeLabels (no overlaps); a lone arrow falls back to 62% along it.
+  const [lx, ly] = labelAt ?? [x1 + (x2 - x1) * 0.62 - labelWidth(a) / 2, y1 + (y2 - y1) * 0.62 - 2.6];
   return (
     <g
       role="button"
@@ -93,12 +132,10 @@ function ArrowShape({ a, onClick }: { a: Arrow; onClick?: (id: string) => void }
       <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={a.kind === "selected" ? 0.55 : 0.38}
         strokeDasharray={dash} opacity={a.kind === "alternative" ? 0.85 : 1} />
       <polygon points={`${x2},${y2} ${left[0]},${left[1]} ${right[0]},${right[1]}`} fill={color} />
-      <g transform={`translate(${mx},${my - 1.6})`}>
-        <rect x={-0.2} y={-1.25} width={a.label.length * 0.62 + 1.4} height={1.9} rx={0.12}
+      <g transform={`translate(${lx},${ly})`}>
+        <rect x={0} y={0} width={labelWidth(a)} height={1.9} rx={0.12}
           fill="rgba(2,6,23,0.85)" stroke={color} strokeWidth={0.1} />
-        <text x={0.5} y={0.15} fontSize={1.15} fill={color} fontWeight={600}>
-          {a.rank != null ? `${a.rank}. ` : ""}{a.label}
-        </text>
+        <text x={0.7} y={1.4} fontSize={1.15} fill={color} fontWeight={600}>{labelText(a)}</text>
       </g>
     </g>
   );
@@ -191,7 +228,10 @@ export default function Pitch(p: PitchProps) {
           </g>
         )}
       </g>
-      {p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} />)}
+      {(() => {
+        const at = placeLabels(p.arrows ?? []);
+        return p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} labelAt={at.get(a.id)} />);
+      })()}
       {p.marker && (
         <g transform={`translate(${p.marker.x},${p.marker.y})`} pointerEvents="none">
           <circle r={1.6} fill="none" stroke={p.marker.ok ? "#34d399" : "#ef4444"} strokeWidth={0.35} />
