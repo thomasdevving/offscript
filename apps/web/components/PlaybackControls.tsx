@@ -1,6 +1,6 @@
 "use client";
 
-import { clock, cleanLabel, pct } from "@/lib/format";
+import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";
 
@@ -147,8 +147,8 @@ export function WhatIfControls() {
               {examples.map(([outcome, idx]) => (
                 <button key={outcome} type="button" onClick={() => void actions.selectAction(traj.action_id, idx)}
                   className={`rounded-lg px-2 py-1 text-[11px] font-semibold ${traj.rollout_index === idx ? "bg-leaf-500 text-white" : "bg-white/5 text-slate-300 hover:bg-white/10"}`}
-                  title={`${L.sampleOutcome}: ${outcome}`}>
-                  {outcome}
+                  title={`${L.sampleOutcome}: ${outcomeLabel(outcome)}`}>
+                  {outcomeLabel(outcome)}
                 </button>
               ))}
               <button type="button" onClick={() => actions.showSnapshot()} className="btn py-1">
@@ -161,7 +161,7 @@ export function WhatIfControls() {
           </div>
           <input type="range" min={0} max={end} step={50} value={s.whatIf.t} aria-label="Scrub simulated continuation"
             onChange={(e) => actions.setWhatIf({ t: Number(e.target.value), playing: false })} className="timeline mt-2 w-full" />
-          {s.mode === "analyst" && <p className="mt-1 truncate text-[10px] text-leaf-200/60" title={traj.selection_rule}>{traj.selection_rule}</p>}
+          {s.mode === "analyst" && <p className="mt-1 text-[10px] text-leaf-200/60" title={traj.selection_rule}>{s.lang === "en" ? "Shown: the most typical run of the most common outcome." : "Getoond: het meest typische verloop van de meest voorkomende uitkomst."}</p>}
         </>
       )}
     </div>

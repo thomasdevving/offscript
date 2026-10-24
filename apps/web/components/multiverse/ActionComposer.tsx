@@ -95,8 +95,8 @@ export default function ActionComposer() {
                   {o.action_id === recId && <span className="rounded bg-emerald-400 px-1 text-[9px] font-bold text-emerald-950">AI RECOMMENDED</span>}
                   <span className="text-slate-100">{o.label}</span>
                   <span className="ml-auto font-mono text-[10px] text-slate-500">
-                    {o.features.completion_estimate != null ? `${Math.round(o.features.completion_estimate * 100)}% compl.` :
-                      o.features.success_estimate != null ? `${Math.round(o.features.success_estimate * 100)}% ok` :
+                    {o.features.completion_estimate != null ? `${Math.round(o.features.completion_estimate * 100)}% arrives` :
+                      o.features.success_estimate != null ? `${Math.round(o.features.success_estimate * 100)}% succeeds` :
                         o.features.modeled_shot_scoring_probability != null ? `${(o.features.modeled_shot_scoring_probability * 100).toFixed(1)}% shot` : ""}
                   </span>
                 </button>

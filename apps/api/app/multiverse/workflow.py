@@ -776,10 +776,14 @@ class MvExplanationExecutor(Executor):
         except AgentFailure as exc:
             ctx.planning.errors.append(f"explanation_agent: {exc}")
             out, live, label = ExplanationBundle(narratives=[]), False, "none"
+        from ..verification.checks import split_evidence_refs
+        if not ctx.evidence:
+            ctx.evidence = build_multiverse_evidence(ctx)
         ctx.drafts = [Narrative(
             narrative_id=new_id("nar"), analysis_id=ctx.planning.planning_id, audience=d.audience, language=d.language,
             headline=d.headline[:140], body=d.body[:1100], bullets=[b[:260] for b in d.bullets[:10]],
-            caption=(d.caption or None) and d.caption[:140], evidence_refs=d.evidence_refs[:24],
+            caption=(d.caption or None) and d.caption[:140],
+            evidence_refs=split_evidence_refs(d.evidence_refs[:24], ctx.evidence)[0],
             generated_by=label if live else "policy-template", is_live_model_output=live,
             created_at=utcnow().isoformat()) for d in out.narratives[:6]]
         await rt.send(wctx, MvSignal("verify_narratives", f"{len(ctx.drafts)} narratives"), "explanation_agent",

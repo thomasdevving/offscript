@@ -59,13 +59,14 @@ export function ResponseMatrix({ p }: { p: MultiversePlanning }) {
   );
 }
 
-export default function AgentBattle({ p }: { p: MultiversePlanning }) {
+/** Analysts get every round and the full matrix; `compact` (broadcasters) keeps only the outcome. */
+export default function AgentBattle({ p, compact = false }: { p: MultiversePlanning; compact?: boolean }) {
   const s = p.summary;
   const lab = (aid: string | null | undefined) =>
     p.attack_proposals.find((a) => a.action.action_id === aid)?.action.label.replace(" (actual)", "") ?? "–";
   return (
     <section className="space-y-2" data-testid="agent-battle">
-      <ol className="space-y-1.5">
+      {!compact && <ol className="space-y-1.5">
         {p.rounds.map((r) => {
           const atk = p.attack_proposals.filter((a) => a.round === r.round);
           const dfn = p.defense_proposals.filter((d) => d.round === r.round);
@@ -86,12 +87,12 @@ export default function AgentBattle({ p }: { p: MultiversePlanning }) {
                     : <div className="text-slate-500">kept responses</div>}
                 </div>
               </div>
-              <div className="mt-1 text-[10px] text-slate-400">Simulator: {r.new_cells} new pairs · {r.note}</div>
+              <div className="mt-1 text-[10px] text-slate-400">{r.note}</div>
             </li>
           );
         })}
-      </ol>
-      <ResponseMatrix p={p} />
+      </ol>}
+      {!compact && <ResponseMatrix p={p} />}
       {s && (
         <div className="grid grid-cols-2 gap-1.5 text-[11px]" data-testid="strategy-summary">
           <div className="rounded bg-white/[0.04] p-1.5"><div className="text-slate-500">Most robust</div><div className="font-semibold text-white">{lab(s.most_robust_action_id)}</div></div>
@@ -107,9 +108,7 @@ export default function AgentBattle({ p }: { p: MultiversePlanning }) {
         <span className={`rounded px-1.5 py-0.5 font-semibold ${p.verification_status === "verified" ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`} data-testid="mv-verification">
           {p.verification_status === "verified" ? "✓ verified" : p.verification_status} ({p.verification_checks.filter((c) => c.passed).length}/{p.verification_checks.length} checks)
         </span>
-        <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{p.cells_computed} simulated · {p.cache_hits} cached</span>
         <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{p.live_model_calls ? `${p.live_model_calls} live model calls` : "deterministic planner"}</span>
-        {p.duration_ms && <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-slate-300">{(p.duration_ms / 1000).toFixed(1)} s</span>}
         {p.degraded && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-300">degraded</span>}
       </div>
     </section>

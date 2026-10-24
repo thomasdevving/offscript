@@ -66,7 +66,7 @@ export function Moments() {
                   {d.source === "manual" && <span className="rounded bg-white/10 px-1 text-[9px] uppercase text-slate-300">manual</span>}
                   <span className="ml-auto flex items-center gap-1 text-[10px] text-slate-400">
                     <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
-                    {status ?? (detected ? "detected" : `score ${d.candidate_score.toFixed(2)}`)}
+                    {status ?? (detected ? "detected" : "")}
                   </span>
                 </div>
                 <div className="mt-1 truncate text-[11px] text-slate-400">
@@ -97,7 +97,6 @@ function EventFeed() {
             {eventLabel(e.event_type, s.lang)}
           </span>
           <span className="truncate text-slate-500">{e.player_ids.map((p) => names.get(p) ?? p).join(" → ")}</span>
-          {e.details?.scripted && s.mode === "analyst" && <span className="ml-auto text-[9px] uppercase tracking-wider text-slate-600">script</span>}
           {ACTIONS.has(e.event_type) && e.snapshot_id && !e.details?.scripted && (
             <button type="button" onClick={() => void actions.analyseEvent(e.event_id)} title={L.manualHint}
               className="ml-auto shrink-0 rounded-md bg-leaf-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-leaf-200 hover:bg-leaf-500/25">

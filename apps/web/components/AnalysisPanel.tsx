@@ -23,7 +23,6 @@ function StatusBadges({ a }: { a: CounterfactualAnalysis }) {
     <div className="flex flex-wrap gap-1.5">
       {a.status === "verified" && <span className="chip bg-emerald-500/15 text-emerald-300" data-testid="verified-badge">✓ {L.verified}{v === "verified_with_warnings" ? " (warnings)" : ""}</span>}
       {a.status === "unavailable" && <span className="chip">{L.unavailable}</span>}
-      {a.cached && s.mode === "analyst" && <span className="chip">{L.cached}</span>}
       {a.model.degraded && <span className="chip bg-amber-500/15 text-amber-300">{L.degraded}</span>}
       {s.mode === "analyst" && <span className="chip">
         {a.model.agent_mode === "foundry" ? `Foundry · ${a.model.deployment} · ${a.model.live_model_calls} live calls` : L.policy}
@@ -244,6 +243,9 @@ function Evidence({ a, d }: { a: CounterfactualAnalysis; d: DecisionPoint }) {
   );
 }
 
+const EXPIRY: Record<string, string> = { GOAL: "a goal", MATCH_ENDED: "full time", POSSESSION_CHANGED: "a change of possession" };
+const expiryText = (types: string[]) => types.map((x) => EXPIRY[x] ?? x.toLowerCase().replace(/_/g, " ")).join(", ");
+
 function BroadcasterView({ a, overlays }: { a: CounterfactualAnalysis; overlays: Overlay[] }) {
   const s = useApp();
   const L = t(s.lang);
@@ -272,17 +274,17 @@ function BroadcasterView({ a, overlays }: { a: CounterfactualAnalysis; overlays:
           <div className="rounded-lg bg-white/[0.04] p-1.5"><div className="num font-mono text-white">{ov.priority}</div><div className="text-slate-500">{L.priority}</div></div>
         </div>
       )}
-      {ov && <div className="text-[11px] text-slate-400">{L.expires}: {ov.expires.on_event_types.join(", ")} · max {(ov.expires.max_age_ms ?? 0) / 1000}s · {ov.verification_status}</div>}
-      <div className="rounded-xl bg-black/40 ring-1 ring-white/5">
-        <div className="flex items-center justify-between border-b border-white/5 px-3 py-1.5 text-[11px] text-slate-400">
+      {ov && <div className="text-[11px] text-slate-400">{L.expires}: {expiryText(ov.expires.on_event_types)} · max {(ov.expires.max_age_ms ?? 0) / 1000} s</div>}
+      <details className="rounded-xl bg-black/40 ring-1 ring-white/5">
+        <summary className="flex cursor-pointer items-center justify-between px-3 py-1.5 text-[11px] text-slate-400">
           {L.overlayJson}
           <button type="button" className="btn px-2 py-0.5"
-            onClick={() => { void navigator.clipboard?.writeText(json); setCopied(true); setTimeout(() => setCopied(false), 1200); }}>
+            onClick={(e) => { e.preventDefault(); void navigator.clipboard?.writeText(json); setCopied(true); setTimeout(() => setCopied(false), 1200); }}>
             {copied ? L.copied : L.copy}
           </button>
-        </div>
-        <pre className="max-h-48 overflow-auto p-2 text-[10px] leading-snug text-emerald-200" data-testid="overlay-json">{json}</pre>
-      </div>
+        </summary>
+        <pre className="max-h-48 overflow-auto border-t border-white/5 p-2 text-[10px] leading-snug text-emerald-200" data-testid="overlay-json">{json}</pre>
+      </details>
     </div>
   );
 }

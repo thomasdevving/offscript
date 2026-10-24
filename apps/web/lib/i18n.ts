@@ -70,7 +70,7 @@ const en = {
   copied: "Copied",
   priority: "Priority",
   duration: "Duration",
-  expires: "Expires on",
+  expires: "Hides on",
   analyseAction: "Analyse",
   manualHint: "Analyse any on-ball action",
   observedOutcome: "Observed outcome",

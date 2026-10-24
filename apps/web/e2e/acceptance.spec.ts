@@ -36,7 +36,7 @@ test("shoot-or-pass end to end", async ({ page }) => {
   await page.getByTestId("analyst-table").getByRole("button").nth(1).click();
   await expect(page.getByTestId("view-banner")).toContainText("Simulated alternative");
   await expect(page.getByTestId("whatif-controls")).toBeVisible();
-  await expect(page.getByTestId("trace-label")).toContainText("rollout #");
+  await expect(page.getByTestId("trace-label")).not.toContainText("rollout");
   await page.getByTestId("back-to-match").click();
   await expect(page.getByTestId("view-banner")).toContainText("Observed synthetic timeline");
 
@@ -51,8 +51,8 @@ test("shoot-or-pass end to end", async ({ page }) => {
 
   // Controlled recovery: an invalid alternative is rejected and the workflow recovers.
   await page.getByTestId("fault-invalid_candidate").click();
-  await expect(page.getByTestId("workflow-inspector")).toContainText("Rejected proposals");
-  await expect(page.getByTestId("workflow-inspector")).toContainText("PLAYER_NOT_ON_PITCH");
+  await expect(page.getByTestId("checks-caught")).toContainText("What the checks caught");
+  await expect(page.getByTestId("checks-caught")).toContainText("is not on the pitch");
   await expect(page.getByTestId("workflow-status")).toContainText("completed · verified");
   await page.getByRole("button", { name: /main analysis/ }).click();
 

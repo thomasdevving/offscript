@@ -2,6 +2,7 @@
 
 import type { AgentStep, CounterfactualAnalysis } from "@offscript/contracts";
 import { useState } from "react";
+import { plainCheckIssue } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";
 import StressTestStory from "./StressTestStory";
@@ -58,7 +59,7 @@ export function AgentPipeline({ a }: { a: CounterfactualAnalysis }) {
   );
 }
 
-function StepCard({ step }: { step: AgentStep }) {
+function StepCard({ step, retry }: { step: AgentStep; retry: boolean }) {
   const [open, setOpen] = useState(false);
   const meta = AGENTS.find((x) => x[0] === step.agent);
   return (
@@ -66,18 +67,17 @@ function StepCard({ step }: { step: AgentStep }) {
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open}
         className="flex w-full items-center gap-2 px-2.5 py-2 text-left">
         <span className={`h-2 w-2 shrink-0 rounded-full ${statusColor(step.status)}`} />
-        <span className="text-xs font-bold text-white">{meta?.[1] ?? step.agent} Agent</span>
-        {step.attempt > 1 && <span className="rounded bg-slate-800 px-1 text-[10px] text-amber-300">attempt {step.attempt}</span>}
-        <span className="truncate text-[10px] text-slate-400">{step.task}</span>
-        <span className="ml-auto shrink-0 font-mono text-[10px] text-slate-500">{step.duration_ms != null ? `${step.duration_ms.toFixed(0)} ms` : "…"}</span>
-        <span className={`shrink-0 rounded px-1 text-[9px] font-semibold uppercase ${step.live_model ? "bg-leaf-500/20 text-leaf-200" : "bg-slate-800 text-slate-400"}`}>{step.model}</span>
-        <span className="shrink-0 text-[10px] uppercase text-slate-400">{step.status}</span>
+        <span className="shrink-0 text-xs font-bold text-white">{meta?.[1] ?? step.agent} Agent</span>
+        {retry && <span className="shrink-0 rounded bg-slate-800 px-1 text-[10px] text-amber-300">retry</span>}
+        <span className="truncate text-[10px] text-slate-400">{meta?.[2]}</span>
+        <span className="ml-auto shrink-0 text-[10px] text-slate-500">{open ? "−" : "+"}</span>
       </button>
       {step.handoff_to && (
         <div className="px-2.5 pb-1.5 text-[10px] text-sage-300">→ {step.handoff_to.replace("_agent", "")}: {step.handoff_reason}</div>
       )}
       {open && (
         <div className="space-y-2 border-t border-white/5 px-2.5 py-2 text-[10px]">
+          <div className="text-slate-400">{step.task} · {step.model} · {step.duration_ms != null ? `${step.duration_ms.toFixed(0)} ms` : "…"} · {step.status}</div>
           {step.tool_calls.map((tc) => (
             <div key={tc.call_id} className="rounded-lg bg-black/30 p-1.5">
               <div className="flex gap-2 font-mono">
@@ -97,6 +97,26 @@ function StepCard({ step }: { step: AgentStep }) {
         </div>
       )}
     </li>
+  );
+}
+
+/** What the validation and verification checks stopped, in plain words, and what was published instead. */
+function ChecksCaught({ a }: { a: CounterfactualAnalysis }) {
+  const wf = a.workflow;
+  const caught = [...new Set([...wf.rejected_candidates.map((r) => r.reason), ...wf.verification_issues].map(plainCheckIssue))];
+  if (!caught.length) return null;
+  const replaced = a.narratives.some((n) => n.generated_by.includes("fallback after rejected"));
+  const fixed = [
+    wf.rejected_candidates.length ? "Impossible options were removed before anything was simulated." : "",
+    wf.explanation_retries > 0 ? "The Explanation agent rewrote the text." : "",
+    replaced ? "Text that failed a check was replaced by a verified version." : "",
+  ].filter(Boolean);
+  return (
+    <div className="rounded-lg bg-white/[0.03] p-2 text-[10px] ring-1 ring-white/5" data-testid="checks-caught">
+      <div className="font-semibold text-slate-200">What the checks caught</div>
+      <ul className="mt-0.5 text-slate-400">{caught.slice(0, 6).map((v) => <li key={v}>• {v}</li>)}</ul>
+      {fixed.length > 0 && <div className="mt-1 text-leaf-300">✓ {fixed.join(" ")} Nothing unchecked reached the screen.</div>}
+    </div>
   );
 }
 
@@ -125,22 +145,12 @@ export default function WorkflowInspector() {
             <div className="rounded-lg bg-white/[0.04] p-1.5"><div className="num font-mono text-sm text-white">{wf.retry_count + wf.explanation_retries}</div>retries</div>
           </div>
           <ol className="space-y-1.5" data-testid="workflow-steps">
-            {wf.steps.map((st) => <StepCard key={st.step_id} step={st} />)}
+            {wf.steps.map((st, i) => (
+              <StepCard key={st.step_id} step={st}
+                retry={wf.steps.slice(0, i).some((x) => x.agent === st.agent && x.task === st.task)} />
+            ))}
           </ol>
-          {wf.rejected_candidates.length > 0 && (
-            <div className="rounded-lg bg-black/30 p-2 text-[10px] text-slate-300">
-              <div className="font-semibold text-red-300">Rejected proposals</div>
-              {wf.rejected_candidates.map((r, i) => <div key={i}>• [{r.stage}] {r.reason}</div>)}
-            </div>
-          )}
-          {wf.verification_issues.length > 0 && (
-            <div className="rounded-lg bg-black/30 p-2 text-[10px] text-amber-200">
-              {wf.verification_issues.slice(0, 6).map((v, i) => <div key={i}>• {v}</div>)}
-            </div>
-          )}
-          <div className="text-[10px] text-slate-500">
-            correlation {wf.correlation_id} · state v{wf.state_version} · {wf.handoffs.length} handoffs
-          </div>
+          <ChecksCaught a={a} />
         </div>
       )}
     </section>

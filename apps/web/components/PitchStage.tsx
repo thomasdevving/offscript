@@ -3,7 +3,7 @@
 import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@offscript/contracts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ballPath, interpolate, type RenderFrame } from "@/lib/frames";
-import { clock, cleanLabel, pct } from "@/lib/format";
+import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { activeOverlay } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
@@ -67,7 +67,7 @@ export function OutcomeCard({ action, outcome, lines }: { action: string; outcom
     <div className="pointer-events-none absolute bottom-2 left-1/2 z-10 w-max max-w-[92%] -translate-x-1/2 animate-rise bg-slate-950/80 px-3 py-1.5 text-center shadow-2xl ring-1 ring-leaf-400/40 backdrop-blur"
       data-testid="outcome-card">
       <div className="text-[13px] font-bold text-white">
-        {action} → <span className="text-amber-300">{outcome.replace(/_/g, " ").toLowerCase()}</span>
+        {action} → <span className="text-amber-300">{outcomeLabel(outcome).toLowerCase()}</span>
       </div>
       {lines.filter(Boolean).map((l) => <div key={l} className="font-mono text-[10.5px] leading-snug text-leaf-200">{l}</div>)}
     </div>
@@ -139,7 +139,7 @@ export default function PitchStage() {
 
   const simRes = traj ? analysis?.simulation?.results.find((r) => r.action_id === traj.action_id) : undefined;
   const atEnd = !!traj && s.whatIf.t >= (traj.frames[traj.frames.length - 1]?.t_ms ?? 0) - 1;
-  const traceLabel = traj ? `${cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")} · rollout #${traj.rollout_index} · ${traj.outcome}` : "";
+  const traceLabel = traj ? `${cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")} · ${outcomeLabel(traj.outcome).toLowerCase()}` : "";
 
   return (
     <div className="relative">
@@ -160,7 +160,7 @@ export default function PitchStage() {
           outcome={traj.outcome}
           lines={[
             simRes ? `P(goal) ${pct(simRes.p_goal.value, s.lang)} · ${simRes.n_rollouts} ${L.simulations}` : "",
-            `rollout #${traj.rollout_index} · ${s.lang === "en" ? "one simulated continuation" : "één gesimuleerd verloop"}`,
+            `${s.lang === "en" ? "one simulated continuation" : "één gesimuleerd verloop"}`,
           ]}
         />
       )}

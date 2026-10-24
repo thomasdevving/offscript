@@ -182,6 +182,14 @@ def _close(x: float, pool: list[float], tol: float) -> bool:
     return any(abs(abs(x) - abs(p)) <= tol for p in pool)
 
 
+def split_evidence_refs(refs: list[str], evidence: list[EvidenceItem]) -> tuple[list[str], list[str]]:
+    """Split a draft's citations into (known, unknown) evidence refs. A model may cite a field name that does
+    not exist; such a citation carries no information, so it is dropped (and noted) rather than published.
+    Every number in the text is still checked against the evidence by verify_narrative."""
+    known = {it.ref for it in evidence}
+    return [r for r in refs if r in known], [r for r in refs if r not in known]
+
+
 def verify_narrative(narrative: Narrative, evidence: list[EvidenceItem], roster: dict[str, Player],
                      allowed_player_ids: set[str]) -> list[str]:
     """Return a list of issues (empty when the narrative is fully grounded)."""

@@ -90,7 +90,7 @@ export default function DecisionTree() {
               <text x={10} y={14} fontSize={9} fill="#94a3b8" fontFamily="monospace">{clock(n.match_clock_ms)} {src}</text>
               <text x={10} y={29} fontSize={11} fill="#f8fafc" fontWeight={700}>{n.label.slice(0, 20)}</text>
               <text x={10} y={42} fontSize={9.5} fill={n.status === "terminal" ? "#fcd34d" : "#c9dca2"}>
-                {(n.kind === "root" ? "decision" : n.outcome || n.status).replace(/_/g, " ").slice(0, 18)}
+                {(n.kind === "root" ? "your move" : n.outcome || n.status).replace(/_/g, " ").slice(0, 18)}
                 {n.value_vs_counter != null ? ` · ${(n.value_vs_counter * 100).toFixed(1)}%` : ""}
               </text>
             </g>

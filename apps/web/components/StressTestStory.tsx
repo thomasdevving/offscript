@@ -1,6 +1,7 @@
 "use client";
 
 import type { CounterfactualAnalysis, FaultInjection } from "@offscript/contracts";
+import { plainCheckIssue } from "@/lib/format";
 
 export interface StressStory {
   broke: string;
@@ -23,7 +24,7 @@ export function stressStory(a: CounterfactualAnalysis, fault: FaultInjection): S
     const again = wf.steps.filter((s) => s.agent === "strategy_agent").length > 1;
     return {
       broke: "We slipped an impossible option into the Strategy agent's proposal: a pass to a substitute who is not on the pitch.",
-      caught: rej ? `Validation rejected it: ${rej.reason}.` : "Validation rejected the impossible option.",
+      caught: rej ? `Validation rejected it: ${plainCheckIssue(rej.reason)}.` : "Validation rejected the impossible option.",
       fixed: `${again ? "The Strategy agent proposed again, and the analysis continued with feasible options only. " : ""}${result}`,
       ok,
     };
@@ -33,7 +34,7 @@ export function stressStory(a: CounterfactualAnalysis, fault: FaultInjection): S
     const templated = a.narratives.some((n) => n.generated_by.includes("fallback after rejected"));
     return {
       broke: "We inserted a probability into the story that the simulation never produced.",
-      caught: issue ? `The Verification agent checked every number against the evidence and rejected it: ${issue}.`
+      caught: issue ? `The Verification agent checked every number against the evidence and rejected it: ${plainCheckIssue(issue)}.`
         : "The Verification agent checked every number against the evidence and rejected the story.",
       fixed: `${wf.explanation_retries > 0 ? "The Explanation agent rewrote the story. "
         : templated ? "The rejected story was replaced by a verified one; the false number never reached the screen. " : ""}${result}`,

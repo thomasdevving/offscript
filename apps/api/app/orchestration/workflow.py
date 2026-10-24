@@ -56,7 +56,7 @@ from ..services.overlays import analysis_overlays
 from ..simulation import geometry as g
 from ..simulation.candidates import generate_candidates, validate_candidate
 from ..simulation.monte_carlo import evaluate_actions
-from ..verification.checks import verify_analysis, verify_narrative
+from ..verification.checks import split_evidence_refs, verify_analysis, verify_narrative
 from ..verification.evidence import action_keys
 
 STATE_KEY = "analysis_state"
@@ -814,13 +814,18 @@ class ExplanationAgentExecutor(Executor):
         live = bool(step and step.live_model)
         label = step.model if step else "none"
         drafts: list[Narrative] = []
+        dropped: set[str] = set()
         for d in out.narratives[:6]:
+            refs, unknown = split_evidence_refs(d.evidence_refs[:20], rt.ctx.evidence)
+            dropped.update(unknown)
             drafts.append(Narrative(
                 narrative_id=new_id("nar"), analysis_id=rt.ctx.analysis.analysis_id, audience=d.audience,
                 language=d.language, headline=d.headline[:140], body=d.body[:900], bullets=[b[:240] for b in d.bullets[:10]],
-                caption=(d.caption or None) and d.caption[:140], evidence_refs=d.evidence_refs[:20],
+                caption=(d.caption or None) and d.caption[:140], evidence_refs=refs,
                 generated_by=label if live else "policy-template", is_live_model_output=live,
                 created_at=utcnow().isoformat()))
+        if dropped and step:
+            step.notes.append(f"Dropped citations of evidence fields that do not exist: {sorted(dropped)[:4]}")
         if "contradictory_claim" in rt.faults and attempt == 1 and drafts:
             sim = rt.ctx.analysis.simulation
             best = max(sim.results, key=lambda r: r.p_goal.value)

@@ -115,7 +115,7 @@ function Stage() {
           {node.kind === "observed" ? "Canonical synthetic timeline" : node.kind === "root" ? "Frozen decision state" : `Simulated branch · depth ${node.depth}`}
         </span>
         {node.transition && node.kind !== "observed" && (
-          <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] text-leaf-200 backdrop-blur">{node.transition.sample_kind.replace("_", " ")} sample · rollout #{node.transition.rollout_index} · not a certainty</span>
+          <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] text-leaf-200 backdrop-blur">one possible future · not a certainty</span>
         )}
       </div>
       <div className="absolute left-3 top-3 z-10"><DimToggle /></div>
@@ -130,7 +130,7 @@ function Stage() {
           lines={[
             treeNode?.value_vs_counter != null
               ? `${pct(treeNode.value_vs_counter)} modelled goal chance vs ${node.entering_strategy ? `“${node.entering_strategy.label}”` : "the defence's best counter"}` : "",
-            node.transition ? `${node.transition.sample_kind.replace("_", " ")} sample · rollout #${node.transition.rollout_index} · one simulated continuation` : "one simulated continuation",
+            "one simulated continuation",
           ]} />
       )}
       <PitchView match={match} frame={frame} arrows={arrows} highlightId={snap?.ball.possessor_id ?? null}
@@ -272,7 +272,7 @@ export default function MultiverseView() {
             {app.mode === "casual" && shownPlanning.summary ? (
               <div className="text-xs text-slate-300">Selected option vs the defence&apos;s best answer: <b className="text-white">{pct(shownPlanning.summary.selected_value_vs_counter, app.lang)}</b> modelled goal chance within 10 s (vs {pct(shownPlanning.summary.selected_value_vs_baseline, app.lang)} against a balanced shape).</div>
             ) : (
-              <AgentBattle p={shownPlanning} />
+              <AgentBattle p={shownPlanning} compact={app.mode === "broadcaster"} />
             )}
             {app.mode !== "casual" && (
               <details className="rounded-xl bg-white/[0.03] p-2 text-xs" data-testid="mv-inspector">

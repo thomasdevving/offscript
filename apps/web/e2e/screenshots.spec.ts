@@ -28,6 +28,7 @@ test("capture product screenshots", async ({ page }) => {
   await page.getByRole("radio", { name: "Broadcaster" }).click();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowRight");
+  await page.getByText("Overlay instructions (JSON)").click();
   await expect(page.getByTestId("overlay-json")).toBeVisible();
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${OUT}/broadcaster-mode.png` });
