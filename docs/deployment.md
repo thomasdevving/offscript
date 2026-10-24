@@ -115,7 +115,7 @@ app is uploaded by the script.
 
 How GitHub signs in to Azure (no secrets stored anywhere): a user-assigned managed identity
 `offscript-github-deploy` in `parallel-rg` has a **federated credential** that trusts only GitHub
-Actions tokens for `repo:thomasdevving/parallel:ref:refs/heads/main`, and the **Contributor** role
+Actions tokens for `repo:thomasdevving/offscript:ref:refs/heads/main`, and the **Contributor** role
 on `parallel-rg` only. The workflow's client/tenant/subscription IDs are identifiers, not secrets.
 To set this up for another subscription:
 

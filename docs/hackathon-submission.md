@@ -101,7 +101,7 @@ intervals only, authored demo scenarios, a cold start of 20-40 s when the scaled
 
 ## Repository and demo instructions
 
-* Repository: https://github.com/thomasdevving/parallel (must be public at submission)
+* Repository: https://github.com/thomasdevving/offscript (must be public at submission)
 * Run locally: see [README](../README.md#quick-start) (two commands each for API and web).
 * Live demo: https://parallelwebplb33l5h5wpok.z1.web.core.windows.net (app: https://parallelwebplb33l5h5wpok.z1.web.core.windows.net/app/); API health https://parallel-api.salmoncliff-9321cda4.germanywestcentral.azurecontainerapps.io/api/health. The API scales to zero: the first visit after a quiet period shows a "warming up" screen for 20-40 s.
 * Video: `<add public YouTube/Vimeo URL>` - script in [demo-script.md](demo-script.md).
