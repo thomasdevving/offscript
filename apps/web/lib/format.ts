@@ -56,6 +56,7 @@ export function plainCheckIssue(raw: string): string {
     [/^Mentions (.*), who is not part of this decision/, (g) => `mentions ${g[1]}, who is not part of this moment`],
     [/^Missing model qualifier/, () => "did not say it is a model estimate"],
     [/^Broadcast caption longer/, () => "caption too long for broadcast"],
+    [/^Uses an internal identifier \((.*)\)/, (g) => `used an internal code (${g[1]}) instead of plain words`],
     [/^Uses the internal player id (\S+) instead of the name (.*)$/, (g) => `used a player code (${g[1]}) instead of the name ${g[2]}`],
     [/^[A-Z_]+: (.*)$/s, (g) => g[1]],
   ];

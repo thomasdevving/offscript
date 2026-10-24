@@ -168,6 +168,7 @@ def _record(analysis: CounterfactualAnalysis, checks: list[VerificationCheck], e
 
 _PCT = re.compile(r"(?<![\w.,])([+-]?\d+(?:[.,]\d+)?)\s?%")
 _NUM = re.compile(r"(?<![\w.,%])([+-]?\d+(?:[.,]\d+)?)(?![\d%])")
+_INTERNAL_ID = re.compile(r"(?<![\w-])(?:(?=[a-z0-9-]*[a-z]{3})(?=[a-z0-9-]*\d)[a-z0-9]+(?:-[a-z0-9]+){2,}|[a-z]+(?:_[a-z0-9]+){2,})(?![\w-])")
 
 
 def extract_numbers(text: str) -> tuple[list[float], list[float]]:
@@ -221,6 +222,10 @@ def verify_narrative(narrative: Narrative, evidence: list[EvidenceItem], roster:
         # Viewers see names, never internal ids such as "H10".
         if re.search(rf"(?<![\w-]){re.escape(pid)}(?![\w-])", text):
             issues.append(f"Uses the internal player id {pid} instead of the name {p.name}")
+    # Nor other internal identifiers: snapshot/match codes ("demo-match-073-snap-0002") or field names
+    # ("p_goal_within_horizon"). Formations such as "4-3-3" have no word part and are allowed.
+    for m in _INTERNAL_ID.findall(text):
+        issues.append(f"Uses an internal identifier ({m}) that viewers would not understand")
     refs = {it.ref for it in evidence}
     unknown = [r for r in narrative.evidence_refs if r not in refs]
     if unknown:

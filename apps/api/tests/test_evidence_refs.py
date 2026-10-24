@@ -24,3 +24,11 @@ def test_internal_player_ids_are_rejected():
                   body="", caption="Castellane's shot was blocked.", generated_by="t", is_live_model_output=False, created_at="")
     issues = verify_narrative(n, [], {"H10": P()}, {"H10"})
     assert any("internal player id H10" in i for i in issues)
+
+
+def test_internal_identifiers_are_rejected_but_formations_are_not():
+    from app.verification.checks import _INTERNAL_ID
+
+    assert _INTERNAL_ID.findall("the same snapshot (demo-match-073-snap-0002)") == ["demo-match-073-snap-0002"]
+    assert _INTERNAL_ID.findall("measured as p_goal_within_horizon") == ["p_goal_within_horizon"]
+    assert _INTERNAL_ID.findall("a 4-3-3 shape, a 2-on-1, a 10-second horizon, Mbeki-Larsen") == []
