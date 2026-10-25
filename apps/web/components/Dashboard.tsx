@@ -79,6 +79,7 @@ export default function Dashboard() {
   useEffect(() => {
     void actions.init();
     actions.restorePitchDim();
+    actions.restoreFollow();
     // Deep links from the landing page open in a viewer mode (?mode=casual|analyst|broadcaster).
     const m = new URLSearchParams(window.location.search).get("mode");
     if (m === "casual" || m === "analyst" || m === "broadcaster") actions.setMode(m);

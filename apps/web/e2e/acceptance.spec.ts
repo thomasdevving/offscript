@@ -96,3 +96,20 @@ test("keyboard and decision timeline navigation", async ({ page }) => {
   await page.keyboard.press("Escape");
   await expect(page.getByTestId("view-banner")).toContainText("Observed synthetic timeline");
 });
+
+test("follow a team: optional, pauses for that team's decision and marks it", async ({ page }) => {
+  await page.goto("/app/?scenario=shoot_vs_pass");
+  await expect(page.getByText("Live", { exact: true })).toBeVisible();
+  // Off by default: "Everyone".
+  await expect(page.getByTestId("follow-select")).toHaveValue("");
+  await page.getByTestId("follow-select").selectOption({ label: "Harbour City FC" });
+  await page.getByRole("button", { name: "2×" }).click();
+  await page.getByTestId("play-toggle").click();
+  await expect(page.getByTestId("follow-note")).toContainText("Your team · Harbour City FC", { timeout: 60_000 });
+  await expect(page.locator('[data-testid="decision-list"] [data-followed]').first()).toBeVisible();
+  // The choice is remembered and can be switched off again.
+  await page.reload();
+  await expect(page.getByTestId("follow-select")).toHaveValue("team:HCF");
+  await page.getByTestId("follow-select").selectOption("");
+  await expect(page.getByTestId("follow-note")).toHaveCount(0);
+});

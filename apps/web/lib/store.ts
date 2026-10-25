@@ -18,6 +18,7 @@ import type {
 } from "@offscript/contracts";
 import { create } from "zustand";
 import { api, type Health, type ScenarioInfo } from "./api";
+import { type Follow, FOLLOW_KEY, decodeFollow, encodeFollow, pausesFor } from "./follow";
 import { MatchSocket, type ServerMessage } from "./socket";
 
 export type View = "observed" | "snapshot" | "simulated";
@@ -84,6 +85,7 @@ export interface AppState {
   mode: ViewerMode;
   lang: Language;
   autoPause: boolean;
+  follow: Follow;
   autoAnalyze: boolean;
   conn: ConnState;
   recap: Recap | null;
@@ -135,6 +137,7 @@ export const useApp = create<AppState>(() => ({
   mode: "casual",
   lang: "en",
   autoPause: true,
+  follow: null,
   autoAnalyze: true,
   conn: "idle",
   recap: null,
@@ -215,7 +218,8 @@ function onMessage(msg: ServerMessage): void {
         detected: [...s.detected, dp.decision_point_id],
         decisions: exists ? s.decisions : [...s.decisions, dp].sort((a, b) => a.sim_time_ms - b.sim_time_ms),
       });
-      if (s.autoPause && s.view === "observed") {
+      // A fan who follows a team or player is only stopped for their decisions; the rest still gets analysed.
+      if (s.autoPause && s.view === "observed" && pausesFor(s.follow, dp, s.match)) {
         socket?.send({ type: "pause" });
         actions.selectDecision(dp.decision_point_id, { fromLive: true });
       }
@@ -458,6 +462,25 @@ export const actions = {
       // ?dim=3d in the URL wins (handy for demo links), then the remembered choice.
       const v = new URLSearchParams(window.location.search).get("dim") ?? localStorage.getItem("offscript.pitchDim");
       if (v === "2d" || v === "3d") set({ pitchDim: v });
+    } catch {
+      /* storage unavailable */
+    }
+  },
+
+  setFollow(f: Follow): void {
+    set({ follow: f });
+    try {
+      if (f) localStorage.setItem(FOLLOW_KEY, encodeFollow(f));
+      else localStorage.removeItem(FOLLOW_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+  },
+  /** Restores the fan's follow choice (client only, after hydration); ?follow=team:HCF in the URL wins. */
+  restoreFollow(): void {
+    try {
+      const v = new URLSearchParams(window.location.search).get("follow") ?? localStorage.getItem(FOLLOW_KEY);
+      set({ follow: decodeFollow(v) });
     } catch {
       /* storage unavailable */
     }

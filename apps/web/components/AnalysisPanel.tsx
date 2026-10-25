@@ -4,6 +4,7 @@ import type { ActionResult, CounterfactualAnalysis, DecisionPoint, Language, Nar
   PairwiseComparison } from "@offscript/contracts";
 import { useEffect, useState } from "react";
 import { clock, cleanLabel, pct, signedPp } from "@/lib/format";
+import { followLabel, followRelation } from "@/lib/follow";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";
 import { mv } from "@/lib/mvStore";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
@@ -32,6 +33,24 @@ function StatusBadges({ a }: { a: CounterfactualAnalysis }) {
   );
 }
 
+/** For fans who follow a team or player: whose decision this is, from their side. Framing only, no numbers. */
+function FollowNote({ d }: { d: DecisionPoint }) {
+  const s = useApp();
+  const rel = followRelation(s.follow, d, s.match);
+  const name = followLabel(s.follow, s.match);
+  if (!rel || !name) return null;
+  const en = s.lang === "en";
+  const text = rel === "player" ? (en ? `The player you follow` : `De speler die je volgt`)
+    : rel === "team" ? (en ? `Your team · ${name}` : `Jouw team · ${name}`)
+      : (en ? `Against your team · ${name}` : `Tegen jouw team · ${name}`);
+  return (
+    <div className={`mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold ${rel === "opponent" ? "bg-orange-500/10 text-orange-200" : "bg-leaf-500/15 text-leaf-200"}`}
+      data-testid="follow-note">
+      {rel === "opponent" ? "⚔" : "★"} {text}
+    </div>
+  );
+}
+
 function DecisionHeader({ d }: { d: DecisionPoint }) {
   const s = useApp();
   const L = t(s.lang);
@@ -45,6 +64,7 @@ function DecisionHeader({ d }: { d: DecisionPoint }) {
         {cleanLabel(d.actual_action.label)} → <span className="font-semibold text-amber-300">{eventLabel(d.actual_outcome, s.lang)}</span>
         <span className="text-slate-500"> · {L.observedOutcome.toLowerCase()}</span>
       </div>
+      <FollowNote d={d} />
       {s.mode === "analyst" && <div className="mt-2 flex flex-wrap gap-1">
         {d.triggers.map((tr) => (
           <span key={tr} className="chip text-sage-200/90">{triggerLabel(tr, s.lang)}</span>

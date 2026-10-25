@@ -3,6 +3,7 @@
 import type { MatchEvent } from "@offscript/contracts";
 import { useState } from "react";
 import { clock, pct } from "@/lib/format";
+import { activeFollow, followRelation } from "@/lib/follow";
 import DecisionValue from "./DecisionValue";
 import { eventLabel, t, triggerLabel } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
@@ -49,6 +50,9 @@ export function Moments() {
         {s.decisions.map((d) => {
           const a = s.analyses[d.decision_point_id];
           const sel = d.decision_point_id === s.selectedDecisionId;
+          const rel = followRelation(s.follow, d, s.match);
+          const mine = rel === "team" || rel === "player";
+          const dim = !!activeFollow(s.follow, s.match) && !mine && !sel;
           const status = a?.status;
           const detected = s.detected.includes(d.decision_point_id);
           const dot = status === "verified" ? "bg-emerald-400" : status === "running" || status === "pending" ? "bg-amber-400 animate-pulse"
@@ -59,10 +63,11 @@ export function Moments() {
                 actions.control({ type: "seek", t_ms: (d.outcome_time_ms ?? d.sim_time_ms) + 200 });
                 void actions.selectDecision(d.decision_point_id);
               }}
-                className={`group w-56 rounded-xl px-3 py-2 text-left transition ${sel ? "bg-sage-500/15 ring-1 ring-sage-400/50" : "bg-white/[0.03] hover:bg-white/[0.06]"}`}>
+                data-followed={mine || undefined}
+                className={`group w-56 rounded-xl px-3 py-2 text-left transition ${sel ? "bg-sage-500/15 ring-1 ring-sage-400/50" : mine ? "bg-leaf-500/10 ring-1 ring-leaf-400/40 hover:bg-leaf-500/15" : "bg-white/[0.03] hover:bg-white/[0.06]"} ${dim ? "opacity-50 hover:opacity-100" : ""}`}>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="num font-mono text-slate-400">{clock(d.match_clock_ms)}</span>
-                  <span className="truncate font-semibold text-white">{d.actor_name}</span>
+                  <span className="truncate font-semibold text-white">{mine && <span className="text-leaf-300">★ </span>}{d.actor_name}</span>
                   {d.source === "manual" && <span className="rounded bg-white/10 px-1 text-[9px] uppercase text-slate-300">manual</span>}
                   <span className="ml-auto flex items-center gap-1 text-[10px] text-slate-400">
                     <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />

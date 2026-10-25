@@ -3,6 +3,7 @@
 import type { DecisionValueAggregate } from "@offscript/contracts";
 import { useEffect, useState } from "react";
 import { leftOnTable, oneLiner, pp } from "@/lib/decisionValue";
+import { activeFollow } from "@/lib/follow";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 
@@ -34,14 +35,18 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
   const shortNames = Object.fromEntries((s.match?.players ?? []).map((p) => [p.player_id, p.short_name]));
   const remaining = r.decisions_detected - r.decisions_analysed - r.decisions_pending;
   const notEnough = en ? "Not enough decisions" : "Te weinig beslissingen";
+  const f = activeFollow(s.follow, s.match);
+  // The followed player or team, and (for a followed team) its players, are marked in the table.
+  const followed = (a: DecisionValueAggregate) => !!f && (a.key === f.id || (f.kind === "team" && a.scope === "player" && a.team_id === f.id));
 
   const row = (a: DecisionValueAggregate) => {
     const lt = leftOnTable(a, s.lang);
     return (
-      <tr key={`${a.scope}-${a.key}`} className="border-t border-line" data-testid={`dva-row-${a.scope}`}>
+      <tr key={`${a.scope}-${a.key}`} className={`border-t border-line ${followed(a) ? "bg-leaf-500/10" : ""}`} data-testid={`dva-row-${a.scope}`}
+        data-followed={followed(a) || undefined}>
         <td className="py-1 pr-2">
           <span className="mr-1.5 inline-block h-2.5 w-1 rounded-full align-middle" style={{ background: colors[a.team_id ?? a.key] ?? "#64748b" }} />
-          <span className="font-semibold text-white">{a.name}</span>
+          <span className="font-semibold text-white">{followed(a) && <span className="text-leaf-300">★ </span>}{a.name}</span>
         </td>
         <td className="num px-1 text-right font-mono text-slate-400">{a.n_decisions}</td>
         {lt ? (
@@ -103,15 +108,19 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
             const rated = r.players.filter((p) => leftOnTable(p, s.lang));
             const thin = r.players.filter((p) => !leftOnTable(p, s.lang));
             if (!rated.length || showThin) return r.players.map(row);
+            // A followed player stays visible even with too few decisions for a value.
+            const keep = thin.filter((p) => f?.kind === "player" && p.key === f.id);
+            const folded = thin.filter((p) => !keep.includes(p));
             return (
               <>
                 {rated.map(row)}
-                {thin.length > 0 && (
+                {keep.map(row)}
+                {folded.length > 0 && (
                   <tr className="border-t border-line">
                     <td colSpan={6} className="py-1">
                       <button type="button" onClick={() => setShowThin(true)} data-testid="dva-show-thin"
                         className="text-[11px] text-slate-500 hover:text-slate-300">
-                        {en ? `+ ${thin.length} players with fewer than ${r.min_decisions} decisions` : `+ ${thin.length} spelers met minder dan ${r.min_decisions} beslissingen`}
+                        {en ? `+ ${folded.length} players with fewer than ${r.min_decisions} decisions` : `+ ${folded.length} spelers met minder dan ${r.min_decisions} beslissingen`}
                       </button>
                     </td>
                   </tr>

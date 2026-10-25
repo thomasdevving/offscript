@@ -1,6 +1,7 @@
 "use client";
 
 import type { ViewerMode } from "@offscript/contracts";
+import { activeFollow, decodeFollow, encodeFollow } from "@/lib/follow";
 import { t } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 import BrandMark from "./BrandMark";
@@ -24,6 +25,36 @@ function Segmented<T extends string>(props: { label: string; value: T; options: 
         </button>
       ))}
     </div>
+  );
+}
+
+/** Optional personalisation: follow a team or a player. "Everyone" (the default) changes nothing. */
+function FollowPicker() {
+  const s = useApp();
+  const m = s.match;
+  if (!m) return null;
+  const en = s.lang === "en";
+  const f = activeFollow(s.follow, m);
+  const teams = [m.home, m.away];
+  return (
+    <label className={`flex items-center gap-1.5 rounded-xl border px-2 py-1 text-[12px] ${f ? "border-leaf-400/50 bg-leaf-500/10" : "border-white/[0.06] bg-white/[0.03]"}`}>
+      <span className={f ? "font-semibold text-leaf-200" : "text-slate-400"}>{f ? "★" : ""} {en ? "Follow" : "Volg"}</span>
+      <select value={encodeFollow(f)} onChange={(e) => actions.setFollow(decodeFollow(e.target.value))} data-testid="follow-select"
+        aria-label={en ? "Follow a team or player" : "Volg een team of speler"}
+        className="max-w-36 truncate bg-transparent font-medium text-white outline-none">
+        <option value="" className="bg-slate-900">{en ? "Everyone" : "Iedereen"}</option>
+        <optgroup label={en ? "Teams" : "Teams"} className="bg-slate-900">
+          {teams.map((t) => <option key={t.team_id} value={encodeFollow({ kind: "team", id: t.team_id })}>{t.name}</option>)}
+        </optgroup>
+        {teams.map((t) => (
+          <optgroup key={t.team_id} label={t.short_name} className="bg-slate-900">
+            {m.players.filter((p) => p.team_id === t.team_id).sort((a, b) => a.shirt_number - b.shirt_number).map((p) => (
+              <option key={p.player_id} value={encodeFollow({ kind: "player", id: p.player_id })}>{p.shirt_number} · {p.name}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -51,12 +82,13 @@ export default function Header() {
         {s.scenarios.length > 0 && <label className="flex min-w-0 items-center gap-2">
           <span className="sr-only">{L.scenario}</span>
           <select value={s.scenarioId ?? ""} onChange={(e) => void actions.selectScenario(e.target.value)} data-testid="scenario-select"
-            className="max-w-72 truncate rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-[13px] font-medium text-white outline-none hover:bg-white/[0.06]">
+            className="max-w-60 truncate rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-[13px] font-medium text-white outline-none hover:bg-white/[0.06]">
             {s.scenarios.map((sc) => (
               <option key={sc.scenario_id} value={sc.scenario_id} className="bg-slate-900">{sc.title}</option>
             ))}
           </select>
         </label>}
+        {s.appView === "live" && <FollowPicker />}
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <Segmented<ViewerMode> label={L.mode} value={s.mode} onChange={actions.setMode} testId="mode-switch"
             options={[{ v: "casual", label: L.casual }, { v: "analyst", label: L.analyst }, { v: "broadcaster", label: L.broadcaster }]} />

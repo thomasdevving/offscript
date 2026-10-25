@@ -1,6 +1,7 @@
 "use client";
 
 import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
+import { activeFollow, followRelation } from "@/lib/follow";
 import { t } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";
 
@@ -44,6 +45,9 @@ export function MatchTimeline() {
         const left = (d.sim_time_ms / dur) * 100;
         const sel = d.decision_point_id === s.selectedDecisionId;
         const seen = s.detected.includes(d.decision_point_id);
+        const rel = followRelation(s.follow, d, s.match);
+        const mine = rel === "team" || rel === "player";
+        const dim = !!activeFollow(s.follow, s.match) && !mine && !sel;
         return (
           <button
             key={d.decision_point_id}
@@ -52,7 +56,7 @@ export function MatchTimeline() {
               actions.control({ type: "seek", t_ms: (d.outcome_time_ms ?? d.sim_time_ms) + 200 });
               void actions.selectDecision(d.decision_point_id);
             }}
-            className={`absolute top-[6px] h-3 w-3 -translate-x-1/2 rotate-45 ring-2 ring-ink transition ${sel ? "scale-[1.35] bg-white shadow-[0_0_10px] shadow-sage-400" : seen ? "bg-sage-400" : "bg-slate-600 hover:bg-slate-400"}`}
+            className={`absolute top-[6px] h-3 w-3 -translate-x-1/2 rotate-45 ring-2 ring-ink transition ${sel ? "scale-[1.35] bg-white shadow-[0_0_10px] shadow-sage-400" : mine ? "scale-110 bg-leaf-400" : seen ? "bg-sage-400" : "bg-slate-600 hover:bg-slate-400"} ${dim ? "opacity-40" : ""}`}
             style={{ left: `${left}%` }}
             aria-label={`${L.decisions}: ${d.actor_name} ${clock(d.match_clock_ms)}`}
             title={`${clock(d.match_clock_ms)} ${d.actor_name}`}
