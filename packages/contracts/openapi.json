@@ -3536,7 +3536,10 @@
           "language": {
             "enum": [
               "en",
-              "nl"
+              "nl",
+              "es",
+              "fr",
+              "de"
             ],
             "title": "Language",
             "type": "string"
@@ -3636,7 +3639,10 @@
           "language": {
             "enum": [
               "en",
-              "nl"
+              "nl",
+              "es",
+              "fr",
+              "de"
             ],
             "title": "Language",
             "type": "string"
@@ -4426,7 +4432,10 @@
           "language": {
             "enum": [
               "en",
-              "nl"
+              "nl",
+              "es",
+              "fr",
+              "de"
             ],
             "title": "Language",
             "type": "string"
@@ -5738,6 +5747,62 @@
         "summary": "Evidence"
       }
     },
+    "/api/analyses/{analysis_id}/narratives": {
+      "post": {
+        "description": "Adds verified narratives in another language to a finished analysis (instant, no new simulation).",
+        "operationId": "add_narratives_api_analyses__analysis_id__narratives_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": true,
+            "schema": {
+              "enum": [
+                "en",
+                "nl",
+                "es",
+                "fr",
+                "de"
+              ],
+              "title": "Language",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CounterfactualAnalysis"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Narratives"
+      }
+    },
     "/api/analyses/{analysis_id}/overlays": {
       "get": {
         "operationId": "overlays_api_analyses__analysis_id__overlays_get",
@@ -6661,7 +6726,10 @@
                 {
                   "enum": [
                     "en",
-                    "nl"
+                    "nl",
+                    "es",
+                    "fr",
+                    "de"
                   ],
                   "type": "string"
                 },
@@ -6723,7 +6791,10 @@
               "default": "en",
               "enum": [
                 "en",
-                "nl"
+                "nl",
+                "es",
+                "fr",
+                "de"
               ],
               "title": "Language",
               "type": "string"
@@ -6774,7 +6845,10 @@
               "default": "en",
               "enum": [
                 "en",
-                "nl"
+                "nl",
+                "es",
+                "fr",
+                "de"
               ],
               "title": "Language",
               "type": "string"

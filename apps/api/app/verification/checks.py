@@ -25,8 +25,12 @@ CERTAINTY_PHRASES = [
     r"would have scored", r"would have won", r"would definitely", r"definitely", r"guaranteed", r"certainly",
     r"for sure", r"proves? that", r"zou hebben gescoord", r"zou hebben gewonnen", r"zeker weten", r"gegarandeerd",
     r"bewijst dat", r"ongetwijfeld",
+    r"habría marcado", r"habría ganado", r"sin duda", r"garantizad", r"demuestra que",
+    r"aurait marqué", r"aurait gagné", r"sans aucun doute", r"garanti", r"prouve que",
+    r"hätte getroffen", r"hätte gewonnen", r"ohne zweifel", r"garantiert", r"beweist, dass",
 ]
-HEDGE_WORDS = ["model", "simulat", "estimate", "schatting", "simulatie"]
+HEDGE_WORDS = ["model", "modèle", "simulat", "simulac", "estimate", "estimac", "estimation", "schatting", "simulatie",
+               "schätzung"]
 
 
 def _check(cid: str, name: str, ok: bool, details: str = "", severity: str = "error") -> VerificationCheck:

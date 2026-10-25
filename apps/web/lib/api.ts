@@ -82,6 +82,9 @@ export const api = {
   decisionValue: (matchId: string) => req<DecisionValueReport>(`/api/matches/${matchId}/decision-value`),
   analyseAllDecisions: (matchId: string) =>
     req<DecisionValueReport>(`/api/matches/${matchId}/decision-value/analyze`, { method: "POST" }),
+  /** Adds verified narratives in another language to a finished analysis (instant, no new simulation). */
+  addNarratives: (id: string, language: string) =>
+    req<CounterfactualAnalysis>(`/api/analyses/${id}/narratives?language=${language}`, { method: "POST" }),
   recap: (matchId: string, language: string) =>
     req<Recap>(`/api/matches/${matchId}/recap?language=${language}`, { method: "POST" }),
 };

@@ -635,11 +635,16 @@ def verification_tools(rt: AnalysisRuntime) -> list:
 
 
 def _allowed_players(ctx: AnalysisContext) -> set[str]:
-    allowed = {ctx.decision.actor_id}
-    allowed |= {c.target_player_id for c in ctx.analysis.candidates if c.target_player_id}
-    actor = ctx.snapshot.player(ctx.decision.actor_id)
+    return allowed_players(ctx.decision, ctx.analysis, ctx.snapshot)
+
+
+def allowed_players(decision: DecisionPoint, analysis: CounterfactualAnalysis, snapshot: MatchStateSnapshot) -> set[str]:
+    """Players a narrative may mention: the actor, the option targets and everyone within 12 m of the actor."""
+    allowed = {decision.actor_id}
+    allowed |= {c.target_player_id for c in analysis.candidates if c.target_player_id}
+    actor = snapshot.player(decision.actor_id)
     if actor is not None:
-        for p in ctx.snapshot.players:
+        for p in snapshot.players:
             if g.distance((p.x, p.y), (actor.x, actor.y)) < 12:
                 allowed.add(p.player_id)
     return allowed
@@ -771,7 +776,7 @@ def explanation_tools(rt: AnalysisRuntime) -> list:
     def check_narrative(audience: str, language: str, headline: str, body: str, caption: str | None = None) -> dict:
         n = Narrative(narrative_id="draft", analysis_id=ctx.analysis.analysis_id,
                       audience=audience if audience in ("casual", "analyst", "broadcaster") else "casual",
-                      language=language if language in ("en", "nl") else "en", headline=headline, body=body,
+                      language=language if language in ("en", "nl", "es", "fr", "de") else "en", headline=headline, body=body,
                       caption=caption, generated_by="draft", is_live_model_output=False, created_at="")
         return {"issues": verify_narrative(n, ctx.evidence, ctx.roster, _allowed_players(ctx))}
 

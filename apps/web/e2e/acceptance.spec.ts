@@ -113,3 +113,19 @@ test("follow a team: optional, pauses for that team's decision and marks it", as
   await page.getByTestId("follow-select").selectOption("");
   await expect(page.getByTestId("follow-note")).toHaveCount(0);
 });
+
+test("language menu: English by default, Spanish story and interface on request", async ({ page }) => {
+  await page.goto("/app/?scenario=shoot_vs_pass");
+  await expect(page.getByText("Live", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("lang-select")).toHaveValue("en");
+  await page.getByRole("button", { name: "2×" }).click();
+  await page.getByTestId("play-toggle").click();
+  await expect(page.getByTestId("verified-badge")).toBeVisible({ timeout: 60_000 });
+  await page.getByTestId("lang-select").selectOption("es");
+  await expect(page.getByText("Según nuestro modelo de simulación").first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("tab", { name: "Pruebas" })).toBeVisible();
+  // Remembered across reloads, and back to English on request.
+  await page.reload();
+  await expect(page.getByTestId("lang-select")).toHaveValue("es");
+  await page.getByTestId("lang-select").selectOption("en");
+});

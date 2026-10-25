@@ -3,7 +3,7 @@ import type { DecisionValueAggregate, DecisionValueReport, Language, ViewerMode 
 /** Probability -> percentage points with one decimal ("1.8"), Dutch decimal comma. */
 export function pp(v: number, lang: Language = "en"): string {
   const s = (Math.abs(v) < 0.0005 ? 0 : v * 100).toFixed(1);
-  return lang === "nl" ? s.replace(".", ",") : s;
+  return lang !== "en" ? s.replace(".", ",") : s;
 }
 
 /** "Left on the table" is the negated DVA: a positive amount and its interval, in pp. */
@@ -25,7 +25,7 @@ export function headlinePlayer(r: DecisionValueReport): DecisionValueAggregate |
  */
 export function oneLiner(r: DecisionValueReport, mode: ViewerMode, lang: Language = "en",
   shortNames: Record<string, string> = {}): string {
-  const en = lang === "en";
+  const en = lang !== "nl";
   const p = headlinePlayer(r);
   if (!p) {
     return en

@@ -5,15 +5,18 @@ import type { ActionResult, CounterfactualAnalysis, DecisionPoint, Language, Nar
 import { useEffect, useState } from "react";
 import { clock, cleanLabel, pct, signedPp } from "@/lib/format";
 import { followLabel, followRelation } from "@/lib/follow";
-import { eventLabel, t, triggerLabel } from "@/lib/i18n";
+import { eventLabel, t, tr, triggerLabel } from "@/lib/i18n";
 import { mv } from "@/lib/mvStore";
+import { localizeOverlays } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
 import RecoveryPanel from "./RecoveryPanel";
 import AgentActivity from "./AgentActivity";
 import WorkflowInspector, { AgentPipeline } from "./WorkflowInspector";
 
 function narrativeFor(a: CounterfactualAnalysis, mode: string, lang: Language): Narrative | undefined {
-  return a.narratives.find((n) => n.audience === mode && n.language === lang);
+  // Spanish, French and German narratives are added on request; until then the English one is shown.
+  return a.narratives.find((n) => n.audience === mode && n.language === lang)
+    ?? a.narratives.find((n) => n.audience === mode && n.language === "en");
 }
 
 function StatusBadges({ a }: { a: CounterfactualAnalysis }) {
@@ -39,10 +42,12 @@ function FollowNote({ d }: { d: DecisionPoint }) {
   const rel = followRelation(s.follow, d, s.match);
   const name = followLabel(s.follow, s.match);
   if (!rel || !name) return null;
-  const en = s.lang === "en";
-  const text = rel === "player" ? (en ? `The player you follow` : `De speler die je volgt`)
-    : rel === "team" ? (en ? `Your team · ${name}` : `Jouw team · ${name}`)
-      : (en ? `Against your team · ${name}` : `Tegen jouw team · ${name}`);
+  const en = s.lang !== "nl";
+  const text = rel === "player"
+    ? tr(s.lang, { en: "The player you follow", nl: "De speler die je volgt", es: "El jugador que sigues", fr: "Le joueur que vous suivez", de: "Der Spieler, dem du folgst" })
+    : `${rel === "team"
+      ? tr(s.lang, { en: "Your team", nl: "Jouw team", es: "Tu equipo", fr: "Votre équipe", de: "Dein Team" })
+      : tr(s.lang, { en: "Against your team", nl: "Tegen jouw team", es: "Contra tu equipo", fr: "Contre votre équipe", de: "Gegen dein Team" })} · ${name}`;
   return (
     <div className={`mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold ${rel === "opponent" ? "bg-orange-500/10 text-orange-200" : "bg-leaf-500/15 text-leaf-200"}`}
       data-testid="follow-note">
@@ -240,7 +245,7 @@ function Evidence({ a, d }: { a: CounterfactualAnalysis; d: DecisionPoint }) {
           </div>
         )}
         <p className="text-[10px] text-slate-500">
-          {s.lang === "en"
+          {s.lang !== "nl"
             ? "Every number shown is a computed field (traceable in the evidence table). Intervals are Monte Carlo error only; the football model itself is synthetic and uncalibrated."
             : "Elk getal is een berekend veld (herleidbaar in de bewijstabel). Intervallen tonen alleen de Monte-Carlo-fout; het voetbalmodel is synthetisch en ongekalibreerd."}
           {sim && ` Reproducible: seed ${sim.config.seed}, ${sim.simulator_version}.`}
@@ -257,7 +262,8 @@ function BroadcasterView({ a, overlays }: { a: CounterfactualAnalysis; overlays:
   const s = useApp();
   const L = t(s.lang);
   const [copied, setCopied] = useState(false);
-  const ov = overlays.find((o) => o.analysis_id === a.analysis_id && o.viewer_mode === "broadcaster" && o.language === s.lang);
+  const ov = localizeOverlays(overlays, [a], s.lang)
+    .find((o) => o.analysis_id === a.analysis_id && o.viewer_mode === "broadcaster" && o.language === s.lang);
   const n = narrativeFor(a, "broadcaster", s.lang);
   if (!ov && !n) return null;
   const json = JSON.stringify(ov ?? n, null, 2);
@@ -324,7 +330,7 @@ export default function AnalysisPanel() {
   const overall = a?.simulation?.overall_verdict;
   const tabs: { id: RailTab; label: string }[] = [
     { id: "story", label: L.story },
-    { id: "evidence", label: s.lang === "en" ? "Evidence" : "Bewijs" },
+    { id: "evidence", label: tr(s.lang, { en: "Evidence", nl: "Bewijs", es: "Pruebas", fr: "Preuves", de: "Belege" }) },
     { id: "agents", label: L.agents },
   ];
   return (
@@ -334,7 +340,7 @@ export default function AnalysisPanel() {
           <h2 className="eyebrow">{L.analysisTitle}</h2>
           {s.recovery && (
             <button type="button" onClick={() => useApp.setState({ recovery: null, recoveryFault: null })} className="btn px-2 py-0.5 text-[11px]">
-              ← {s.lang === "en" ? "main analysis" : "hoofdanalyse"}
+              ← {tr(s.lang, { en: "main analysis", nl: "hoofdanalyse", es: "análisis principal", fr: "analyse principale", de: "Hauptanalyse" })}
             </button>
           )}
         </div>
@@ -363,7 +369,9 @@ export default function AnalysisPanel() {
         <button type="button" data-testid="explore-multiverse"
           onClick={() => { actions.setView("multiverse"); void mv.open(d.decision_point_id, d.match_id); }}
           className="notch w-full bg-gradient-to-r from-leaf-600 to-sage-600 py-2.5 text-sm font-bold tracking-wide text-white transition hover:brightness-110">
-          {s.lang === "en" ? "Take the decision yourself in the Multiverse →" : "Neem de beslissing zelf in het Multiverse →"}
+          {tr(s.lang, { en: "Take the decision yourself in the Multiverse →", nl: "Neem de beslissing zelf in het Multiverse →",
+            es: "Toma tú la decisión en el Multiverso →", fr: "Prenez la décision vous-même dans le Multivers →",
+            de: "Triff die Entscheidung selbst im Multiversum →" })}
         </button>
       </section>
       {a && (
@@ -389,7 +397,7 @@ export default function AnalysisPanel() {
                 </div>}
               </article>
             ) : (
-              <p className="text-sm text-slate-500">{running ? `${L.analysing}…` : s.mode === "broadcaster" ? (s.lang === "en" ? "The broadcast caption is shown above." : "Het omroepbijschrift staat hierboven.") : "-"}</p>
+              <p className="text-sm text-slate-500">{running ? `${L.analysing}…` : s.mode === "broadcaster" ? (s.lang !== "nl" ? "The broadcast caption is shown above." : "Het omroepbijschrift staat hierboven.") : "-"}</p>
             )}
           </div>
           <div hidden={tab !== "evidence"} className="px-1">

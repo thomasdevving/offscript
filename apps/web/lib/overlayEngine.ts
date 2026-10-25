@@ -1,4 +1,4 @@
-import type { Language, MatchEvent, Overlay, ViewerMode } from "@offscript/contracts";
+import type { CounterfactualAnalysis, Language, MatchEvent, Overlay, ViewerMode } from "@offscript/contracts";
 
 /**
  * Picks the overlay to show at simulation time `t` for a viewer.
@@ -31,4 +31,19 @@ export function activeOverlay(
     if (!best || o.priority > best.priority || (o.priority === best.priority && o.sim_time_ms > best.sim_time_ms)) best = o;
   }
   return best;
+}
+
+/**
+ * Overlays are produced in English and Dutch. For Spanish, French and German the English overlay keeps
+ * its timing, priority and expiry rules, and its text is replaced by that analysis' verified broadcast
+ * narrative in the viewer's language when it is available.
+ */
+export function localizeOverlays(overlays: Overlay[], analyses: CounterfactualAnalysis[], lang: Language): Overlay[] {
+  if (lang === "en" || lang === "nl") return overlays;
+  const byId = new Map(analyses.map((a) => [a.analysis_id, a]));
+  return overlays.filter((o) => o.language === "en").map((o) => {
+    const n = byId.get(o.analysis_id ?? "")?.narratives.find((x) => x.audience === "broadcaster" && x.language === lang);
+    return n ? { ...o, language: lang, headline: n.headline, caption: n.caption ?? o.caption, narrative: n.body }
+      : { ...o, language: lang };
+  });
 }

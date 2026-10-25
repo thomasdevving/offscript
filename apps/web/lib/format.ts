@@ -3,12 +3,12 @@ import type { Language } from "@offscript/contracts";
 export function pct(v: number | null | undefined, lang: Language = "en", digits = 1): string {
   if (v == null || Number.isNaN(v)) return "-";
   const s = `${(v * 100).toFixed(digits)}%`;
-  return lang === "nl" ? s.replace(".", ",") : s;
+  return lang !== "en" ? s.replace(".", ",") : s;
 }
 
 export function signedPp(v: number, lang: Language = "en"): string {
   const s = `${v >= 0 ? "+" : ""}${(v * 100).toFixed(1)} pp`;
-  return lang === "nl" ? s.replace(".", ",") : s;
+  return lang !== "en" ? s.replace(".", ",") : s;
 }
 
 export function clock(ms: number): string {
@@ -22,8 +22,36 @@ export function minuteOf(ms: number): number {
   return Math.floor(ms / 60000) + 1;
 }
 
-export function cleanLabel(label: string): string {
-  return label.replace(" (actual)", "");
+// Option labels come from the simulator in English; they follow the viewer's language (set by the store).
+let labelLang: Language = "en";
+export function setLabelLanguage(lang: Language): void {
+  labelLang = lang;
+}
+
+const DRIBBLES: Record<string, Partial<Record<Language, string>>> = {
+  "Dribble towards goal": { nl: "Dribbel richting doel", es: "Regate hacia la portería", fr: "Dribble vers le but", de: "Dribbling Richtung Tor" },
+  "Dribble diagonally right": { nl: "Dribbel schuin naar rechts", es: "Regate en diagonal a la derecha", fr: "Dribble en diagonale à droite", de: "Dribbling diagonal nach rechts" },
+  "Dribble diagonally left": { nl: "Dribbel schuin naar links", es: "Regate en diagonal a la izquierda", fr: "Dribble en diagonale à gauche", de: "Dribbling diagonal nach links" },
+  "Dribble wide right": { nl: "Dribbel naar rechts buiten", es: "Regate por la banda derecha", fr: "Dribble côté droit", de: "Dribbling über rechts" },
+  "Dribble wide left": { nl: "Dribbel naar links buiten", es: "Regate por la banda izquierda", fr: "Dribble côté gauche", de: "Dribbling über links" },
+};
+
+/** "Pass to Mbeki-Larsen (actual)" -> "Pase a Mbeki-Larsen" in the viewer's language. */
+export function cleanLabel(label: string, lang: Language = labelLang): string {
+  const base = label.replace(" (actual)", "");
+  if (lang === "en") return base;
+  if (base === "Shoot") return { nl: "Schieten", es: "Tiro", fr: "Tir", de: "Schuss" }[lang];
+  const pass = /^(Through ball|Pass) to (.+)$/.exec(base);
+  if (pass) {
+    const [through, who] = [pass[1] === "Through ball", pass[2]];
+    return {
+      nl: through ? `Steekpass naar ${who}` : `Pass naar ${who}`,
+      es: through ? `Pase al hueco a ${who}` : `Pase a ${who}`,
+      fr: through ? `Passe en profondeur à ${who}` : `Passe à ${who}`,
+      de: through ? `Steilpass zu ${who}` : `Pass zu ${who}`,
+    }[lang];
+  }
+  return DRIBBLES[base]?.[lang] ?? base;
 }
 
 const OUTCOMES: Record<string, string> = {

@@ -20,12 +20,12 @@ export function DimToggle() {
   const dim = useApp((s) => s.pitchDim);
   const lang = useApp((s) => s.lang);
   return (
-    <div role="radiogroup" aria-label={lang === "en" ? "Pitch view" : "Veldweergave"} data-testid="dim-toggle"
+    <div role="radiogroup" aria-label={lang !== "nl" ? "Pitch view" : "Veldweergave"} data-testid="dim-toggle"
       className="flex bg-slate-950/80 p-0.5 ring-1 ring-white/10 backdrop-blur">
       {(["2d", "3d"] as const).map((v) => (
         <button key={v} type="button" role="radio" aria-checked={dim === v} onClick={() => actions.setPitchDim(v)}
           className="tab px-2.5 py-1 text-[11px]" data-testid={`dim-${v}`}
-          title={v === "2d" ? (lang === "en" ? "Tactical board" : "Tactisch bord") : (lang === "en" ? "3D replay" : "3D-herhaling")}>
+          title={v === "2d" ? (lang !== "nl" ? "Tactical board" : "Tactisch bord") : (lang !== "nl" ? "3D replay" : "3D-herhaling")}>
           {v.toUpperCase()}
         </button>
       ))}

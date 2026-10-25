@@ -15,6 +15,7 @@ from ..models.narrative import Narrative
 from ..models.simulation import ActionResult, PairwiseComparison
 from ..models.verification import EvidenceItem
 from ..verification.evidence import action_keys, num, pct
+from .templates_intl import INTL_LANGUAGES, build_intl_narratives
 
 ASSUMPTIONS = {
     "en": [
@@ -146,6 +147,14 @@ def build_template_narratives(
 
     for lang in languages:
         L = lang
+        if L in INTL_LANGUAGES:
+            out.extend(build_intl_narratives(
+                analysis, decision, roster, L, best=best, actual=actual, alts=alts, res=res, comps=comps,
+                refs_core=refs_core,
+                analyst_refs=refs_core + [f"results.{keys[c.action_id]}.p_shot" for c in analysis.candidates]
+                + ["decision.pressure_count_5m", "decision.nearest_defender_m", "sim.confidence_level"],
+                generated_by=generated_by, now=now))
+            continue
         best_label = action_label(best, roster, L)
         best_phrase = _phrase(best, roster, L)
         act_noun = _noun(actual, L)

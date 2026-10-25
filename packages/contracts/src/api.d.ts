@@ -55,6 +55,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/analyses/{analysis_id}/narratives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Narratives
+         * @description Adds verified narratives in another language to a finished analysis (instant, no new simulation).
+         */
+        post: operations["add_narratives_api_analyses__analysis_id__narratives_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/analyses/{analysis_id}/overlays": {
         parameters: {
             query?: never;
@@ -2272,7 +2292,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "nl";
+            language: "en" | "nl" | "es" | "fr" | "de";
             /** Narrative Id */
             narrative_id: string;
             /**
@@ -2309,7 +2329,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "nl";
+            language: "en" | "nl" | "es" | "fr" | "de";
             /** Match Id */
             match_id: string;
             /** Match Time Ms */
@@ -2665,7 +2685,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "nl";
+            language: "en" | "nl" | "es" | "fr" | "de";
             /** Match Id */
             match_id: string;
             /** Momentum */
@@ -3291,6 +3311,39 @@ export interface operations {
             };
         };
     };
+    add_narratives_api_analyses__analysis_id__narratives_post: {
+        parameters: {
+            query: {
+                language: "en" | "nl" | "es" | "fr" | "de";
+            };
+            header?: never;
+            path: {
+                analysis_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CounterfactualAnalysis"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     overlays_api_analyses__analysis_id__overlays_get: {
         parameters: {
             query?: never;
@@ -3880,7 +3933,7 @@ export interface operations {
         parameters: {
             query?: {
                 viewer_mode?: string | null;
-                language?: ("en" | "nl") | null;
+                language?: ("en" | "nl" | "es" | "fr" | "de") | null;
             };
             header?: never;
             path: {
@@ -3913,7 +3966,7 @@ export interface operations {
     get_recap_api_matches__match_id__recap_get: {
         parameters: {
             query?: {
-                language?: "en" | "nl";
+                language?: "en" | "nl" | "es" | "fr" | "de";
             };
             header?: never;
             path: {
@@ -3946,7 +3999,7 @@ export interface operations {
     make_recap_api_matches__match_id__recap_post: {
         parameters: {
             query?: {
-                language?: "en" | "nl";
+                language?: "en" | "nl" | "es" | "fr" | "de";
             };
             header?: never;
             path: {

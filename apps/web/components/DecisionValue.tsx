@@ -4,7 +4,7 @@ import type { DecisionValueAggregate } from "@offscript/contracts";
 import { useEffect, useState } from "react";
 import { leftOnTable, oneLiner, pp } from "@/lib/decisionValue";
 import { activeFollow } from "@/lib/follow";
-import { t } from "@/lib/i18n";
+import { t, tr } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 
 /**
@@ -14,7 +14,7 @@ import { actions, useApp } from "@/lib/store";
 export default function DecisionValue({ compact = false }: { compact?: boolean }) {
   const s = useApp();
   const L = t(s.lang);
-  const en = s.lang === "en";
+  const en = s.lang !== "nl";
   const [showThin, setShowThin] = useState(false);
   const r = s.decisionValue && s.decisionValue.match_id === s.matchId ? s.decisionValue : null;
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
       <table className="mt-2 w-full" data-testid="dva-table">
         <thead>
           <tr className="text-left text-[10px] uppercase tracking-wider text-slate-500">
-            <th className="py-1 font-medium">{en ? "Player" : "Speler"}</th>
+            <th className="py-1 font-medium">{tr(s.lang, { en: "Player", nl: "Speler", es: "Jugador", fr: "Joueur", de: "Spieler" })}</th>
             <th className="px-1 text-right font-medium" title={en ? "Analysed decisions" : "Geanalyseerde beslissingen"}>n</th>
             {analyst ? (
               <>
@@ -98,7 +98,7 @@ export default function DecisionValue({ compact = false }: { compact?: boolean }
                 <th className="pl-1 text-right font-medium" title={en ? "Decisions with a clearly better alternative" : "Beslissingen met een duidelijk betere optie"}>{en ? "Clear" : "Duidelijk"}</th>
               </>
             ) : (
-              <th className="pl-1 text-right font-medium">{en ? "Goal chance left (95%)" : "Gemiste doelkans (95%)"}</th>
+              <th className="pl-1 text-right font-medium">{tr(s.lang, { en: "Goal chance left (95%)", nl: "Gemiste doelkans (95%)", es: "Probabilidad de gol perdida (95%)", fr: "Chance de but laissée (95%)", de: "Liegengelassene Torchance (95%)" })}</th>
             )}
           </tr>
         </thead>

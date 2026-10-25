@@ -1,4 +1,5 @@
 import type { Language } from "@offscript/contracts";
+import { de, es, EVENT_INTL, fr, TRIGGER_INTL } from "./i18n-intl";
 
 const en = {
   tagline: "Every decision creates another game.",
@@ -98,7 +99,7 @@ const en = {
   pickDecision: "Pick a decision to explore",
 };
 
-type Dict = typeof en;
+export type Dict = typeof en;
 
 const nl: Dict = {
   tagline: "Elke beslissing creeert een andere wedstrijd.",
@@ -198,10 +199,20 @@ const nl: Dict = {
   pickDecision: "Kies een beslissing om te verkennen",
 };
 
-export const dictionaries: Record<Language, Dict> = { en, nl };
+export const dictionaries: Record<Language, Dict> = { en, nl, es, fr, de };
+
+export const LANGUAGES: { v: Language; label: string; short: string }[] = [
+  { v: "en", label: "English", short: "EN" }, { v: "nl", label: "Nederlands", short: "NL" },
+  { v: "es", label: "Español", short: "ES" }, { v: "fr", label: "Français", short: "FR" }, { v: "de", label: "Deutsch", short: "DE" },
+];
+
+/** Picks the text for the current language; anything not translated falls back to English. */
+export function tr(lang: Language, m: { en: string; nl?: string; es?: string; fr?: string; de?: string }): string {
+  return m[lang] ?? m.en;
+}
 
 export function t(lang: Language): Dict {
-  return dictionaries[lang];
+  return dictionaries[lang] ?? en;
 }
 
 const EVENT_LABELS: Record<string, [string, string]> = {
@@ -229,6 +240,7 @@ const EVENT_LABELS: Record<string, [string, string]> = {
 
 export function eventLabel(type: string, lang: Language): string {
   const e = EVENT_LABELS[type];
+  if (lang === "es" || lang === "fr" || lang === "de") return EVENT_INTL[lang][type] ?? (e ? e[0] : type);
   return e ? e[lang === "en" ? 0 : 1] : type;
 }
 
@@ -243,5 +255,6 @@ export function triggerLabel(trigger: string, lang: Language): string {
     MISSED_FORWARD_PASS: ["Forward option not taken", "Voorwaartse optie niet benut"],
   };
   const e = map[trigger];
+  if (lang === "es" || lang === "fr" || lang === "de") return TRIGGER_INTL[lang][trigger] ?? (e ? e[0] : trigger);
   return e ? e[lang === "en" ? 0 : 1] : trigger;
 }

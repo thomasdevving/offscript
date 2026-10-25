@@ -54,7 +54,7 @@ class VerificationDecision(BaseModel):
 
 class NarrativeDraft(BaseModel):
     audience: Literal["casual", "analyst", "broadcaster"]
-    language: Literal["en", "nl"]
+    language: Literal["en", "nl", "es", "fr", "de"]
     headline: str
     body: str
     bullets: list[str] = []

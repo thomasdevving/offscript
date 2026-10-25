@@ -18,13 +18,15 @@ from typing import Any
 from ..agents.runner import AgentRunner, ChatClientProvider
 from ..config import Settings
 from ..models.analysis import AnalyzeRequest, CounterfactualAnalysis, ModelInfo, SimulateRequest
-from ..models.common import SIMULATOR_VERSION, new_id, utcnow
+from ..models.common import SIMULATOR_VERSION, Language, new_id, utcnow
 from ..models.decisions import DecisionPoint
 from ..models.overlay import Overlay
 from ..models.simulation import SimulationConfig, SimulationRun, Trajectory
 from ..models.workflow import AnalysisWorkflowState
-from ..orchestration.workflow import AnalysisContext, AnalysisRuntime, run_workflow
+from ..narratives.templates import build_template_narratives
+from ..orchestration.workflow import AnalysisContext, AnalysisRuntime, allowed_players, run_workflow
 from ..simulation.monte_carlo import REPRESENTATIVE_RULE, evaluate_actions, replay_rollout
+from ..verification.checks import verify_narrative
 from . import metrics
 from .hub import EventHub
 from .overlays import analysis_overlays
@@ -126,6 +128,35 @@ class AnalysisService:
                 if a.match_id == match_id and not a.fault_injection and a.status in ("pending", "running", "verified")}
         return [await self.start(dp.decision_point_id, AnalyzeRequest())
                 for dp in md.decisions if dp.decision_point_id not in live]
+
+    def add_language(self, analysis_id: str, language: Language) -> CounterfactualAnalysis:
+        """Adds verified narratives in another language to a finished analysis, without re-running it.
+
+        The narratives come from the deterministic templates, so every number is the same evidence the
+        original analysis verified; each one is checked again by the narrative verifier before it is kept.
+        """
+        a = self.store.analyses[analysis_id]
+        if a.status != "verified" or a.simulation is None or a.verification is None:
+            return a
+        if any(n.language == language for n in a.narratives):
+            return a
+        decision = self.store.decisions[a.decision_point_id]
+        md = self.store.matches[decision.match_id]
+        evidence = a.verification.accepted_evidence
+        allowed = allowed_players(decision, a, md.snapshots[decision.snapshot_id])
+        added = []
+        for n in build_template_narratives(a, decision, md.roster, evidence, [language],
+                                           generated_by="policy-template (language added on request)"):
+            issues = verify_narrative(n, evidence, md.roster, allowed)
+            n.verification_status = "rejected" if issues else "verified"
+            n.verification_notes = issues
+            if not issues:
+                added.append(n)
+            else:
+                log.warning("narrative %s/%s for %s failed verification: %s", n.audience, language, analysis_id, issues)
+        with self.store.lock:
+            a.narratives = [*a.narratives, *added]
+        return a
 
     def _register(self, a: CounterfactualAnalysis, decision: DecisionPoint, key: str | None) -> None:
         with self.store.lock:

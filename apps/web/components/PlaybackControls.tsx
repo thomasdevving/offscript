@@ -2,7 +2,7 @@
 
 import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
 import { activeFollow, followRelation } from "@/lib/follow";
-import { t } from "@/lib/i18n";
+import { t, tr } from "@/lib/i18n";
 import { actions, selectedAnalysis, useApp } from "@/lib/store";
 
 const SPEEDS = [0.5, 1, 2, 4];
@@ -96,7 +96,7 @@ export default function PlaybackControls() {
       {/* Playback preferences are rarely changed: tucked behind a settings toggle. */}
       <details className="group relative text-[11px] text-slate-400">
         <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-sm text-sm hover:bg-white/10 hover:text-white [&::-webkit-details-marker]:hidden"
-          aria-label={s.lang === "en" ? "Playback settings" : "Afspeelinstellingen"} title={s.lang === "en" ? "Playback settings" : "Afspeelinstellingen"}>⚙</summary>
+          aria-label={s.lang !== "nl" ? "Playback settings" : "Afspeelinstellingen"} title={s.lang !== "nl" ? "Playback settings" : "Afspeelinstellingen"}>⚙</summary>
         <div className="glass absolute bottom-10 right-0 z-20 flex w-max flex-col gap-2 bg-panel/95 p-3">
         <label className="flex cursor-pointer items-center gap-1.5 hover:text-slate-200">
           <input type="checkbox" checked={s.autoPause} onChange={(e) => actions.setAutoPause(e.target.checked)} className="accent-sage-500" />
@@ -121,8 +121,13 @@ export function WhatIfControls() {
   if (s.view === "snapshot") {
     return (
       <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-gradient-to-r from-sage-600/20 to-transparent px-4 py-2.5 text-sm text-sage-100 ring-1 ring-sage-400/25">
-        <span>{s.lang === "en" ? "Choose an option on the pitch or in the panel to watch a simulated continuation." :
-          "Kies een optie op het veld of in het paneel om een gesimuleerd vervolg te bekijken."}</span>
+        <span>{tr(s.lang, {
+          en: "Choose an option on the pitch or in the panel to watch a simulated continuation.",
+          nl: "Kies een optie op het veld of in het paneel om een gesimuleerd vervolg te bekijken.",
+          es: "Elige una opción en el campo o en el panel para ver una continuación simulada.",
+          fr: "Choisissez une option sur le terrain ou dans le panneau pour voir une suite simulée.",
+          de: "Wähle eine Option auf dem Feld oder im Panel, um einen simulierten Verlauf zu sehen.",
+        })}</span>
         <button type="button" onClick={() => actions.backToMatch()} className="btn ml-auto">
           {L.returnToMatch}
         </button>
@@ -134,7 +139,7 @@ export function WhatIfControls() {
   const examples = res ? Object.entries(res.example_rollouts ?? {}) : [];
   return (
     <div className="rounded-2xl bg-gradient-to-r from-leaf-600/20 to-transparent px-4 py-2.5 ring-1 ring-leaf-400/25" data-testid="whatif-controls">
-      {s.whatIf.loading && <div className="text-sm text-leaf-200">{s.lang === "en" ? "Re-running rollout from its seed..." : "Simulatie opnieuw afspelen vanaf seed..."}</div>}
+      {s.whatIf.loading && <div className="text-sm text-leaf-200">{s.lang !== "nl" ? "Re-running rollout from its seed..." : "Simulatie opnieuw afspelen vanaf seed..."}</div>}
       {s.whatIf.error && <div className="text-sm text-red-300">{s.whatIf.error}</div>}
       {traj && (
         <>
@@ -165,7 +170,7 @@ export function WhatIfControls() {
           </div>
           <input type="range" min={0} max={end} step={50} value={s.whatIf.t} aria-label="Scrub simulated continuation"
             onChange={(e) => actions.setWhatIf({ t: Number(e.target.value), playing: false })} className="timeline mt-2 w-full" />
-          {s.mode === "analyst" && <p className="mt-1 text-[10px] text-leaf-200/60" title={traj.selection_rule}>{s.lang === "en" ? "Shown: the most typical run of the most common outcome." : "Getoond: het meest typische verloop van de meest voorkomende uitkomst."}</p>}
+          {s.mode === "analyst" && <p className="mt-1 text-[10px] text-leaf-200/60" title={traj.selection_rule}>{s.lang !== "nl" ? "Shown: the most typical run of the most common outcome." : "Getoond: het meest typische verloop van de meest voorkomende uitkomst."}</p>}
         </>
       )}
     </div>

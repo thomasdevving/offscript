@@ -1,8 +1,8 @@
 "use client";
 
-import type { ViewerMode } from "@offscript/contracts";
+import type { Language, ViewerMode } from "@offscript/contracts";
 import { activeFollow, decodeFollow, encodeFollow } from "@/lib/follow";
-import { t } from "@/lib/i18n";
+import { LANGUAGES, t, tr } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 import BrandMark from "./BrandMark";
 import ThemeToggle from "./ThemeToggle";
@@ -33,16 +33,16 @@ function FollowPicker() {
   const s = useApp();
   const m = s.match;
   if (!m) return null;
-  const en = s.lang === "en";
+  const en = s.lang !== "nl";
   const f = activeFollow(s.follow, m);
   const teams = [m.home, m.away];
   return (
     <label className={`flex items-center gap-1.5 rounded-xl border px-2 py-1 text-[12px] ${f ? "border-leaf-400/50 bg-leaf-500/10" : "border-white/[0.06] bg-white/[0.03]"}`}>
-      <span className={f ? "font-semibold text-leaf-200" : "text-slate-400"}>{f ? "★" : ""} {en ? "Follow" : "Volg"}</span>
+      <span className={f ? "font-semibold text-leaf-200" : "text-slate-400"}>{f ? "★" : ""} {tr(s.lang, { en: "Follow", nl: "Volg", es: "Seguir", fr: "Suivre", de: "Folgen" })}</span>
       <select value={encodeFollow(f)} onChange={(e) => actions.setFollow(decodeFollow(e.target.value))} data-testid="follow-select"
-        aria-label={en ? "Follow a team or player" : "Volg een team of speler"}
+        aria-label={tr(s.lang, { en: "Follow a team or player", nl: "Volg een team of speler", es: "Sigue a un equipo o jugador", fr: "Suivre une équipe ou un joueur", de: "Einem Team oder Spieler folgen" })}
         className="max-w-36 truncate bg-transparent font-medium text-white outline-none">
-        <option value="" className="bg-slate-900">{en ? "Everyone" : "Iedereen"}</option>
+        <option value="" className="bg-slate-900">{tr(s.lang, { en: "Everyone", nl: "Iedereen", es: "Todos", fr: "Tout le monde", de: "Alle" })}</option>
         <optgroup label={en ? "Teams" : "Teams"} className="bg-slate-900">
           {teams.map((t) => <option key={t.team_id} value={encodeFollow({ kind: "team", id: t.team_id })}>{t.name}</option>)}
         </optgroup>
@@ -75,7 +75,7 @@ export default function Header() {
               className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${s.appView === v
                 ? v === "multiverse" ? "bg-gradient-to-r from-leaf-600 to-sage-600 text-white shadow-lg shadow-sage-900/40" : "bg-white text-slate-900"
                 : "text-slate-400 hover:text-white"}`}>
-              {v === "live" ? (s.lang === "en" ? "Live match" : "Live wedstrijd") : "Multiverse"}
+              {v === "live" ? tr(s.lang, { en: "Live match", nl: "Live wedstrijd", es: "Partido en directo", fr: "Match en direct", de: "Live-Spiel" }) : "Multiverse"}
             </button>
           ))}
         </nav>
@@ -93,6 +93,14 @@ export default function Header() {
           <Segmented<ViewerMode> label={L.mode} value={s.mode} onChange={actions.setMode} testId="mode-switch"
             options={[{ v: "casual", label: L.casual }, { v: "analyst", label: L.analyst }, { v: "broadcaster", label: L.broadcaster }]} />
           <button type="button" onClick={() => void actions.openRecap()} data-testid="open-recap" className="btn">{L.recap}</button>
+          <label className="flex items-center rounded-xl border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[12px]">
+            <span className="sr-only">{L.language}</span>
+            <span aria-hidden className="mr-1 text-slate-400">🌐</span>
+            <select value={s.lang} onChange={(e) => actions.setLang(e.target.value as Language)} data-testid="lang-select"
+              aria-label={L.language} className="bg-transparent font-semibold text-white outline-none">
+              {LANGUAGES.map((l) => <option key={l.v} value={l.v} className="bg-slate-900">{l.short} · {l.label}</option>)}
+            </select>
+          </label>
           <ThemeToggle lang={s.lang} />
           <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-2.5 py-1.5 text-[11px]">
             <span className={`rounded-md px-1.5 py-0.5 font-semibold ${live ? "bg-leaf-500/20 text-leaf-200" : "text-slate-300"}`}

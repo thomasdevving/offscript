@@ -110,7 +110,7 @@ function EventFeed() {
           )}
         </li>
       ))}
-      {!feed.length && <li className="px-2 py-2 text-slate-500">{s.lang === "en" ? "Press play to start the event stream." : "Druk op afspelen om de stream te starten."}</li>}
+      {!feed.length && <li className="px-2 py-2 text-slate-500">{s.lang !== "nl" ? "Press play to start the event stream." : "Druk op afspelen om de stream te starten."}</li>}
     </ol>
   );
 }
@@ -146,7 +146,7 @@ function StatsPanel() {
       {row(L.possession, h?.possession_share ?? null, a?.possession_share ?? null, (x) => pct(x, s.lang, 0))}
       {row(L.shots, h?.shots ?? 0, a?.shots ?? 0, (x) => String(x ?? 0))}
       {row(L.modeledQuality, h?.total_modeled_shot_quality ?? 0, a?.total_modeled_shot_quality ?? 0, (x) => (x ?? 0).toFixed(2), true)}
-      <p className="mt-1 text-[10px] text-slate-500">* {s.lang === "en" ? "model estimate (synthetic, uncalibrated); other values observed in the synthetic feed." :
+      <p className="mt-1 text-[10px] text-slate-500">* {s.lang !== "nl" ? "model estimate (synthetic, uncalibrated); other values observed in the synthetic feed." :
         "modelschatting (synthetisch, ongekalibreerd); overige waarden waargenomen in de synthetische feed."}</p>
     </div>
   );

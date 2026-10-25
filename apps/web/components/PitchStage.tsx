@@ -4,8 +4,8 @@ import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@offsc
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ballPath, interpolate, type RenderFrame } from "@/lib/frames";
 import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
-import { t } from "@/lib/i18n";
-import { activeOverlay } from "@/lib/overlayEngine";
+import { t, tr } from "@/lib/i18n";
+import { activeOverlay, localizeOverlays } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
 import { ScoreBug } from "./MatchIntel";
 import OverlayCard from "./OverlayCard";
@@ -124,9 +124,10 @@ export default function PitchStage() {
   }
 
   let overlay: Overlay | null = null;
-  if (s.view === "observed") overlay = activeOverlay(s.overlays, renderT, s.mode, s.lang, s.seenEvents);
+  const overlays = localizeOverlays(s.overlays, Object.values(s.analyses), s.lang);
+  if (s.view === "observed") overlay = activeOverlay(overlays, renderT, s.mode, s.lang, s.seenEvents);
   else if (analysis && s.mode === "broadcaster" && !s.recovery)
-    overlay = s.overlays.find((o) => o.analysis_id === analysis.analysis_id && o.viewer_mode === "broadcaster" && o.language === s.lang) ?? null;
+    overlay = overlays.find((o) => o.analysis_id === analysis.analysis_id && o.viewer_mode === "broadcaster" && o.language === s.lang) ?? null;
 
   if (!match) {
     return <div className="flex aspect-[111/74] w-full animate-pulse items-center justify-center rounded-xl bg-white/[0.03] text-sm text-slate-500">Loading match…</div>;
@@ -160,7 +161,7 @@ export default function PitchStage() {
           outcome={traj.outcome}
           lines={[
             simRes ? `P(goal) ${pct(simRes.p_goal.value, s.lang)} · ${simRes.n_rollouts} ${L.simulations}` : "",
-            `${s.lang === "en" ? "one simulated continuation" : "één gesimuleerd verloop"}`,
+            tr(s.lang, { en: "one simulated continuation", nl: "één gesimuleerd verloop", es: "una continuación simulada", fr: "une suite simulée", de: "ein simulierter Verlauf" }),
           ]}
         />
       )}

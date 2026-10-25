@@ -42,7 +42,7 @@ export type DecisionValueItem = S["DecisionValueItem"];
 export type DecisionValueAggregate = S["DecisionValueAggregate"];
 
 export type ViewerMode = "casual" | "analyst" | "broadcaster";
-export type Language = "en" | "nl";
+export type Language = "en" | "nl" | "es" | "fr" | "de";
 export type FaultInjection = "invalid_candidate" | "contradictory_claim" | "model_unavailable" | "simulation_timeout";
 
 // Football Multiverse

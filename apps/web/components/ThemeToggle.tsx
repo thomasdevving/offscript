@@ -1,17 +1,18 @@
 "use client";
 
+import type { Language } from "@offscript/contracts";
 import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
 /** Light/dark switch. The theme lives on <html data-theme>, set before paint by the root layout. */
-export default function ThemeToggle({ lang = "en" }: { lang?: "en" | "nl" }) {
+export default function ThemeToggle({ lang = "en" }: { lang?: Language }) {
   const [theme, setTheme] = useState<Theme>("light");
   useEffect(() => {
     setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   }, []);
   const next: Theme = theme === "light" ? "dark" : "light";
-  const label = lang === "en" ? `Switch to ${next} theme` : next === "dark" ? "Donker thema" : "Licht thema";
+  const label = lang !== "nl" ? `Switch to ${next} theme` : next === "dark" ? "Donker thema" : "Licht thema";
   return (
     <button type="button" className="btn h-8 w-8 p-0" aria-label={label} title={label} data-testid="theme-toggle"
       onClick={() => {

@@ -324,6 +324,13 @@ def analysis(request: Request, analysis_id: str) -> CounterfactualAnalysis:
     return _analysis(request, analysis_id)
 
 
+@router.post("/analyses/{analysis_id}/narratives", response_model=CounterfactualAnalysis)
+def add_narratives(request: Request, analysis_id: str, language: Language) -> CounterfactualAnalysis:
+    """Adds verified narratives in another language to a finished analysis (instant, no new simulation)."""
+    _analysis(request, analysis_id)
+    return _svc(request).analyses.add_language(analysis_id, language)
+
+
 @router.post("/analyses/{analysis_id}/cancel")
 def cancel(request: Request, analysis_id: str) -> dict:
     _analysis(request, analysis_id)
@@ -413,6 +420,8 @@ async def decision_value_analyze(request: Request, match_id: str,
 # ------------------------------------------------------------------------------- recap
 @router.post("/matches/{match_id}/recap", response_model=Recap)
 def make_recap(request: Request, match_id: str, language: Language = "en") -> Recap:
+    # The recap is written in English and Dutch; other languages get the English recap.
+    language = language if language in ("en", "nl") else "en"
     md = _match(request, match_id)
     store = _svc(request).store
     analyses = [a for a in store.analyses.values() if a.match_id == match_id and a.status == "verified"

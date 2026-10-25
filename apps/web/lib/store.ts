@@ -18,6 +18,7 @@ import type {
 } from "@offscript/contracts";
 import { create } from "zustand";
 import { api, type Health, type ScenarioInfo } from "./api";
+import { setLabelLanguage } from "./format";
 import { type Follow, FOLLOW_KEY, decodeFollow, encodeFollow, pausesFor } from "./follow";
 import { MatchSocket, type ServerMessage } from "./socket";
 
@@ -156,6 +157,7 @@ const get = useApp.getState;
 let socket: MatchSocket | null = null;
 const polling = new Set<string>();
 const MAX_FRAMES = 900;
+const LANG_KEY = "offscript.lang";
 let dvTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Re-reads the Decision Value report shortly after analyses finish (only once it has been opened). */
@@ -339,6 +341,7 @@ export const actions = {
     if (!get().analyses[decisionId] && (get().autoAnalyze || !opts.fromLive)) {
       await actions.analyze(decisionId);
     }
+    await actions.ensureLanguage();
   },
 
   async analyze(decisionId: string, rollouts?: number): Promise<void> {
@@ -379,6 +382,7 @@ export const actions = {
     } finally {
       polling.delete(analysisId);
     }
+    await actions.ensureLanguage();
     await actions.refreshOverlays();
   },
 
@@ -426,7 +430,49 @@ export const actions = {
     set({ mode });
   },
   setLang(lang: Language): void {
+    setLabelLanguage(lang);
     set({ lang, recap: null });
+    try {
+      if (lang === "en") localStorage.removeItem(LANG_KEY);
+      else localStorage.setItem(LANG_KEY, lang);
+    } catch {
+      /* storage unavailable */
+    }
+    void actions.ensureLanguage();
+  },
+  /** Restores the viewer's language (client only, after hydration); ?lang=es in the URL wins. English by default. */
+  restoreLang(): void {
+    try {
+      const v = new URLSearchParams(window.location.search).get("lang") ?? localStorage.getItem(LANG_KEY);
+      if (v && ["en", "nl", "es", "fr", "de"].includes(v)) {
+        setLabelLanguage(v as Language);
+        set({ lang: v as Language });
+      }
+    } catch {
+      /* storage unavailable */
+    }
+  },
+  /**
+   * The agents write every analysis in English and Dutch. For Spanish, French and German the API adds
+   * verified narratives to the finished analysis on request; until they arrive the English text is shown.
+   */
+  async ensureLanguage(): Promise<void> {
+    const s = get();
+    if (s.lang === "en" || s.lang === "nl") return;
+    const lang = s.lang;
+    const sel = s.selectedDecisionId ? s.analyses[s.selectedDecisionId] : null;
+    for (const a of [sel, s.recovery]) {
+      if (!a || a.status !== "verified" || a.narratives.some((n) => n.language === lang)) continue;
+      try {
+        const b = await api.addNarratives(a.analysis_id, lang);
+        const now = get();
+        if (now.recovery?.analysis_id === b.analysis_id) set({ recovery: b });
+        const entry = Object.entries(now.analyses).find(([, x]) => x.analysis_id === b.analysis_id);
+        if (entry) set({ analyses: { ...now.analyses, [entry[0]]: b } });
+      } catch {
+        /* the English narratives stay visible */
+      }
+    }
   },
   setAutoPause(v: boolean): void {
     set({ autoPause: v });

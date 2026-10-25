@@ -10,7 +10,7 @@ SCHEMA_VERSION = "1.0"
 SIMULATOR_VERSION = "offscript-sim-1.0.0"
 
 ViewerMode = Literal["casual", "analyst", "broadcaster"]
-Language = Literal["en", "nl"]
+Language = Literal["en", "nl", "es", "fr", "de"]
 JobStatus = Literal["pending", "running", "completed", "failed", "timed_out", "cancelled"]
 
 

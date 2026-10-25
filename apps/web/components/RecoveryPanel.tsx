@@ -1,14 +1,18 @@
 "use client";
 
 import type { FaultInjection } from "@offscript/contracts";
-import { t } from "@/lib/i18n";
+import { t, tr } from "@/lib/i18n";
 import { actions, useApp } from "@/lib/store";
 
-const FAULTS: { id: FaultInjection; en: string; nl: string }[] = [
-  { id: "invalid_candidate", en: "Impossible pass", nl: "Onmogelijke pass" },
-  { id: "contradictory_claim", en: "False number in the story", nl: "Vals getal in het verhaal" },
-  { id: "model_unavailable", en: "AI model outage", nl: "AI-model valt uit" },
-  { id: "simulation_timeout", en: "Simulation cut short", nl: "Simulatie afgekapt" },
+const FAULTS: { id: FaultInjection; en: string; nl: string; es: string; fr: string; de: string }[] = [
+  { id: "invalid_candidate", en: "Impossible pass", nl: "Onmogelijke pass", es: "Pase imposible", fr: "Passe impossible",
+    de: "Unmöglicher Pass" },
+  { id: "contradictory_claim", en: "False number in the story", nl: "Vals getal in het verhaal",
+    es: "Dato falso en la historia", fr: "Chiffre faux dans le récit", de: "Falsche Zahl im Text" },
+  { id: "model_unavailable", en: "AI model outage", nl: "AI-model valt uit", es: "Caída del modelo de IA",
+    fr: "Panne du modèle d'IA", de: "KI-Modell fällt aus" },
+  { id: "simulation_timeout", en: "Simulation cut short", nl: "Simulatie afgekapt", es: "Simulación interrumpida",
+    fr: "Simulation interrompue", de: "Simulation abgebrochen" },
 ];
 
 export default function RecoveryPanel() {
@@ -22,7 +26,7 @@ export default function RecoveryPanel() {
         {FAULTS.map((f) => (
           <button key={f.id} type="button" onClick={() => void actions.runRecovery(f.id)} data-testid={`fault-${f.id}`}
             className={`rounded-lg px-2 py-1.5 text-xs font-semibold transition ${s.recoveryFault === f.id ? "bg-red-500/20 text-red-100 ring-1 ring-red-400/60" : "bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]"}`}>
-            {s.lang === "en" ? f.en : f.nl}
+            {tr(s.lang, f)}
           </button>
         ))}
       </div>

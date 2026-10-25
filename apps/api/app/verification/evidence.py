@@ -11,15 +11,17 @@ from ..models.decisions import DecisionPoint
 from ..models.match import Player
 from ..models.verification import EvidenceItem
 
+DECIMAL_COMMA = ("nl", "es", "fr", "de")
+
 
 def pct(value: float, language: str = "en", digits: int = 1) -> str:
     s = f"{value * 100:.{digits}f}%"
-    return s.replace(".", ",") if language == "nl" else s
+    return s.replace(".", ",") if language in DECIMAL_COMMA else s
 
 
 def num(value: float, language: str = "en", digits: int = 1) -> str:
     s = f"{value:.{digits}f}"
-    return s.replace(".", ",") if language == "nl" else s
+    return s.replace(".", ",") if language in DECIMAL_COMMA else s
 
 
 def action_keys(analysis: CounterfactualAnalysis) -> dict[str, str]:

@@ -141,3 +141,19 @@ def test_websocket_stream(client):
 def test_metrics_endpoint(client):
     m = client.get("/api/metrics").json()
     assert "startup.generate_match" in m and m["startup.generate_match"]["count"] >= 2
+
+
+def test_add_language_narratives(client):
+    """Spanish, French and German narratives are added instantly to a finished analysis and all pass verification."""
+    for match_id in ("demo-match-073", "demo-match-031"):
+        decisions = client.get(f"/api/matches/{match_id}/decisions").json()
+        for dp in decisions:
+            a = _wait(client, client.post(f"/api/decisions/{dp['decision_point_id']}/analyze").json()["analysis_id"])
+            assert a["status"] == "verified"
+            for lang in ("es", "fr", "de"):
+                out = client.post(f"/api/analyses/{a['analysis_id']}/narratives", params={"language": lang}).json()
+                got = [n for n in out["narratives"] if n["language"] == lang]
+                assert {n["audience"] for n in got} == {"casual", "analyst", "broadcaster"}, (lang, dp["actor_name"])
+                assert all(n["verification_status"] == "verified" for n in got)
+    assert client.post("/api/analyses/x/narratives", params={"language": "es"}).status_code == 404
+    assert client.post("/api/analyses/x/narratives", params={"language": "xx"}).status_code == 422

@@ -80,6 +80,7 @@ export default function Dashboard() {
     void actions.init();
     actions.restorePitchDim();
     actions.restoreFollow();
+    actions.restoreLang();
     // Deep links from the landing page open in a viewer mode (?mode=casual|analyst|broadcaster).
     const m = new URLSearchParams(window.location.search).get("mode");
     if (m === "casual" || m === "analyst" || m === "broadcaster") actions.setMode(m);
@@ -100,7 +101,7 @@ export default function Dashboard() {
       <Header />
       {healthError && ready && (
         <div className="bg-amber-500/10 px-4 py-1.5 text-center text-xs text-amber-200" role="alert">
-          {lang === "en" ? "Connection to the analysis service lost. Reconnecting…" : "Verbinding met de analysedienst verbroken. Opnieuw verbinden…"}
+          {lang !== "nl" ? "Connection to the analysis service lost. Reconnecting…" : "Verbinding met de analysedienst verbroken. Opnieuw verbinden…"}
         </div>
       )}
       {!ready && (healthError || slow) ? <WarmingUp error={healthError} /> : appView === "multiverse" ? <MultiverseView /> : (
@@ -120,7 +121,7 @@ export default function Dashboard() {
             <Moments />
             <MatchCentre />
             <p className="px-1 text-[11px] text-slate-600">
-              {lang === "en"
+              {lang !== "nl"
                 ? "Synthetic match with fictional teams and players. Alternatives are simulated by an explicit, uncalibrated model; they are estimates, not what would have happened."
                 : "Synthetische wedstrijd met fictieve teams en spelers. Alternatieven worden gesimuleerd met een expliciet, ongekalibreerd model; het zijn schattingen, geen werkelijkheid."}
             </p>

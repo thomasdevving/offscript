@@ -171,7 +171,8 @@ export default function MultiverseView() {
   const planning = node?.planning_id ? st.plannings[node.planning_id] : null;
   const recPlanning = node?.recommendation_planning_id ? st.plannings[node.recommendation_planning_id] : null;
   const shownPlanning = planning ?? recPlanning;
-  const narrative = shownPlanning?.narratives.find((n) => n.audience === app.mode && n.language === app.lang);
+  const narrative = shownPlanning?.narratives.find((n) => n.audience === app.mode && n.language === app.lang)
+    ?? shownPlanning?.narratives.find((n) => n.audience === app.mode && n.language === "en");
   const siblings = st.tree?.nodes.filter((n) => n.parent_node_id === node?.parent_node_id && n.node_id !== node?.node_id) ?? [];
 
   if (!st.session) {
