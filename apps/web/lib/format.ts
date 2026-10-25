@@ -27,6 +27,14 @@ let labelLang: Language = "en";
 export function setLabelLanguage(lang: Language): void {
   labelLang = lang;
 }
+export function labelLanguage(): Language {
+  return labelLang;
+}
+const ACTUAL: Record<Language, string> = { en: "actual", nl: "werkelijk", es: "real", fr: "réel", de: "tatsächlich" };
+/** The "(actual)" tag for the option the player really chose, in the viewer's language. */
+export function actualTag(lang: Language = labelLang): string {
+  return `(${ACTUAL[lang]})`;
+}
 
 const DRIBBLES: Record<string, Partial<Record<Language, string>>> = {
   "Dribble towards goal": { nl: "Dribbel richting doel", es: "Regate hacia la portería", fr: "Dribble vers le but", de: "Dribbling Richtung Tor" },

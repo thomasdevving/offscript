@@ -3,7 +3,7 @@
 import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@offscript/contracts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ballPath, interpolate, type RenderFrame } from "@/lib/frames";
-import { clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
+import { actualTag, clock, cleanLabel, labelLanguage, outcomeLabel, pct } from "@/lib/format";
 import { t, tr } from "@/lib/i18n";
 import { activeOverlay, localizeOverlays } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
@@ -49,13 +49,13 @@ function candidateArrows(a: CounterfactualAnalysis | null, s: MatchStateSnapshot
   return a.candidates.map((c) => {
     const to: [number, number] = c.action_type === "shoot" ? goalTarget(s) : [c.target_x ?? carrier.x, c.target_y ?? carrier.y];
     const r = res.get(c.action_id);
-    const label = `${cleanLabel(c.label)}${r ? ` ${pct(r.p_goal.value)}` : ""}`;
+    const label = `${cleanLabel(c.label)}${r ? ` ${pct(r.p_goal.value, labelLanguage())}` : ""}`;
     return {
       id: c.action_id,
       from: [carrier.x, carrier.y],
       to,
       kind: c.action_id === selected ? "selected" : c.is_actual ? "actual" : "alternative",
-      label: c.is_actual ? `${label} (actual)` : label,
+      label: c.is_actual ? `${label} ${actualTag()}` : label,
       rank: r ? ranked.findIndex((x) => x.action_id === c.action_id) + 1 : undefined,
     } satisfies Arrow;
   });
