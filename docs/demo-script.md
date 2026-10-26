@@ -98,7 +98,7 @@ response matrix filling live → the branch plays.*
 * 1:11: the defending agent's best answer was "Cover lane to Mbeki-Larsen"; this branch: 3 planning
   rounds, 12 live model calls, verified 12/12 checks.
 * 1:48: in the 10-minute match, 18 of 18 decisions were analysed and verified; Luca Ferreira-Holm
-  left the most modelled goal chance on the table (about 2.5 percentage points across 3 decisions).
+  left the most modelled goal chance on the table (about 1.5 percentage points across 3 decisions in the latest take; the exact value varies slightly per live run).
 
 ## Before you hit record
 
