@@ -48,6 +48,7 @@ EXPLANATION = COMMON + (
     "action 'would have scored' or 'would have won'. casual: 2-3 plain sentences, at most two numbers, no jargon. "
     "analyst: verdict, method (same snapshot, paired rollouts, horizon), bullets per option with intervals, "
     "assumptions. broadcaster: an upper-case headline of max 4 words and a caption under 90 characters. "
-    "Before answering you may call check_narrative on a draft to catch unsupported numbers. List the evidence "
-    "refs you used, exactly as get_verified_evidence returns them."
+    "Write each narrative once, directly in your final answer: the Verification Agent checks every claim "
+    "afterwards and sends back anything unsupported. List the evidence refs you used, exactly as "
+    "get_verified_evidence returns them."
 )

@@ -758,6 +758,16 @@ class VerificationAgentExecutor(Executor):
 # =========================================================================================
 
 
+# The live model writes the English narratives; every other requested language is produced from the same
+# verified evidence by the deterministic templates and checked by the same verifier. Writing fewer
+# narratives is what makes the live Explanation agent fast: output tokens dominate its latency.
+LIVE_NARRATIVE_LANGUAGES = ("en",)
+
+
+def live_languages(languages: list[str]) -> list[str]:
+    return [lang for lang in languages if lang in LIVE_NARRATIVE_LANGUAGES] or languages[:1]
+
+
 def explanation_tools(rt: AnalysisRuntime) -> list:
     ctx = rt.ctx
 
@@ -767,20 +777,13 @@ def explanation_tools(rt: AnalysisRuntime) -> list:
     def get_verified_evidence() -> dict:
         return {"evidence": [{"ref": e.ref, "label": e.label, "display": e.display} for e in ctx.evidence],
                 "allowed_players": sorted(ctx.roster[p].name for p in _allowed_players(ctx)),
-                "requested": [{"audience": a, "language": lang} for lang in ctx.languages
+                "requested": [{"audience": a, "language": lang} for lang in live_languages(ctx.languages)
                               for a in ("casual", "analyst", "broadcaster")],
                 "previous_issues": rt.state.verification_issues[-6:]}
 
-    @tool(name="check_narrative", description="Self-check a draft narrative for unsupported numbers or claims.",
-          max_invocations=6)
-    def check_narrative(audience: str, language: str, headline: str, body: str, caption: str | None = None) -> dict:
-        n = Narrative(narrative_id="draft", analysis_id=ctx.analysis.analysis_id,
-                      audience=audience if audience in ("casual", "analyst", "broadcaster") else "casual",
-                      language=language if language in ("en", "nl", "es", "fr", "de") else "en", headline=headline, body=body,
-                      caption=caption, generated_by="draft", is_live_model_output=False, created_at="")
-        return {"issues": verify_narrative(n, ctx.evidence, ctx.roster, _allowed_players(ctx))}
-
-    return [get_verified_evidence, check_narrative]
+    # No self-check tool: drafting every narrative in a tool call and then again in the answer doubled the
+    # output tokens. The Verification Agent checks each claim right after and routes failures back here.
+    return [get_verified_evidence]
 
 
 def make_explanation_policy(rt: AnalysisRuntime):
@@ -808,7 +811,7 @@ class ExplanationAgentExecutor(Executor):
         feedback = st.verification_issues[-6:] if attempt > 1 else []
         prompt = ("Write viewer narratives for the verified analysis.\n"
                   + (f"The Verification Agent rejected these claims, fix them: {feedback}\n" if feedback else "")
-                  + rt.context_json({"languages": rt.ctx.languages, "attempt": attempt}))
+                  + rt.context_json({"languages": live_languages(rt.ctx.languages), "attempt": attempt}))
         try:
             out, step = await rt.runner.run("explanation_agent", "Explain the verified analysis", prompts.EXPLANATION,
                                             explanation_tools(rt), prompt, ExplanationBundle,
@@ -831,6 +834,18 @@ class ExplanationAgentExecutor(Executor):
                 created_at=utcnow().isoformat()))
         if dropped and step:
             step.notes.append(f"Dropped citations of evidence fields that do not exist: {sorted(dropped)[:4]}")
+        if live:
+            # Other requested languages come from the verified evidence via the templates (instant).
+            have = {(n.audience, n.language) for n in drafts}
+            others = [lang for lang in rt.ctx.languages if lang not in live_languages(rt.ctx.languages)]
+            if others:
+                for n in build_template_narratives(rt.ctx.analysis, rt.ctx.decision, rt.ctx.roster, rt.ctx.evidence,
+                                                   others, generated_by="policy-template (from verified evidence)"):
+                    if (n.audience, n.language) not in have:
+                        drafts.append(n)
+                if step:
+                    step.notes.append(f"Live model wrote {', '.join(live_languages(rt.ctx.languages))}; "
+                                      f"{', '.join(others)} built from the verified evidence.")
         if "contradictory_claim" in rt.faults and attempt == 1 and drafts:
             sim = rt.ctx.analysis.simulation
             best = max(sim.results, key=lambda r: r.p_goal.value)

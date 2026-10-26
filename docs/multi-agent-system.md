@@ -20,7 +20,7 @@ and in [multiverse.md](multiverse.md).
 | Strategy | Choose strategically meaningful, *feasible* alternatives; revise after feedback | `generate_candidate_actions`, `validate_candidate_action` | `StrategyProposal` (candidate ids or custom proposals) |
 | Simulation | Choose budgets, run the simulator, judge stability, request revisions | `run_simulation(rollouts)`, `request_strategy_revision` | `SimulationReport` |
 | Verification | Check the analysis, later the narratives; route failures | `run_verification_checks`, `verify_narratives` | `VerificationDecision` (status + route) |
-| Explanation | Personalised narratives (3 viewer modes × EN/NL) from verified evidence only | `get_verified_evidence`, `check_narrative` (self-check) | `ExplanationBundle` |
+| Explanation | Personalised narratives (3 viewer modes × EN/NL) from verified evidence only | `get_verified_evidence` (writes English live; other languages from verified templates; the Verification Agent checks every claim) | `ExplanationBundle` |
 | Publisher (executor) | Finalise status, replace failing narratives with verified templates, build overlays | – | `CounterfactualAnalysis` |
 
 ## Workflow graph
@@ -130,7 +130,7 @@ deterministic verification, with two new agents that have **opposing objectives*
 | Defending | Minimise it with feasible defensive strategies | `get_threat_assessment`, `get_defensive_options`, `validate_defensive_strategy`, `get_planning_feedback` | `DefensePlan` |
 | Simulation | Evaluate every (action, defence) pair with equal paired budgets; decide whether another round can change the answer | `evaluate_response_matrix` | `MatrixReport` |
 | Verification | 12 deterministic checks on the matrix, summary, user-action respect and transition replay; then narrative grounding | `run_multiverse_checks`, `verify_narratives` | `VerificationDecision` |
-| Explanation | Casual / analyst / broadcaster × EN/NL from the planning evidence table | `get_planning_evidence`, `check_narrative` | `ExplanationBundle` |
+| Explanation | Casual / analyst / broadcaster × EN/NL from the planning evidence table | `get_planning_evidence` | `ExplanationBundle` |
 
 Attack → Defence → Simulation repeats for at most 3 rounds (tabu list and a 0.2 pp improvement
 threshold stop oscillation); `max_iterations=40` bounds the graph. The agents choose *which* cells to

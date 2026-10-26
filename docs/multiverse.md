@@ -64,7 +64,7 @@ stateDiagram-v2
 | Defending | `get_threat_assessment`, `get_defensive_options`, `validate_defensive_strategy`, `get_planning_feedback` | `DefensePlan` |
 | Simulation | `evaluate_response_matrix` (equal budget for every cell, cache-aware) | `MatrixReport` (continue or stop) |
 | Verification | `run_multiverse_checks`, `verify_narratives` | `VerificationDecision` |
-| Explanation | `get_planning_evidence`, `check_narrative` | `ExplanationBundle` |
+| Explanation | `get_planning_evidence` | `ExplanationBundle` |
 
 Round 1: the attacker proposes the user's action (or, without one, the actual action), the best
 viable pass and a different type of action; the defender answers the most dangerous threats. Later

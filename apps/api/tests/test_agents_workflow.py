@@ -177,3 +177,28 @@ async def test_every_detected_decision_gets_grounded_narratives_first_time(setti
             assert len(a.narratives) == 6, dp.decision_point_id
             checked += 1
     assert checked >= 4
+
+
+async def test_live_explanation_writes_english_and_dutch_comes_from_verified_templates(settings, store, hub, monkeypatch):
+    """With a live model the Explanation agent only writes English; Dutch is built from the same evidence."""
+    from app.agents.runner import AgentRunner
+
+    original = AgentRunner.run
+
+    async def run(self, agent, task, instructions, tools, prompt, schema, policy, attempt=1, **kw):
+        out, step = await original(self, agent, task, instructions, tools, prompt, schema, policy, attempt, **kw)
+        if agent == "explanation_agent":
+            assert '"languages": ["en"]' in prompt  # the live model is only asked for English
+            out = out.model_copy(update={"narratives": [n for n in out.narratives if n.language == "en"]})
+            step.live_model = True
+            step.model = "foundry:test"
+        return out, step
+
+    monkeypatch.setattr(AgentRunner, "run", run)
+    a, _ = await _run(settings, store, hub)
+    assert a.status == "verified", a.workflow.errors
+    langs = {(n.audience, n.language): n for n in a.narratives}
+    assert set(langs) == {(m, lang) for m in ("casual", "analyst", "broadcaster") for lang in ("en", "nl")}
+    assert all(n.verification_status == "verified" for n in a.narratives)
+    assert all(langs[(m, "en")].generated_by == "foundry:test" for m in ("casual", "analyst", "broadcaster"))
+    assert all("from verified evidence" in langs[(m, "nl")].generated_by for m in ("casual", "analyst", "broadcaster"))
