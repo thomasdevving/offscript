@@ -1,5 +1,71 @@
 @import "tailwindcss";
 
+.app-header-primary { display: flex; align-items: center; gap: 16px; padding: 10px 16px; }
+.app-header-settings { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+@media (max-width: 640px) {
+  .app-header-primary { flex-wrap: wrap; gap: 10px; }
+  .app-header-logo { width: 100%; }
+  .app-header-primary [role="tab"] { padding-left: 10px; padding-right: 10px; }
+  .app-header-secondary > div { margin-left: 0; }
+}
+
+/* Multiverse: the pitch leads; the decision desk and match paths share its grid. */
+.mv-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 31%); gap: 14px 18px; width: 100%; max-width: 1760px; margin: 0 auto; padding: 20px; align-content: start; }
+.mv-stage-column { grid-column: 1; grid-row: 2; min-width: 0; display: flex; flex-direction: column; gap: 14px; align-self: start; }
+.mv-title { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; padding: 0 0 5px; }
+.mv-scoreboard { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--color-slate-200); }
+.mv-scoreboard b { font-size: 18px; font-variant-numeric: tabular-nums; color: var(--color-leaf-200); }
+.mv-pitch-stack { grid-column: 1; grid-row: 2; min-width: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.mv-stage-panel { min-width: 0; background: var(--color-panel); border: 1px solid var(--color-line); }
+.mv-inspector { grid-column: 2; grid-row: 2; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.mv-map { grid-column: 1 / -1; grid-row: 3; min-width: 0; }
+.mv-disclaimer { grid-column: 1 / -1; grid-row: 4; }
+.mv-direction-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 12px 16px; color: var(--color-slate-300); font-size: 12px; }
+.mv-direction-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.mv-direction-legend svg { width: 42px; height: 12px; color: var(--color-leaf-300); }
+.mv-direction-legend .mv-defence-key svg { color: #fb923c; }
+.mv-direction-legend .mv-observed-key svg { color: #f8fafc; }
+.mv-attack-direction { width: fit-content; max-width: calc(100% - 20px); margin: 8px 10px; padding: 4px 7px; background: #071e15e8; color: #e1efda; font-size: 11px; pointer-events: none; }
+.mv-attack-direction span { color: #c6d7c5; }
+.mv-options { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; padding: 2px; }
+.mv-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; text-align: left; background: var(--color-slate-900); border: 1px solid var(--color-line); border-radius: 3px; color: var(--color-slate-100); transition: background 120ms, border-color 120ms; }
+.mv-option:hover, .mv-option:focus-visible { border-color: var(--color-leaf-400); background: var(--color-leaf-950); }
+.mv-option:focus-visible { outline: 2px solid var(--color-leaf-400); outline-offset: 2px; }
+.mv-option.is-selected { border-color: var(--color-leaf-400); background: var(--color-leaf-950); }
+.mv-option:disabled { opacity: .55; cursor: wait; }
+.mv-option-direction { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex: 0 0 30px; color: var(--color-leaf-300); }
+.mv-option-direction svg { width: 26px; height: 26px; }
+.mv-option-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.mv-option-title { font-size: 13px; font-weight: 700; line-height: 1.35; }
+.mv-option-rank { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-right: 4px; border: 1px solid currentColor; border-radius: 3px; color: var(--color-leaf-300); font-size: 12px; }
+.mv-option-detail { color: var(--color-slate-400); font-size: 11px; line-height: 1.4; }
+.mv-option-badge { color: var(--color-leaf-300); font-size: 9px; font-weight: 700; letter-spacing: .04em; }
+.mv-option-check { width: 17px; height: 17px; flex: 0 0 17px; margin-left: auto; border: 1px solid var(--color-slate-500); border-radius: 50%; text-align: center; font-size: 11px; line-height: 15px; }
+.is-selected .mv-option-check { border-color: var(--color-leaf-400); background: var(--color-leaf-400); color: #102719; }
+.pitch-action-arrow:focus-visible > line:first-of-type { stroke: #ffffff80; }
+:root[data-theme="light"] .mv-stage-panel { background: #fff; border-color: #d6e2d3; }
+:root[data-theme="light"] .mv-option { background: #f6f8f4; border-color: #dce5d9; color: #102719; }
+:root[data-theme="light"] .mv-option:hover, :root[data-theme="light"] .mv-option.is-selected, :root[data-theme="light"] .mv-option:focus-visible { background: #eaf3e3; border-color: #5f9c5e; }
+:root[data-theme="light"] .mv-option-direction, :root[data-theme="light"] .mv-option-rank, :root[data-theme="light"] .mv-option-badge, :root[data-theme="light"] .mv-direction-legend svg { color: #3a6742; }
+:root[data-theme="light"] .mv-option-detail, :root[data-theme="light"] .mv-direction-legend { color: #4c594f; }
+:root[data-theme="light"] .mv-scoreboard { color: #37423a; }
+:root[data-theme="light"] .mv-scoreboard b { color: #102719; }
+:root[data-theme="light"] .mv-direction-legend .mv-defence-key svg { color: #b94c0b; }
+:root[data-theme="light"] .mv-direction-legend .mv-observed-key svg { color: #4c594f; }
+@media (max-width: 1023px) {
+  .mv-workspace { grid-template-columns: minmax(0, 1fr); padding: 12px; }
+  .mv-stage-column { display: contents; }
+  .mv-title { gap: 8px 16px; }
+  .mv-inspector { grid-column: 1; grid-row: 3; }
+  .mv-map { grid-column: 1; grid-row: 4; }
+  .mv-disclaimer { grid-column: 1; grid-row: 5; }
+}
+@media (max-width: 480px) {
+  .mv-title h1 { font-size: 22px; }
+  .mv-direction-legend { gap: 10px 14px; padding: 10px; font-size: 11px; }
+  .mv-attack-direction span { display: none; }
+}
+
 @theme {
   /* Brand: the logo's forest-to-leaf greens. "leaf" = primary / simulated, "sage" = frozen decision state. */
   --color-ink: #040906;
@@ -283,7 +349,8 @@ input[type="range"].timeline::-moz-range-thumb {
     aspect-ratio: 107 / 70;
     transform-style: preserve-3d;
     transform: translate(4%, 10%) rotateX(var(--tx)) rotateZ(var(--tz));
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* The stage and inverse-facing labels must use the same angle in the same frame. */
+    pointer-events: none;
   }
   .layer {
     position: absolute;
@@ -311,11 +378,9 @@ input[type="range"].timeline::-moz-range-thumb {
     background: linear-gradient(135deg, rgba(143, 202, 124, 0.09), rgba(143, 202, 124, 0.02));
     box-shadow: inset 0 0 0 1px rgba(143, 202, 124, 0.35), 0 0 40px rgba(95, 156, 94, 0.15);
     transform: translateZ(calc(var(--z) * var(--zs)));
-    animation: drift 7s ease-in-out infinite;
   }
   .branch-path {
     filter: drop-shadow(0 0 1.2px currentColor);
-    animation: flow 1.2s linear infinite;
   }
   /* Children that face the camera whatever the stage tilt. */
   .billboard {
@@ -388,8 +453,7 @@ input[type="range"].timeline::-moz-range-thumb {
     transform: rotateX(90deg);
   }
 
-  /* Drop line: hangs from a floating layer down to the real pitch. Its length follows the layer's
-     drift (same keyframes, duration and delay), so it always touches the player below. */
+  /* Drop line: hangs from a frozen future down to the same player on the real pitch. */
   .drop {
     position: absolute;
     width: 0;
@@ -398,7 +462,6 @@ input[type="range"].timeline::-moz-range-thumb {
     opacity: 0.75;
     transform-origin: 50% 0;
     transform: rotateX(-90deg);
-    animation: drop-drift 7s ease-in-out infinite;
   }
   /* Players repeated on each future: same coordinates, so a pass lands on its own layer's player. */
   .ghost-dot { opacity: 0.5; }
@@ -410,11 +473,6 @@ input[type="range"].timeline::-moz-range-thumb {
     background: rgba(4, 9, 6, 0.6);
     font-size: 10px;
     box-shadow: none;
-  }
-  .decision-ring {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: ring-pulse 2.4s ease-in-out infinite;
   }
 
   /* Headline word with a stepped extrusion. */
@@ -459,18 +517,6 @@ input[type="range"].timeline::-moz-range-thumb {
   .face.bottom { transform: rotateX(-90deg) translateZ(26px); background: rgba(4, 9, 6, 0.9); }
 }
 
-@keyframes drift {
-  0%, 100% { transform: translateZ(calc(var(--z) * var(--zs))); }
-  50% { transform: translateZ(calc(var(--z) * var(--zs) * 1.12)); }
-}
-@keyframes drop-drift {
-  0%, 100% { height: calc(var(--z) * var(--zs)); }
-  50% { height: calc(var(--z) * var(--zs) * 1.12); }
-}
-@keyframes ring-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.25); opacity: 0.25; }
-}
 @keyframes spin {
   from { transform: rotateX(-22deg) rotateY(0deg); }
   to { transform: rotateX(-22deg) rotateY(360deg); }

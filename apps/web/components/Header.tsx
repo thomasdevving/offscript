@@ -66,8 +66,10 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/[0.05] bg-ink/75 backdrop-blur-xl">
       <span aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-leaf-400/50 to-transparent" />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <div className="app-header-primary">
+        <div className="app-header-logo">
         <Logo />
+        </div>
         <nav role="tablist" aria-label="View" className="flex rounded-xl bg-white/[0.04] p-0.5" data-testid="view-tabs">
           {(["live", "multiverse"] as const).map((v) => (
             <button key={v} type="button" role="tab" aria-selected={s.appView === v} onClick={() => actions.setView(v)}
@@ -79,6 +81,21 @@ export default function Header() {
             </button>
           ))}
         </nav>
+        <div className="app-header-settings">
+          <label className="flex items-center rounded-xl border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[12px]">
+            <span className="sr-only">{L.language}</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mr-1 h-4 w-4 shrink-0 text-slate-400">
+              <circle cx="12" cy="12" r="9" /><ellipse cx="12" cy="12" rx="4" ry="9" /><path d="M3 12h18" />
+            </svg>
+            <select value={s.lang} onChange={(e) => actions.setLang(e.target.value as Language)} data-testid="lang-select"
+              aria-label={L.language} className="w-12 bg-transparent font-semibold text-white outline-none">
+              {LANGUAGES.map((l) => <option key={l.v} value={l.v} className="bg-slate-900">{l.short}</option>)}
+            </select>
+          </label>
+          <ThemeToggle lang={s.lang} />
+        </div>
+      </div>
+      <div className="app-header-secondary flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pb-2.5">
         {s.scenarios.length > 0 && <label className="flex min-w-0 items-center gap-2">
           <span className="sr-only">{L.scenario}</span>
           <select value={s.scenarioId ?? ""} onChange={(e) => void actions.selectScenario(e.target.value)} data-testid="scenario-select"
@@ -93,15 +110,6 @@ export default function Header() {
           <Segmented<ViewerMode> label={L.mode} value={s.mode} onChange={actions.setMode} testId="mode-switch"
             options={[{ v: "casual", label: L.casual }, { v: "analyst", label: L.analyst }, { v: "broadcaster", label: L.broadcaster }]} />
           <button type="button" onClick={() => void actions.openRecap()} data-testid="open-recap" className="btn">{L.recap}</button>
-          <label className="flex items-center rounded-xl border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[12px]">
-            <span className="sr-only">{L.language}</span>
-            <span aria-hidden className="mr-1 text-slate-400">🌐</span>
-            <select value={s.lang} onChange={(e) => actions.setLang(e.target.value as Language)} data-testid="lang-select"
-              aria-label={L.language} className="bg-transparent font-semibold text-white outline-none">
-              {LANGUAGES.map((l) => <option key={l.v} value={l.v} className="bg-slate-900">{l.short} · {l.label}</option>)}
-            </select>
-          </label>
-          <ThemeToggle lang={s.lang} />
           <div className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-2.5 py-1.5 text-[11px]">
             <span className={`rounded-md px-1.5 py-0.5 font-semibold ${live ? "bg-leaf-500/20 text-leaf-200" : "text-slate-300"}`}
               title={live ? `Microsoft Foundry deployment: ${s.health?.foundry_deployment}` : "No Foundry deployment configured: agents use the labelled deterministic planner"}

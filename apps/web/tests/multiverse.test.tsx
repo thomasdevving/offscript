@@ -129,6 +129,21 @@ describe("AgentBattle and response matrix", () => {
 });
 
 describe("ActionComposer", () => {
+  it("previews an option on hover or keyboard focus without selecting or validating it", () => {
+    const choose = vi.spyOn(mv, "chooseCandidate").mockResolvedValue(undefined);
+    render(<ActionComposer />);
+    const option = screen.getAllByTestId("option")[0];
+    fireEvent.pointerEnter(option);
+    expect(useMv.getState().previewCandidateId).toBe(options.options[0].action_id);
+    fireEvent.pointerLeave(option);
+    expect(useMv.getState().previewCandidateId).toBeNull();
+    fireEvent.focus(option);
+    expect(useMv.getState().previewCandidateId).toBe(options.options[0].action_id);
+    fireEvent.blur(option);
+    expect(useMv.getState().previewCandidateId).toBeNull();
+    expect(choose).not.toHaveBeenCalled();
+  });
+
   it("manual mode offers tools and options, and only submits a validated action", () => {
     const choose = vi.spyOn(mv, "chooseCandidate").mockResolvedValue(undefined);
     render(<ActionComposer />);

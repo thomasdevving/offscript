@@ -80,6 +80,7 @@ export interface AppState {
   recovery: CounterfactualAnalysis | null;
   recoveryFault: FaultInjection | null;
   selectedActionId: string | null;
+  previewActionId: string | null;
   whatIf: WhatIf;
   view: View;
   overlays: Overlay[];
@@ -132,6 +133,7 @@ export const useApp = create<AppState>(() => ({
   recovery: null,
   recoveryFault: null,
   selectedActionId: null,
+  previewActionId: null,
   whatIf: initialWhatIf,
   view: "observed",
   overlays: [],
@@ -284,7 +286,7 @@ export const actions = {
     socket?.close();
     set({
       scenarioId, matchId: sc.match_id, match: null, decisions: [], detected: [], feed: [], seenEvents: [], frames: [],
-      selectedDecisionId: null, snapshot: null, selectedActionId: null, whatIf: initialWhatIf, view: "observed",
+      selectedDecisionId: null, snapshot: null, selectedActionId: null, previewActionId: null, whatIf: initialWhatIf, view: "observed",
       overlays: [], recovery: null, recoveryFault: null, recap: null, decisionValue: null, decisionValueError: null, playback: initialPlayback, stats: null,
     });
     const [match, decisions, overlays] = await Promise.all([
@@ -306,7 +308,7 @@ export const actions = {
   },
 
   seek(t: number): void {
-    set({ frames: [], view: "observed", selectedActionId: null, whatIf: initialWhatIf });
+    set({ frames: [], view: "observed", selectedActionId: null, previewActionId: null, whatIf: initialWhatIf });
     actions.control({ type: "seek", t_ms: Math.round(t) });
   },
 
@@ -329,7 +331,7 @@ export const actions = {
   },
 
   async selectDecision(decisionId: string, opts: { fromLive?: boolean } = {}): Promise<void> {
-    set({ selectedDecisionId: decisionId, selectedActionId: null, whatIf: initialWhatIf, view: "snapshot",
+    set({ selectedDecisionId: decisionId, selectedActionId: null, previewActionId: null, whatIf: initialWhatIf, view: "snapshot",
       snapshot: null, recovery: null, recoveryFault: null });
     if (!opts.fromLive) actions.control({ type: "pause" });
     try {
@@ -404,7 +406,7 @@ export const actions = {
     const s = get();
     const a = s.recovery ?? (s.selectedDecisionId ? s.analyses[s.selectedDecisionId] : undefined);
     if (!a) return;
-    set({ selectedActionId: actionId, whatIf: { ...initialWhatIf, loading: true }, view: "simulated" });
+    set({ selectedActionId: actionId, previewActionId: null, whatIf: { ...initialWhatIf, loading: true }, view: "simulated" });
     actions.control({ type: "pause" });
     try {
       const traj = await api.trajectory(a.analysis_id, actionId, rollout);
@@ -418,12 +420,16 @@ export const actions = {
     set({ whatIf: { ...get().whatIf, ...patch } });
   },
 
+  previewAction(actionId: string | null): void {
+    set({ previewActionId: actionId });
+  },
+
   showSnapshot(): void {
-    set({ view: "snapshot", selectedActionId: null, whatIf: initialWhatIf });
+    set({ view: "snapshot", selectedActionId: null, previewActionId: null, whatIf: initialWhatIf });
   },
 
   backToMatch(): void {
-    set({ view: "observed", selectedActionId: null, whatIf: initialWhatIf });
+    set({ view: "observed", selectedActionId: null, previewActionId: null, whatIf: initialWhatIf });
   },
 
   setMode(mode: ViewerMode): void {

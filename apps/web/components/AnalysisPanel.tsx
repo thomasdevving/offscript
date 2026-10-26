@@ -9,6 +9,8 @@ import { eventLabel, t, tr, triggerLabel } from "@/lib/i18n";
 import { mv } from "@/lib/mvStore";
 import { localizeOverlays } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
+import { actionDirection, candidateBadges } from "@/lib/pitchDirections";
+import ActionDirectionIcon from "./ActionDirectionIcon";
 import RecoveryPanel from "./RecoveryPanel";
 import AgentActivity from "./AgentActivity";
 import WorkflowInspector, { AgentPipeline } from "./WorkflowInspector";
@@ -96,6 +98,7 @@ function PossibleFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Ma
     return (showCi ? r?.p_goal.ci95_high : r?.p_goal.value) ?? 0;
   })) * 1.08;
   const ordered = [...a.candidates].sort((x, y) => Number(y.is_actual) - Number(x.is_actual));
+  const badges = candidateBadges(a.candidates);
   return (
     <div data-testid="casual-cards">
       <div className="mb-2 flex items-baseline justify-between">
@@ -112,6 +115,7 @@ function PossibleFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Ma
             const isFav = favoured && best?.action_id === c.action_id;
             const w = r ? Math.max(1.5, (r.p_goal.value / max) * 100) : 0;
             const color = sel ? "#d4ee8f" : c.is_actual ? "#e2e8f0" : isFav ? "#8fca7c" : "#cfe2b4";
+            const direction = s.snapshot ? actionDirection(c, s.snapshot) : null;
             return (
               <li key={c.action_id} className="relative animate-rise" style={{ animationDelay: `${i * 70}ms` }}>
                 <svg className="absolute -left-5 top-0 h-full w-5 overflow-visible" aria-hidden>
@@ -119,15 +123,19 @@ function PossibleFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Ma
                   <circle cx={5.5} cy="50%" r={3} fill="#04060b" stroke={color} strokeWidth={1.5} />
                 </svg>
                 <button type="button" onClick={() => void actions.selectAction(c.action_id)}
+                  onPointerEnter={() => actions.previewAction(c.action_id)} onPointerLeave={() => actions.previewAction(null)}
+                  onFocus={() => actions.previewAction(c.action_id)} onBlur={() => actions.previewAction(null)}
                   className={`group w-full rounded-xl px-3 py-2.5 text-left transition ${sel ? "bg-leaf-500/15 ring-1 ring-leaf-400/60"
                     : isFav ? "bg-leaf-500/[0.07] ring-1 ring-leaf-400/25 hover:bg-leaf-500/10" : "bg-white/[0.03] hover:bg-white/[0.06]"}`}
                   data-testid={`option-${c.is_actual ? "actual" : "alt"}`}>
                   <div className="flex items-start gap-3">
+                    {direction && <ActionDirectionIcon angle={direction.angle} />}
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
                         {c.is_actual ? L.actual : L.alternative}{isFav && <span className="text-leaf-300"> · {L.modelFavours}</span>}
                       </div>
-                      <div className="truncate text-[15px] font-bold text-white">{cleanLabel(c.label)}</div>
+                      <div className="text-[15px] font-bold text-white"><span className="mv-option-rank">{badges.get(c.action_id)}</span> {cleanLabel(c.label)}</div>
+                      {direction && <div className="mv-option-detail mt-1">{direction.description}</div>}
                     </div>
                     <div className="text-right">
                       <div className={`num font-mono text-2xl font-black leading-none ${isFav ? "text-leaf-300" : "text-white"}`}>{r ? pct(r.p_goal.value, s.lang) : "…"}</div>
@@ -162,6 +170,7 @@ function PossibleFutures({ a, res, comps }: { a: CounterfactualAnalysis; res: Ma
 function AnalystTable({ a, res, comps }: { a: CounterfactualAnalysis; res: Map<string, ActionResult>; comps: Map<string, PairwiseComparison> }) {
   const s = useApp();
   const L = t(s.lang);
+  const badges = candidateBadges(a.candidates);
   return (
     <div className="overflow-x-auto">
       <table className="num w-full text-left text-[11px]" data-testid="analyst-table">
@@ -176,8 +185,10 @@ function AnalystTable({ a, res, comps }: { a: CounterfactualAnalysis; res: Map<s
             return (
               <tr key={c.action_id} className={`border-t border-white/5 [&>td]:px-1 ${s.selectedActionId === c.action_id ? "bg-leaf-600/10" : ""}`}>
                 <td className="py-1.5 pr-2">
-                  <button type="button" onClick={() => void actions.selectAction(c.action_id)} className="text-left font-semibold text-white hover:text-leaf-300">
-                    {cleanLabel(c.label)}{c.is_actual ? " *" : ""}
+                  <button type="button" onClick={() => void actions.selectAction(c.action_id)} className="text-left font-semibold text-white hover:text-leaf-300"
+                    onPointerEnter={() => actions.previewAction(c.action_id)} onPointerLeave={() => actions.previewAction(null)}
+                    onFocus={() => actions.previewAction(c.action_id)} onBlur={() => actions.previewAction(null)}>
+                    <span className="mv-option-rank">{badges.get(c.action_id)}</span> {cleanLabel(c.label)}{c.is_actual ? " *" : ""}
                   </button>
                 </td>
                 <td className="font-mono text-white">{pct(r.p_goal.value, s.lang)} <span className="text-slate-500">[{pct(r.p_goal.ci95_low, s.lang)}–{pct(r.p_goal.ci95_high, s.lang)}]</span></td>
