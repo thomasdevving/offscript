@@ -228,8 +228,11 @@ def verify_narrative(narrative: Narrative, evidence: list[EvidenceItem], roster:
             issues.append(f"Uses the internal player id {pid} instead of the name {p.name}")
     # Nor other internal identifiers: snapshot/match codes ("demo-match-073-snap-0002") or field names
     # ("p_goal_within_horizon"). Formations such as "4-3-3" have no word part and are allowed.
+    # Values shown in the evidence table (such as the simulator version) are allowed.
+    shown = " ".join(str(it.display) for it in evidence)
     for m in _INTERNAL_ID.findall(text):
-        issues.append(f"Uses an internal identifier ({m}) that viewers would not understand")
+        if m not in shown:
+            issues.append(f"Uses an internal identifier ({m}) that viewers would not understand")
     refs = {it.ref for it in evidence}
     unknown = [r for r in narrative.evidence_refs if r not in refs]
     if unknown:
