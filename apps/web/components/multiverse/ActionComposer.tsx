@@ -3,6 +3,7 @@
 import type { CandidateAction, InteractionMode, MatchStateSnapshot, SampleKind } from "@offscript/contracts";
 import { actionDirection } from "@/lib/pitchDirections";
 import { mv, useMv, type ComposerType } from "@/lib/mvStore";
+import ActionDirectionIcon from "../ActionDirectionIcon";
 
 const MODES: { v: InteractionMode; label: string; hint: string }[] = [
   { v: "manual", label: "Manual", hint: "You choose every action; agents respond and evaluate but never override you." },
@@ -29,11 +30,7 @@ function OptionRow({ action, snapshot, selected, recommended, actual, rank, busy
         onFocus={() => mv.previewCandidate(action.action_id)} onBlur={() => mv.previewCandidate(null)}
         aria-pressed={selected} data-testid={actual ? "actual-option" : "option"}
         className={`mv-option ${selected ? "is-selected" : ""}`}>
-        <span className="mv-option-direction" aria-hidden="true">
-          <svg viewBox="0 0 28 28"><g transform={`rotate(${direction?.angle ?? 0} 14 14)`}>
-            <path d="M5 14h16m-6-6 6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </g></svg>
-        </span>
+        <ActionDirectionIcon angle={direction?.angle ?? 0} />
         <span className="mv-option-copy">
           <span className="mv-option-title">{rank != null && <span className="mv-option-rank">{rank}</span>} {action.label.replace(" (actual)", "")}</span>
           <span className="mv-option-detail">{actual ? "Observed choice" : direction?.description ?? "Preview direction on the pitch"}

@@ -132,8 +132,8 @@ function Stage() {
   const attackDirection = snap && attackingTeam ? snap.attack_direction[attackingTeam] : 1;
   return (
     <div>
-      <div className="relative">
-      <div className="absolute right-3 top-3 z-10 flex max-w-[65%] flex-col items-end gap-1.5">
+      <div className="relative" data-pitch-stage>
+      <div data-pitch-overlay className="absolute right-3 top-3 z-10 flex max-w-[65%] flex-col items-end gap-1.5">
         <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${node.kind === "observed" ? "bg-slate-950/80 text-slate-100 ring-1 ring-white/20" : simulated ? "bg-leaf-600/90 text-white shadow-lg shadow-leaf-900/50" : "bg-sage-600/90 text-white shadow-lg shadow-sage-900/50"}`} data-testid="mv-banner">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
           {node.kind === "observed" ? "Canonical synthetic timeline" : node.kind === "root" ? "Frozen decision state" : `Simulated branch · depth ${node.depth}`}
@@ -142,10 +142,10 @@ function Stage() {
           <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-[11px] text-leaf-200 backdrop-blur">one possible future · not a certainty</span>
         )}
       </div>
-      <div className="absolute left-3 top-3 z-10"><DimToggle /></div>
+      <div data-pitch-overlay className="absolute left-3 top-3 z-10"><DimToggle /></div>
       {/* The defence's answer, named, while its movement arrows are on the pitch. */}
       {node.entering_strategy && !atEnd && (
-        <div className="absolute bottom-3 left-3 z-10 max-w-[60%] bg-slate-950/85 px-2 py-1 text-[11px] text-orange-200 ring-1 ring-orange-400/30 backdrop-blur" data-testid="mv-defence">
+        <div data-pitch-overlay className="absolute bottom-3 left-3 z-10 max-w-[60%] bg-slate-950/85 px-2 py-1 text-[11px] text-orange-200 ring-1 ring-orange-400/30 backdrop-blur" data-testid="mv-defence">
           Defence: <b className="text-orange-100">{node.entering_strategy.label}</b>
         </div>
       )}

@@ -3,6 +3,12 @@ import type { CandidateAction, MatchStateSnapshot } from "@offscript/contracts";
 export type Point = [number, number];
 export type Motion = "pass" | "dribble" | "shoot" | "run";
 
+/** Stable option references: observed choice is ACT, alternatives follow their list order. */
+export function candidateBadges(actions: readonly Pick<CandidateAction, "action_id" | "is_actual">[]) {
+  let rank = 0;
+  return new Map(actions.map((a) => [a.action_id, a.is_actual ? "ACT" : String(++rank)]));
+}
+
 /** All coordinates stay in the world frame, including when the team attacks left. */
 export function actionDirection(action: CandidateAction, snapshot: MatchStateSnapshot) {
   const actor = snapshot.players.find((p) => p.player_id === action.actor_id);

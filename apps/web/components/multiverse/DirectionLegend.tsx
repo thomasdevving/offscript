@@ -1,11 +1,26 @@
+import type { ReactNode } from "react";
+import { directionStyle, type Motion } from "@/lib/pitchDirections";
+
+function DirectionKey({ motion, defence, observed, children }: { motion: Motion; defence?: boolean; observed?: boolean; children: ReactNode }) {
+  const { dash } = directionStyle(defence ? "defense" : observed ? "actual" : "selected", motion);
+  return <span className={defence ? "mv-defence-key" : observed ? "mv-observed-key" : undefined}>
+    <svg viewBox="0 0 46 12" aria-hidden="true">
+      <path d="M1 6h35" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray={dash?.map((v) => v * 3).join(" ")} />
+      {[16, 29].map((x) => <path key={x} d={`M${x - 2.4} 3.6 ${x} 6 ${x - 2.4} 8.4`} fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />)}
+      <path d="m36 2 8 4-8 4z" fill="currentColor" />
+    </svg>{children}
+  </span>;
+}
+
 export default function DirectionLegend() {
   return (
     <div className="mv-direction-legend" aria-label="Action direction legend">
-      <span><svg viewBox="0 0 36 12" aria-hidden="true"><path d="M1 6h26" stroke="currentColor" strokeWidth="2" strokeDasharray="6 3" /><path d="m26 2 8 4-8 4z" fill="currentColor" /></svg>Pass</span>
-      <span><svg viewBox="0 0 36 12" aria-hidden="true"><path d="M1 6h26" stroke="currentColor" strokeWidth="2" strokeDasharray="1 3" strokeLinecap="round" /><path d="m26 2 8 4-8 4z" fill="currentColor" /></svg>Dribble</span>
-      <span><svg viewBox="0 0 36 12" aria-hidden="true"><path d="M1 6h26" stroke="currentColor" strokeWidth="2" /><path d="m26 2 8 4-8 4z" fill="currentColor" /></svg>Shot</span>
-      <span className="mv-defence-key"><svg viewBox="0 0 36 12" aria-hidden="true"><path d="M1 6h26" stroke="currentColor" strokeWidth="2" strokeDasharray="2 3" /><path d="m26 2 8 4-8 4z" fill="currentColor" /></svg>Defence</span>
-      <span>Numbers match the options · ACT = observed</span>
+      <DirectionKey motion="pass">Pass</DirectionKey>
+      <DirectionKey motion="dribble">Dribble</DirectionKey>
+      <DirectionKey motion="shoot">Shot</DirectionKey>
+      <DirectionKey motion="run" defence>Defence</DirectionKey>
+      <DirectionKey motion="shoot" observed>Observed (ACT)</DirectionKey>
+      <span>Numbers match the options</span>
     </div>
   );
 }

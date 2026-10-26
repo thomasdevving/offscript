@@ -1,10 +1,11 @@
-import type { CounterfactualAnalysis, DecisionPoint, MatchInfo } from "@offscript/contracts";
+import type { CounterfactualAnalysis, DecisionPoint, MatchInfo, MatchStateSnapshot } from "@offscript/contracts";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import AnalysisPanel from "@/components/AnalysisPanel";
 import ComparisonChart from "@/components/ComparisonChart";
 import Pitch from "@/components/Pitch";
-import { useApp } from "@/lib/store";
+import { candidateArrows } from "@/components/PitchStage";
+import { actions, useApp } from "@/lib/store";
 
 const est = (v: number, n = 200) => ({ value: v, ci95_low: Math.max(0, v - 0.01), ci95_high: v + 0.02, successes: Math.round(v * n), trials: n, method: "wilson" as const });
 
@@ -46,10 +47,27 @@ const analysis = {
 } as unknown as CounterfactualAnalysis;
 
 beforeEach(() => {
-  useApp.setState({ decisions: [decision], selectedDecisionId: "dp1", analyses: { dp1: analysis }, mode: "casual", lang: "en", recovery: null, overlays: [] });
+  useApp.setState({ decisions: [decision], selectedDecisionId: "dp1", selectedActionId: null, previewActionId: null, analyses: { dp1: analysis }, mode: "casual", lang: "en", recovery: null, overlays: [] });
 });
 
 describe("AnalysisPanel", () => {
+  it("previews a numbered live option on hover and focus without starting a continuation", () => {
+    const select = vi.spyOn(actions, "selectAction");
+    render(<AnalysisPanel />);
+    const option = screen.getByTestId("option-alt");
+    fireEvent.pointerEnter(option);
+    expect(useApp.getState().previewActionId).toBe("s-pass-H07");
+    fireEvent.pointerLeave(option);
+    expect(useApp.getState().previewActionId).toBeNull();
+    fireEvent.focus(option);
+    expect(useApp.getState().previewActionId).toBe("s-pass-H07");
+    fireEvent.blur(option);
+    expect(useApp.getState().previewActionId).toBeNull();
+    expect(useApp.getState().selectedActionId).toBeNull();
+    expect(select).not.toHaveBeenCalled();
+    select.mockRestore();
+  });
+
   it("casual mode shows simple option cards and the casual narrative", () => {
     render(<AnalysisPanel />);
     expect(screen.getByTestId("casual-cards")).toBeInTheDocument();
@@ -112,6 +130,21 @@ describe("AnalysisPanel", () => {
 });
 
 describe("visual components", () => {
+  it("uses the same stable option markers and target coordinates in the live pitch", () => {
+    const snap = { possession_team_id: "HCF", attack_direction: { HCF: -1 },
+      ball: { possessor_id: "H10" }, players: [{ player_id: "H10", team_id: "HCF", x: 30, y: 34 }] } as unknown as MatchStateSnapshot;
+    const candidates = [...analysis.candidates, ...["two", "three"].map((id) => ({ ...analysis.candidates[1], action_id: id }))];
+    const a = { ...analysis, candidates };
+    const initial = candidateArrows(a, snap, null);
+    expect(initial.map((r) => r.badge)).toEqual(["ACT", "1", "2"]);
+    expect(initial[0].to).toEqual([0, 34]);
+    expect(initial[1]).toMatchObject({ motion: "pass", to: [12, 20] });
+    const preview = candidateArrows(a, snap, null, "three");
+    expect(preview.map((r) => r.badge)).toEqual(["ACT", "3"]);
+    const replay = candidateArrows(a, snap, "three", null, true);
+    expect(replay.map((r) => r.id)).toEqual(["three"]);
+  });
+
   it("ComparisonChart renders one bar per option with an accessible label", () => {
     render(<ComparisonChart candidates={analysis.candidates} results={analysis.simulation!.results} selected={null} lang="en" />);
     expect(screen.getByRole("img", { name: /Comparison chart/ })).toBeInTheDocument();

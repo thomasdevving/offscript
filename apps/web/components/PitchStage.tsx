@@ -3,14 +3,16 @@
 import type { CounterfactualAnalysis, MatchStateSnapshot, Overlay } from "@offscript/contracts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ballPath, interpolate, type RenderFrame } from "@/lib/frames";
-import { actualTag, clock, cleanLabel, labelLanguage, outcomeLabel, pct } from "@/lib/format";
+import { actualTag, clock, cleanLabel, outcomeLabel, pct } from "@/lib/format";
 import { t, tr } from "@/lib/i18n";
 import { activeOverlay, localizeOverlays } from "@/lib/overlayEngine";
 import { actions, selectedAnalysis, selectedDecision, useApp } from "@/lib/store";
+import { actionDirection, candidateBadges } from "@/lib/pitchDirections";
 import { ScoreBug } from "./MatchIntel";
 import OverlayCard from "./OverlayCard";
 import { type Arrow, type Ring } from "./Pitch";
 import PitchView, { DimToggle } from "./PitchView";
+import DirectionLegend from "./multiverse/DirectionLegend";
 
 function useRaf(cb: (dt: number) => void, active: boolean) {
   const ref = useRef(cb);
@@ -35,29 +37,19 @@ function snapshotFrame(s: MatchStateSnapshot): RenderFrame {
   return { t_ms: s.sim_time_ms, ball: [s.ball.x, s.ball.y, 0], players, possessor_id: s.ball.possessor_id ?? null };
 }
 
-function goalTarget(s: MatchStateSnapshot): [number, number] {
-  const dir = s.attack_direction[s.possession_team_id];
-  return dir === 1 ? [105, 34] : [0, 34];
-}
-
-function candidateArrows(a: CounterfactualAnalysis | null, s: MatchStateSnapshot, selected: string | null): Arrow[] {
+export function candidateArrows(a: CounterfactualAnalysis | null, s: MatchStateSnapshot, selected: string | null, preview: string | null = null, replay = false): Arrow[] {
   if (!a || !a.candidates.length) return [];
-  const carrier = s.players.find((p) => p.player_id === s.ball.possessor_id);
-  if (!carrier) return [];
-  const res = new Map((a.simulation?.results ?? []).map((r) => [r.action_id, r]));
-  const ranked = [...a.candidates].sort((x, y) => (res.get(y.action_id)?.p_goal.value ?? 0) - (res.get(x.action_id)?.p_goal.value ?? 0));
-  return a.candidates.map((c) => {
-    const to: [number, number] = c.action_type === "shoot" ? goalTarget(s) : [c.target_x ?? carrier.x, c.target_y ?? carrier.y];
-    const r = res.get(c.action_id);
-    const label = `${cleanLabel(c.label)}${r ? ` ${pct(r.p_goal.value, labelLanguage())}` : ""}`;
-    return {
-      id: c.action_id,
-      from: [carrier.x, carrier.y],
-      to,
-      kind: c.action_id === selected ? "selected" : c.is_actual ? "actual" : "alternative",
-      label: c.is_actual ? `${label} ${actualTag()}` : label,
-      rank: r ? ranked.findIndex((x) => x.action_id === c.action_id) + 1 : undefined,
-    } satisfies Arrow;
+  const badges = candidateBadges(a.candidates);
+  const highlighted = replay ? selected : preview ?? selected;
+  const visible = highlighted ? a.candidates.filter((c) => c.action_id === highlighted || (!replay && c.is_actual))
+    : [...a.candidates.filter((c) => c.is_actual), ...a.candidates.filter((c) => !c.is_actual).slice(0, 2)];
+  return visible.flatMap((c): Arrow[] => {
+    const direction = actionDirection(c, s);
+    if (!direction) return [];
+    return [{ id: c.action_id, from: direction.from, to: direction.to, motion: c.action_type,
+      kind: c.action_id === highlighted ? "selected" : c.is_actual ? "actual" : "alternative",
+      label: `${cleanLabel(c.label)}${c.is_actual ? ` ${actualTag()}` : ""}`, badge: badges.get(c.action_id),
+      rank: c.is_actual ? undefined : Number(badges.get(c.action_id)) }];
   });
 }
 
@@ -65,7 +57,7 @@ function candidateArrows(a: CounterfactualAnalysis | null, s: MatchStateSnapshot
 export function OutcomeCard({ action, outcome, lines }: { action: string; outcome: string; lines: string[] }) {
   return (
     <div className="pointer-events-none absolute bottom-2 left-1/2 z-10 w-max max-w-[92%] -translate-x-1/2 animate-rise bg-slate-950/80 px-3 py-1.5 text-center shadow-2xl ring-1 ring-leaf-400/40 backdrop-blur"
-      data-testid="outcome-card">
+      data-testid="outcome-card" data-pitch-overlay>
       <div className="text-[13px] font-bold text-white">
         {action} → <span className="text-amber-300">{outcomeLabel(outcome).toLowerCase()}</span>
       </div>
@@ -105,7 +97,8 @@ export default function PitchStage() {
     return interpolate(s.frames, renderT);
   }, [s.view, s.whatIf, s.snapshot, s.frames, renderT]);
 
-  const arrows = s.view === "snapshot" && s.snapshot ? candidateArrows(analysis, s.snapshot, s.selectedActionId) : [];
+  const arrows = s.view !== "observed" && s.snapshot
+    ? candidateArrows(analysis, s.snapshot, s.selectedActionId, s.previewActionId, s.view === "simulated") : [];
   const traj = s.whatIf.trajectory;
   const trail = s.view === "simulated" && traj ? ballPath(traj.frames, 0, s.whatIf.t) : undefined;
   const ghost = s.view === "simulated" && traj ? ballPath(traj.frames) : undefined;
@@ -143,9 +136,11 @@ export default function PitchStage() {
   const traceLabel = traj ? `${cleanLabel(analysis?.candidates.find((c) => c.action_id === traj.action_id)?.label ?? "")} · ${outcomeLabel(traj.outcome).toLowerCase()}` : "";
 
   return (
-    <div className="relative">
-      <div className="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5"><ScoreBug /><DimToggle /></div>
-      <div className="absolute bottom-3 right-3 z-10 flex max-w-[60%] flex-col items-end gap-1.5 sm:bottom-auto sm:top-3">
+    <div>
+      <div className="px-1 pb-2"><ScoreBug /></div>
+      <div className="relative" data-pitch-stage>
+      <div data-pitch-overlay className="absolute left-3 top-3 z-10"><DimToggle /></div>
+      <div data-pitch-overlay className="absolute bottom-3 right-3 z-10 flex max-w-[60%] flex-col items-end gap-1.5 sm:bottom-auto sm:top-3">
         <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${banner.cls}`} data-testid="view-banner">
           <span className={`h-1.5 w-1.5 rounded-full ${s.view === "observed" ? "bg-emerald-400" : "bg-white"} ${s.view !== "snapshot" ? "animate-pulse" : ""}`} />
           {banner.text}
@@ -153,7 +148,7 @@ export default function PitchStage() {
         {s.view === "simulated" && <span className="rounded-lg bg-slate-950/80 px-2 py-1 text-right text-[11px] text-leaf-200 backdrop-blur">{L.oneSample}</span>}
       </div>
       {s.view === "simulated" && traj && !atEnd && (
-        <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-slate-950/80 px-2 py-1 font-mono text-[11px] text-leaf-200 backdrop-blur" data-testid="trace-label">{traceLabel}</div>
+        <div data-pitch-overlay className="absolute bottom-3 left-3 z-10 rounded-lg bg-slate-950/80 px-2 py-1 font-mono text-[11px] text-leaf-200 backdrop-blur" data-testid="trace-label">{traceLabel}</div>
       )}
       {s.view === "simulated" && traj && atEnd && (
         <OutcomeCard
@@ -179,6 +174,12 @@ export default function PitchStage() {
         ariaLabel={`${match.home.name} versus ${match.away.name} pitch, ${banner.text}`}
       />
       {overlay && <OverlayCard overlay={overlay} />}
+      </div>
+      {s.view !== "observed" && s.snapshot && <div className="mv-attack-direction" aria-label="Team attacking direction">
+        {s.snapshot.attack_direction[s.snapshot.possession_team_id] === -1 ? "← " : ""}Attacking{s.snapshot.attack_direction[s.snapshot.possession_team_id] === 1 ? " →" : ""}
+        {s.view === "simulated" && <span> · planned route from decision start</span>}
+      </div>}
+      {arrows.length > 0 && <DirectionLegend />}
     </div>
   );
 }

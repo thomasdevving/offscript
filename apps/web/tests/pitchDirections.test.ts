@@ -43,12 +43,13 @@ describe("action directions", () => {
       { id: "one", from: [20, 34], to: [40, 34], kind: "alternative", label: "Pass one", badge: "1" },
       { id: "two", from: [20, 34], to: [40, 35], kind: "alternative", label: "Pass two", badge: "2" },
     ];
-    const labels = placeLabels(routes, scale);
+    const labels = placeLabels(routes, scale, [{ x: 30, y: 36, w: 20, h: 15 }]);
     const size = 3.2 * scale;
     const a = labels.get("one")!, b = labels.get("two")!;
     for (const [x, y] of [a, b]) {
-      // Both routes stay in the y=34..35 corridor: neither badge may cover it.
-      expect(y + size < 34 || y > 35).toBe(true);
+      // Both finite routes stay inside x=20..40, y=34..35.
+      expect(x + size < 20 || x > 40 || y + size < 34 || y > 35).toBe(true);
+      expect(x + size < 30 || x > 50 || y + size < 36 || y > 51).toBe(true);
       expect(Math.hypot(x + size / 2 - 40, y + size / 2 - 34)).toBeLessThan(14);
     }
     expect(Math.abs(a[0] - b[0]) >= size || Math.abs(a[1] - b[1]) >= size).toBe(true);

@@ -47,3 +47,9 @@ depending on colour alone. Option previews must not submit a decision.
 
 The image-generated Multiverse sketch guides composition. It does not authorize
 invented features, player information, metrics or model-validation claims.
+
+Live match decision analysis uses the same route patterns, intermediate chevrons,
+numbered endpoint markers, direction icons and legend as Multiverse. Its numbered
+options preview routes on hover or focus without requesting a trajectory; choosing
+an option still opens the existing simulated continuation. ACT identifies the
+observed choice. The full pitch and playback remain together in the left column.

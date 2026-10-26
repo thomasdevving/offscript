@@ -90,8 +90,8 @@ function crossesBox(a: Arrow, b: Box): boolean {
  * Places every arrow label without overlaps: candidates along the arrow and on either side, best-ranked
  * arrow first, first free spot that stays on the pitch wins. Returns each label's top-left corner.
  */
-export function placeLabels(arrows: Arrow[], scale = 1): Map<string, [number, number]> {
-  const placed: Box[] = [];
+export function placeLabels(arrows: Arrow[], scale = 1, blocked: Box[] = []): Map<string, [number, number]> {
+  const placed: Box[] = [...blocked];
   const out = new Map<string, [number, number]>();
   const hits = (b: Box) => placed.some((o) => b.x < o.x + o.w + 0.3 && o.x < b.x + b.w + 0.3 && b.y < o.y + o.h + 0.3 && o.y < b.y + b.h + 0.3);
   const order = [...arrows].sort((p, q) => (p.rank ?? 99) - (q.rank ?? 99));
@@ -113,9 +113,14 @@ export function placeLabels(arrows: Arrow[], scale = 1): Map<string, [number, nu
       if (pick) break;
     }
     if (!pick) {
-      // Everything nearby is taken: stack under the lowest label.
-      const low = placed.reduce((m, o) => Math.max(m, o.y + o.h), y1);
-      pick = { x: Math.min(105 - w, Math.max(0, x1 - w / 2)), y: low + 0.4, w, h };
+      // A control or outcome overlay may occupy the nearby positions. Find the
+      // nearest clear location on the pitch instead of stacking outside its edge.
+      let nearest = Infinity;
+      for (let y = 0; y <= W - h; y += 2) for (let x = 0; x <= L - w; x += 2) {
+        const b = { x, y, w, h }, distance = Math.hypot(x + w / 2 - x2, y + h / 2 - y2);
+        if (distance < nearest && !hits(b) && !arrows.some((route) => crossesBox(route, b))) { pick = b; nearest = distance; }
+      }
+      pick ??= { x: Math.min(L - w, Math.max(0, x2 - w / 2)), y: Math.min(W - h, Math.max(0, y2 - h / 2)), w, h };
     }
     placed.push(pick);
     out.set(a.id, [pick.x, pick.y]);
@@ -176,15 +181,32 @@ function ArrowLabel({ a, at, scale }: { a: Arrow; at: [number, number]; scale: n
 export default function Pitch(p: PitchProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [badgeScale, setBadgeScale] = useState(1);
+  const [labelObstacles, setLabelObstacles] = useState<Box[]>([]);
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
-      if (width > 0) setBadgeScale(Math.max(1, 22 * (L + 6) / (width * 3.2)));
-    });
-    observer.observe(svg);
-    return () => observer.disconnect();
+    const stage = svg.closest("[data-pitch-stage]");
+    const update = () => {
+      const rect = svg.getBoundingClientRect(), px = rect.width / (L + 6);
+      if (px <= 0) return;
+      setBadgeScale(Math.max(1, 22 / (px * 3.2)));
+      const boxes = Array.from(stage?.querySelectorAll("[data-pitch-overlay]") ?? []).flatMap((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width && r.height ? [{ x: (r.left - rect.left) / px - 3, y: (r.top - rect.top) / px - 3, w: r.width / px, h: r.height / px }] : [];
+      });
+      setLabelObstacles((old) => JSON.stringify(old) === JSON.stringify(boxes) ? old : boxes);
+    };
+    const observer = new ResizeObserver(update);
+    const observe = () => {
+      observer.disconnect();
+      observer.observe(svg);
+      stage?.querySelectorAll("[data-pitch-overlay]").forEach((el) => observer.observe(el));
+      update();
+    };
+    const mutations = new MutationObserver(observe);
+    if (stage) mutations.observe(stage, { childList: true, subtree: true });
+    observe();
+    return () => { observer.disconnect(); mutations.disconnect(); };
   }, []);
   const home = p.match.home;
   const away = p.match.away;
@@ -273,7 +295,7 @@ export default function Pitch(p: PitchProps) {
         )}
       </g>
       {(() => {
-        const at = placeLabels(p.arrows ?? [], badgeScale);
+        const at = placeLabels(p.arrows ?? [], badgeScale, labelObstacles);
         return <>
           <g data-testid="pitch-routes">{p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} labelAt={at.get(a.id)} scale={badgeScale} />)}</g>
           {/* Paint every label after every route so a later arrow cannot cross its text. */}

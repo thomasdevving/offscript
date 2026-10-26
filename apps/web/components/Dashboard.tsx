@@ -73,6 +73,7 @@ export default function Dashboard() {
   const ready = useApp((s) => s.scenarios.length > 0);
   const scenario = useApp((s) => s.scenarios.find((x) => x.scenario_id === s.scenarioId));
   const appView = useApp((s) => s.appView);
+  const view = useApp((s) => s.view);
   const L = t(lang);
   // A scaled-to-zero API holds the first request while it starts: after a short wait, explain why.
   const [slow, setSlow] = useState(false);
@@ -113,11 +114,11 @@ export default function Dashboard() {
                 <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-400">{scenario.description}</p>
               </div>
             )}
-            <div className="mx-auto w-full max-w-[max(560px,calc((100vh-300px)*1.5))] frame overflow-hidden p-2 shadow-2xl shadow-black/60">
+            <div className="mv-stage-panel frame w-full overflow-hidden p-1.5">
               <PitchStage />
             </div>
-            <WhatIfControls />
-            <PlaybackControls />
+            {view === "simulated" ? <><WhatIfControls /><PlaybackControls /></>
+              : <><PlaybackControls /><WhatIfControls /></>}
             <Moments />
             <MatchCentre />
             <p className="px-1 text-[11px] text-slate-600">
@@ -126,7 +127,7 @@ export default function Dashboard() {
                 : "Synthetische wedstrijd met fictieve teams en spelers. Alternatieven worden gesimuleerd met een expliciet, ongekalibreerd model; het zijn schattingen, geen werkelijkheid."}
             </p>
           </section>
-          <aside className="min-w-0 lg:sticky lg:top-[62px] lg:max-h-[calc(100vh-78px)] lg:overflow-y-auto lg:pr-1" aria-label={L.analysisTitle}>
+          <aside className="min-w-0" aria-label={L.analysisTitle}>
             <AnalysisPanel />
           </aside>
         </main>

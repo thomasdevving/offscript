@@ -198,6 +198,15 @@ function arrowMesh(a: Arrow): { group: THREE.Group; hit: THREE.Mesh | undefined;
   headMesh.rotation.x = -Math.PI / 2;
   headMesh.position.y = 0.07;
   group.add(headMesh);
+  if (Math.hypot(x2 - x1, y2 - y1) > 12) {
+    for (const t of [.35, .65]) {
+      const center: [number, number] = [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t];
+      for (const side of [-.8, .8]) {
+        const wing: [number, number] = [center[0] - .8 * Math.cos(ang) - side * Math.sin(ang), center[1] - .8 * Math.sin(ang) + side * Math.cos(ang)];
+        group.add(groundStrip(wing, center, .4, color, undefined, 1, .09));
+      }
+    }
+  }
   const hitGroup = groundStrip([x1, y1], [x2, y2], 3.2, "#000000", undefined, 0, 0.05);
   const hit = hitGroup.children[0] as THREE.Mesh | undefined;
   if (hit) hit.userData.arrowId = a.id;
