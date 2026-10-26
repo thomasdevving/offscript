@@ -57,6 +57,7 @@ export interface MvState {
   interaction: InteractionMode;
   sampleKind: SampleKind;
   composer: Composer;
+  previewCandidateId: string | null;
   job: MultiverseJob | null;
   live: LiveItem[];
   error: string | null;
@@ -83,6 +84,7 @@ export const useMv = create<MvState>(() => ({
   interaction: "manual",
   sampleKind: "representative",
   composer: emptyComposer,
+  previewCandidateId: null,
   job: null,
   live: [],
   error: null,
@@ -214,7 +216,7 @@ export const mv = {
   },
 
   async select(nodeId: string, opts: { play?: boolean } = {}): Promise<void> {
-    set({ selected: nodeId, composer: emptyComposer, error: null });
+    set({ selected: nodeId, composer: emptyComposer, previewCandidateId: null, error: null });
     const [node, path] = await Promise.all([mvApi.node(nodeId), mvApi.trajectory(nodeId)]);
     set({ nodes: { ...get().nodes, [nodeId]: node }, path });
     const lastStart = path.boundaries.length > 1 ? path.boundaries[path.boundaries.length - 2].t_ms : 0;
@@ -244,13 +246,17 @@ export const mv = {
   },
 
   setComposer(type: ComposerType): void {
-    set({ composer: { ...emptyComposer, type } });
+    set({ composer: { ...emptyComposer, type }, previewCandidateId: null });
     if (type === "shoot") void mv.validate({ action_type: "shoot" });
   },
 
   chooseCandidate(candidateId: string): void {
-    set({ composer: { ...emptyComposer, type: null, candidateId } });
+    set({ composer: { ...emptyComposer, type: null, candidateId }, previewCandidateId: null });
     void mv.validate({ candidate_id: candidateId } as ActionSpec);
+  },
+
+  previewCandidate(candidateId: string | null): void {
+    set({ previewCandidateId: candidateId });
   },
 
   async playerClicked(playerId: string): Promise<void> {

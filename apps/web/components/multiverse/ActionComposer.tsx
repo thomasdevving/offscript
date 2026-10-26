@@ -1,6 +1,7 @@
 "use client";
 
-import type { InteractionMode, SampleKind } from "@offscript/contracts";
+import type { CandidateAction, InteractionMode, MatchStateSnapshot, SampleKind } from "@offscript/contracts";
+import { actionDirection } from "@/lib/pitchDirections";
 import { mv, useMv, type ComposerType } from "@/lib/mvStore";
 
 const MODES: { v: InteractionMode; label: string; hint: string }[] = [
@@ -14,6 +15,38 @@ const SAMPLES: { v: SampleKind; label: string }[] = [
   { v: "defensive_success", label: "Defensive success" },
   { v: "random", label: "Random sample" },
 ];
+
+function OptionRow({ action, snapshot, selected, recommended, actual, rank, busy }: {
+  action: CandidateAction; snapshot?: MatchStateSnapshot; selected: boolean; recommended?: boolean;
+  actual?: boolean; rank?: number; busy: boolean;
+}) {
+  const direction = snapshot ? actionDirection(action, snapshot) : null;
+  const estimate = action.features.completion_estimate ?? action.features.success_estimate;
+  return (
+    <li>
+      <button type="button" onClick={() => mv.chooseCandidate(action.action_id)} disabled={busy}
+        onPointerEnter={() => mv.previewCandidate(action.action_id)} onPointerLeave={() => mv.previewCandidate(null)}
+        onFocus={() => mv.previewCandidate(action.action_id)} onBlur={() => mv.previewCandidate(null)}
+        aria-pressed={selected} data-testid={actual ? "actual-option" : "option"}
+        className={`mv-option ${selected ? "is-selected" : ""}`}>
+        <span className="mv-option-direction" aria-hidden="true">
+          <svg viewBox="0 0 28 28"><g transform={`rotate(${direction?.angle ?? 0} 14 14)`}>
+            <path d="M5 14h16m-6-6 6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </g></svg>
+        </span>
+        <span className="mv-option-copy">
+          <span className="mv-option-title">{rank != null && <span className="mv-option-rank">{rank}</span>} {action.label.replace(" (actual)", "")}</span>
+          <span className="mv-option-detail">{actual ? "Observed choice" : direction?.description ?? "Preview direction on the pitch"}
+            {estimate != null && ` · ${Math.round(estimate * 100)}% ${action.action_type === "pass" ? "arrives" : "succeeds"}`}
+          </span>
+          {actual && <span className="mv-option-badge">ACTUAL</span>}
+          {recommended && <span className="mv-option-badge">AI RECOMMENDED</span>}
+        </span>
+        <span className="mv-option-check" aria-hidden="true">{selected ? "✓" : ""}</span>
+      </button>
+    </li>
+  );
+}
 
 export default function ActionComposer() {
   const s = useMv();
@@ -78,29 +111,14 @@ export default function ActionComposer() {
               s.composer.type === "pass_space" || s.composer.type === "dribble" ? "Click a point on the pitch." :
                 "Pick a tool, or one of the generated options below."}
           </p>
-          <ul className="max-h-40 space-y-1 overflow-y-auto" data-testid="option-list">
+          <ul className="mv-options" data-testid="option-list">
             {opts?.actual && (
-              <li>
-                <button type="button" onClick={() => mv.chooseCandidate(opts.actual!.action_id)}
-                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === opts.actual.action_id ? "bg-leaf-600/25" : "hover:bg-white/[0.06]"}`}>
-                  <span className="rounded bg-slate-200 px-1 text-[9px] font-bold text-slate-900">ACTUAL</span>
-                  <span className="text-white">{opts.actual.label.replace(" (actual)", "")}</span>
-                </button>
-              </li>
+              <OptionRow action={opts.actual} snapshot={s.states[node.node_id]} actual busy={busy}
+                selected={s.composer.candidateId === opts.actual.action_id} />
             )}
-            {opts?.options.map((o) => (
-              <li key={o.action_id}>
-                <button type="button" onClick={() => mv.chooseCandidate(o.action_id)} data-testid="option"
-                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-xs ${s.composer.candidateId === o.action_id ? "bg-leaf-600/25" : "hover:bg-white/[0.06]"}`}>
-                  {o.action_id === recId && <span className="rounded bg-emerald-400 px-1 text-[9px] font-bold text-emerald-950">AI RECOMMENDED</span>}
-                  <span className="text-slate-100">{o.label}</span>
-                  <span className="ml-auto font-mono text-[10px] text-slate-500">
-                    {o.features.completion_estimate != null ? `${Math.round(o.features.completion_estimate * 100)}% arrives` :
-                      o.features.success_estimate != null ? `${Math.round(o.features.success_estimate * 100)}% succeeds` :
-                        o.features.modeled_shot_scoring_probability != null ? `${(o.features.modeled_shot_scoring_probability * 100).toFixed(1)}% shot` : ""}
-                  </span>
-                </button>
-              </li>
+            {opts?.options.map((o, i) => (
+              <OptionRow key={o.action_id} action={o} snapshot={s.states[node.node_id]} rank={i + 1} busy={busy}
+                selected={s.composer.candidateId === o.action_id} recommended={o.action_id === recId} />
             ))}
           </ul>
           {v && (

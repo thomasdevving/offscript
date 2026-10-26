@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Pitch, { type Arrow, type PitchProps } from "./Pitch";
+import { directionStyle } from "@/lib/pitchDirections";
 
 /**
  * 3D replay of the same frames the 2D board draws: a broadcast camera above the touchline, simple
@@ -69,10 +70,6 @@ function boardTexture(): THREE.CanvasTexture {
   tex.anisotropy = 8;
   return tex;
 }
-
-const ARROW_COLOR: Record<Arrow["kind"], string> = {
-  actual: "#f8fafc", selected: "#d4ee8f", alternative: "#cfe2b4", defense: "#f97316", recommended: "#34d399",
-};
 
 function pitchTexture(): THREE.CanvasTexture {
   const px = 20; // pixels per metre
@@ -178,21 +175,20 @@ function groundStrip(from: [number, number], to: [number, number], width: number
 }
 
 function arrowMesh(a: Arrow): { group: THREE.Group; hit: THREE.Mesh | undefined; labelAt: THREE.Vector3 } {
-  const color = ARROW_COLOR[a.kind];
-  const dash: [number, number] | undefined = a.kind === "actual" ? [1.4, 0.9] : a.kind === "alternative" ? [0.8, 0.7]
-    : a.kind === "defense" ? [1, 0.6] : undefined;
-  const width = a.kind === "selected" ? 0.75 : 0.5;
+  const { color, dash } = directionStyle(a.kind, a.motion);
+  const width = a.kind === "selected" ? 0.85 : 0.6;
   const group = new THREE.Group();
   const [x1, y1] = a.from;
   const [x2, y2] = a.to;
   const ang = Math.atan2(y2 - y1, x2 - x1);
-  const head: [number, number] = [x2 - Math.cos(ang) * 2.2, y2 - Math.sin(ang) * 2.2];
+  const headLength = Math.min(3, Math.hypot(x2 - x1, y2 - y1) * 0.4);
+  const head: [number, number] = [x2 - Math.cos(ang) * headLength, y2 - Math.sin(ang) * headLength];
   group.add(groundStrip([x1, y1], head, width, color, dash, a.kind === "alternative" ? 0.85 : 1));
   const tri = new THREE.Shape();
-  const lx = head[0] + Math.cos(ang + Math.PI / 2) * 1.1;
-  const ly = head[1] + Math.sin(ang + Math.PI / 2) * 1.1;
-  const rx = head[0] + Math.cos(ang - Math.PI / 2) * 1.1;
-  const ry = head[1] + Math.sin(ang - Math.PI / 2) * 1.1;
+  const lx = head[0] + Math.cos(ang + Math.PI / 2) * headLength * 0.48;
+  const ly = head[1] + Math.sin(ang + Math.PI / 2) * headLength * 0.48;
+  const rx = head[0] + Math.cos(ang - Math.PI / 2) * headLength * 0.48;
+  const ry = head[1] + Math.sin(ang - Math.PI / 2) * headLength * 0.48;
   // Shape lives in XY; rotating -90 deg about X maps shape y onto world -Z, so feed -z.
   tri.moveTo(x2 - L / 2, -(y2 - W / 2));
   tri.lineTo(lx - L / 2, -(ly - W / 2));
@@ -206,9 +202,10 @@ function arrowMesh(a: Arrow): { group: THREE.Group; hit: THREE.Mesh | undefined;
   const hit = hitGroup.children[0] as THREE.Mesh | undefined;
   if (hit) hit.userData.arrowId = a.id;
   group.add(hitGroup);
-  const side = ((a.rank ?? 1) % 2 === 0 ? 1 : -1) * (1.2 + (a.rank ?? 1) * 0.35);
-  const mx = x1 + (x2 - x1) * 0.62 + Math.cos(ang + Math.PI / 2) * side;
-  const my = y1 + (y2 - y1) * 0.62 + Math.sin(ang + Math.PI / 2) * side;
+  const side = ((a.rank ?? 1) % 2 === 0 ? 1 : -1) * (a.badge ? 4 : 1.2 + (a.rank ?? 1) * 0.35);
+  const t = a.badge ? 1 : .62;
+  const mx = x1 + (x2 - x1) * t + Math.cos(ang + Math.PI / 2) * side;
+  const my = y1 + (y2 - y1) * t + Math.sin(ang + Math.PI / 2) * side;
   return { group, hit, labelAt: v3(mx, my, 0.3) };
 }
 
@@ -270,7 +267,7 @@ export default function Pitch3D(p: PitchProps) {
   const world = useRef<{
     scene: THREE.Scene; camera: THREE.PerspectiveCamera; renderer: THREE.WebGLRenderer;
     players: Map<string, PlayerRig>; ball: THREE.Mesh; ballShadow: THREE.Mesh; overlays: THREE.Group;
-    border: THREE.LineLoop; hits: THREE.Mesh[]; labels: { el: HTMLElement; at: THREE.Vector3 }[];
+    border: THREE.LineLoop; hits: THREE.Mesh[]; labels: { el: HTMLElement; at: THREE.Vector3; leader?: HTMLElement; anchor?: THREE.Vector3 }[];
   } | null>(null);
 
   // Scene, camera, pitch and player figures: built once per match.
@@ -564,6 +561,14 @@ export default function Pitch3D(p: PitchProps) {
         placed.push(p);
         p.lb.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
         p.lb.el.style.visibility = p.visible ? "visible" : "hidden";
+        if (p.lb.leader && p.lb.anchor) {
+          const anchor = p.lb.anchor.clone().project(camera);
+          const ax = ((anchor.x + 1) / 2) * w, ay = ((1 - anchor.y) / 2) * h;
+          const dx = p.x + p.w / 2 - ax, dy = p.y + p.h / 2 - ay;
+          p.lb.leader.style.width = `${Math.hypot(dx, dy)}px`;
+          p.lb.leader.style.transform = `translate(${ax}px, ${ay}px) rotate(${Math.atan2(dy, dx)}rad)`;
+          p.lb.leader.style.visibility = p.visible && anchor.z < 1 ? "visible" : "hidden";
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -692,13 +697,21 @@ export default function Pitch3D(p: PitchProps) {
       wd.overlays.add(group);
       if (hit) wd.hits.push(hit);
       const el = document.createElement("span");
-      const color = ARROW_COLOR[a.kind];
+      const { color } = directionStyle(a.kind, a.motion);
       // Fixed dark chip (inline, so the light theme's colour remapping cannot make it unreadable).
       el.className = "pointer-events-none absolute left-0 top-0 whitespace-nowrap border px-1.5 py-0.5 text-[11px] font-semibold shadow-lg";
-      Object.assign(el.style, { background: "rgba(4, 9, 6, 0.88)", borderColor: color, color, backdropFilter: "blur(4px)" });
-      el.textContent = `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
+      Object.assign(el.style, { background: "#07160f", borderColor: color, color, zIndex: "1" });
+      el.textContent = a.badge ?? `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
+      el.title = a.label;
+      let leader: HTMLElement | undefined;
+      if (a.badge) {
+        Object.assign(el.style, { minWidth: "24px", textAlign: "center", fontSize: "12px", fontWeight: "700" });
+        leader = document.createElement("span");
+        Object.assign(leader.style, { position: "absolute", left: "0", top: "0", height: "1px", background: color, transformOrigin: "0 50%" });
+        host.append(leader);
+      }
       host.append(el);
-      wd.labels.push({ el, at: labelAt });
+      wd.labels.push({ el, at: labelAt, leader, anchor: a.badge ? v3(a.to[0], a.to[1], .1) : undefined });
     }
     if (cur.marker) {
       const c = cur.marker.ok ? "#34d399" : "#ef4444";

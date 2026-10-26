@@ -4,6 +4,7 @@ import type { MatchStateSnapshot, TrackingFrame } from "@offscript/contracts";
 import { useEffect, useMemo, useRef } from "react";
 import { interpolate, type RenderFrame } from "@/lib/frames";
 import { clock, pct } from "@/lib/format";
+import { actionDirection } from "@/lib/pitchDirections";
 import { mv, useMv } from "@/lib/mvStore";
 import { selectedDecision, useApp } from "@/lib/store";
 import { type Arrow } from "../Pitch";
@@ -13,6 +14,7 @@ import ActionComposer from "./ActionComposer";
 import AgentBattle, { PlanningSteps } from "./AgentBattle";
 import CompareModal from "./CompareModal";
 import DecisionTree from "./DecisionTree";
+import DirectionLegend from "./DirectionLegend";
 import LivePlanning from "./LivePlanning";
 
 function useRaf(cb: (dt: number) => void, active: boolean) {
@@ -44,10 +46,6 @@ function snapFrame(s: MatchStateSnapshot): RenderFrame {
   return { t_ms: 0, ball: [s.ball.x, s.ball.y, 0], players, possessor_id: s.ball.possessor_id ?? null };
 }
 
-function goalOf(s: MatchStateSnapshot): [number, number] {
-  return s.attack_direction[s.possession_team_id] === 1 ? [105, 34] : [0, 34];
-}
-
 function Stage() {
   const st = useMv();
   const match = useApp((s) => s.match);
@@ -71,24 +69,44 @@ function Stage() {
   const carrier = snap?.players.find((p) => p.player_id === snap.ball.possessor_id);
   if (atEnd && snap && carrier && node.status === "decision") {
     const c = st.composer;
-    const a = c.validation?.ok ? c.validation.action : null;
-    if (a) {
-      const to: [number, number] = a.action_type === "shoot" ? goalOf(snap) : [a.target_x ?? carrier.x, a.target_y ?? carrier.y];
-      arrows.push({ id: "composer", from: [carrier.x, carrier.y], to, kind: "selected", label: a.label });
-    }
+    const opts = st.options[node.node_id];
+    const candidates = [opts?.actual, ...(opts?.options ?? [])].filter((a) => a != null);
+    const preview = candidates.find((a) => a.action_id === st.previewCandidateId);
+    const selected = candidates.find((a) => a.action_id === c.candidateId);
+    const a = preview ?? (c.validation?.ok ? c.validation.action : selected);
+    const add = (action: NonNullable<typeof a>, kind: Arrow["kind"], prefix = "", rank?: number) => {
+      const direction = actionDirection(action, snap);
+      if (direction) arrows.push({ id: action.action_id, from: direction.from, to: direction.to, kind,
+        label: `${prefix}${action.label.replace(" (actual)", "")}`, motion: action.action_type, rank,
+        badge: rank ? String(rank) : action.is_actual ? "ACT" : kind === "recommended" ? "AI" : "YOU" });
+    };
+    const optionRank = a ? (opts?.options.findIndex((o) => o.action_id === a.action_id) ?? -1) + 1 : 0;
+    if (a) add(a, "selected", preview ? "Preview: " : "", optionRank || undefined);
     const recP = node.recommendation_planning_id ? st.plannings[node.recommendation_planning_id] : null;
     const rec = recP?.attack_proposals.find((x) => x.action.action_id === recP.summary?.most_robust_action_id)?.action;
     if (rec && rec.action_id !== a?.action_id) {
-      const to: [number, number] = rec.action_type === "shoot" ? goalOf(snap) : [rec.target_x ?? carrier.x, rec.target_y ?? carrier.y];
-      arrows.push({ id: "rec", from: [carrier.x, carrier.y], to, kind: "recommended", label: `AI: ${rec.label}` });
+      add(rec, "recommended", "AI: ");
     }
-    const actual = st.options[node.node_id]?.actual;
+    if (!a && !rec && !c.type) opts?.options.slice(0, 2).forEach((o, i) => add(o, "alternative", "", i + 1));
+    const actual = opts?.actual;
     if (actual && actual.action_id !== a?.action_id) {
-      arrows.push({ id: "actual", from: [carrier.x, carrier.y], to: actual.action_type === "shoot" ? goalOf(snap) : [actual.target_x ?? carrier.x, actual.target_y ?? carrier.y], kind: "actual", label: "Actual" });
+      add(actual, "actual", "Observed: ");
+    }
+  }
+  // Keep the chosen route visible during a branch replay, anchored to that step's frozen state.
+  const showEnteringStep = !atEnd || node.status !== "decision";
+  if (showEnteringStep && node.entering_action && snap && path?.boundaries.length) {
+    const startT = path.boundaries.length > 1 ? path.boundaries[path.boundaries.length - 2].t_ms : 0;
+    const start = interpolate(path.frames as unknown as TrackingFrame[], startT);
+    if (start) {
+      const source = { ...snap, players: snap.players.map((p) => ({ ...p, x: start.players[p.player_id]?.[0] ?? p.x, y: start.players[p.player_id]?.[1] ?? p.y })) };
+      const direction = actionDirection(node.entering_action, source);
+      if (direction) arrows.push({ id: "branch-action", from: direction.from, to: direction.to,
+        kind: "selected", label: node.entering_action.label, motion: node.entering_action.action_type });
     }
   }
   // Defensive response arrows for the step that produced this node (defender -> post at step start).
-  if (node.entering_strategy && path && path.boundaries.length) {
+  if (showEnteringStep && node.entering_strategy && path && path.boundaries.length) {
     const startT = path.boundaries.length > 1 ? path.boundaries[path.boundaries.length - 2].t_ms : 0;
     const f0 = interpolate(path.frames as unknown as TrackingFrame[], startT);
     if (f0) {
@@ -98,7 +116,8 @@ function Stage() {
         const target = asg.role === "press" ? [f0.ball[0], f0.ball[1]] : asg.target_player_id ? f0.players[asg.target_player_id] : null;
         if (!target) continue;
         const to: [number, number] = asg.role === "cover_lane" ? [f0.ball[0] + (target[0] - f0.ball[0]) * 0.55, f0.ball[1] + (target[1] - f0.ball[1]) * 0.55] : [target[0], target[1]];
-        arrows.push({ id: `def-${asg.defender_id}`, from: [d[0], d[1]], to, kind: "defense", label: asg.role.replace("_", " ") });
+        if (Math.hypot(to[0] - d[0], to[1] - d[1]) < 0.2) continue;
+        arrows.push({ id: `def-${asg.defender_id}`, from: [d[0], d[1]], to, kind: "defense", motion: "run", label: `Defence: ${asg.role.replace(/_/g, " ")}` });
       }
     }
   }
@@ -107,8 +126,13 @@ function Stage() {
   const marker = st.composer.point ? { x: st.composer.point[0], y: st.composer.point[1], ok: !!st.composer.validation?.ok } : null;
   const simulated = node.kind === "simulated" || (path?.simulated ?? false);
   const treeNode = st.tree?.nodes.find((n) => n.node_id === node.node_id);
+  const attackingTeam = showEnteringStep && node.entering_action
+    ? snap?.players.find((p) => p.player_id === node.entering_action!.actor_id)?.team_id ?? snap?.possession_team_id
+    : snap?.possession_team_id;
+  const attackDirection = snap && attackingTeam ? snap.attack_direction[attackingTeam] : 1;
   return (
-    <div className="relative">
+    <div>
+      <div className="relative">
       <div className="absolute right-3 top-3 z-10 flex max-w-[65%] flex-col items-end gap-1.5">
         <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur ${node.kind === "observed" ? "bg-slate-950/80 text-slate-100 ring-1 ring-white/20" : simulated ? "bg-leaf-600/90 text-white shadow-lg shadow-leaf-900/50" : "bg-sage-600/90 text-white shadow-lg shadow-sage-900/50"}`} data-testid="mv-banner">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
@@ -134,10 +158,19 @@ function Stage() {
           ]} />
       )}
       <PitchView match={match} frame={frame} arrows={arrows} highlightId={snap?.ball.possessor_id ?? null}
+        onArrowClick={atEnd && node.status === "decision" && node.kind !== "observed" ? (id) => {
+          const opts = st.options[node.node_id];
+          if (opts?.actual?.action_id === id || opts?.options.some((o) => o.action_id === id)) mv.chooseCandidate(id);
+        } : undefined}
         tint={node.kind === "observed" ? "observed" : simulated ? "simulated" : "snapshot"}
         selectableIds={selectable} onPlayerClick={(id) => void mv.playerClicked(id)}
         onPitchClick={st.composer.type === "dribble" || st.composer.type === "pass_space" ? (x, y) => void mv.pitchClicked(x, y) : undefined}
         marker={marker} ariaLabel="Multiverse pitch" />
+      </div>
+      {snap && <div className="mv-attack-direction" aria-label="Team attacking direction">
+        {attackDirection === -1 ? "← " : ""}Attacking{attackDirection === 1 ? " →" : ""}
+        {showEnteringStep && node.entering_action && <span> · planned routes from step start</span>}
+      </div>}
     </div>
   );
 }
@@ -147,7 +180,7 @@ function PlayBar() {
   const path = st.path;
   if (!path || path.duration_ms <= 0) return null;
   return (
-    <div className="glass flex items-center gap-3 px-3 py-2">
+    <div className="glass mv-playbar flex items-center gap-3 px-3 py-2">
       <button type="button" onClick={() => mv.setPlay({ playing: !st.playing, playT: st.playT >= path.duration_ms ? 0 : st.playT })}
         className="h-10 w-10 rounded-sm bg-white text-sm font-bold text-slate-950 shadow-lg shadow-leaf-900/40 hover:bg-leaf-100" aria-label={st.playing ? "Pause" : "Play branch"}>{st.playing ? "❚❚" : "▶"}</button>
       <button type="button" onClick={() => mv.setPlay({ playT: 0, playing: true })} className="h-9 w-9 rounded-sm text-sm text-slate-300 hover:bg-white/10" aria-label="Replay branch from the decision">↺</button>
@@ -178,8 +211,8 @@ export default function MultiverseView() {
   if (!st.session) {
     return (
       <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-10" data-testid="mv-start">
-        <div className="eyebrow text-sage-300">Football Multiverse</div>
-        <h1 className="text-4xl font-black tracking-tight text-white">Every decision creates <span className="bg-gradient-to-r from-leaf-400 to-sage-400 bg-clip-text text-transparent">another game</span>.</h1>
+        <h1 className="text-4xl font-black tracking-tight text-white">Football Multiverse</h1>
+        <p className="text-xl font-semibold text-leaf-300">Every decision creates another game.</p>
         <p className="max-w-2xl text-[15px] leading-relaxed text-slate-400">Pick a decision from the current match, then explore different futures: choose actions, let attacking and
           defending agents compete, rewind, fork and compare. Every branch is a simulation under an explicit model of a synthetic match.</p>
         <ul className="grid gap-2 sm:grid-cols-2">
@@ -204,18 +237,23 @@ export default function MultiverseView() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-[1760px] flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_400px] 2xl:grid-cols-[minmax(0,1fr)_440px]" data-testid="multiverse-view">
-      <section className="flex min-w-0 flex-col gap-3">
-        <div className="flex flex-wrap items-baseline gap-x-3 px-1">
+    <div className="mv-workspace" data-testid="multiverse-view">
+      <div className="mv-title">
           <h1 className="text-2xl font-black tracking-tight text-white">Football Multiverse</h1>
+          {app.match && <div className="mv-scoreboard"><span>{app.match.home.short_name}</span>
+            <b>{node?.score[app.match.home.team_id] ?? 0} – {node?.score[app.match.away.team_id] ?? 0}</b>
+            <span>{app.match.away.short_name}</span></div>}
           <p className="text-sm text-slate-400">{node ? `${clock(node.match_clock_ms)} · ${node.label}${node.outcome_label ? ` → ${node.outcome_label.replace(/_/g, " ").toLowerCase()}` : ""}` : ""}</p>
+      </div>
+      <section className="mv-stage-column">
+        <div className="mv-pitch-stack">
+          <div className="mv-stage-panel"><div className="frame overflow-hidden p-1.5"><Stage /></div><DirectionLegend /></div>
+          <PlayBar />
+          {st.error && <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert">{st.error}</p>}
         </div>
-        <div className="mx-auto w-full max-w-[max(520px,calc((100vh-470px)*1.5))] frame overflow-hidden p-2 shadow-2xl shadow-black/60"><Stage /></div>
-        <PlayBar />
-        {st.error && <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert">{st.error}</p>}
-        <section className="glass p-3" aria-label="Multiverse map">
+        <section className="glass mv-map p-4" aria-label="Multiverse map">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <h2 className="eyebrow">Multiverse map</h2>
+            <h2 className="text-sm font-bold text-white">Your match paths</h2>
             {app.mode === "analyst" && <span className="hidden text-[10px] text-slate-500 md:inline">dashed white = canonical synthetic timeline (never changed) · amber = branch ended · % = modelled xG vs the defence&apos;s best counter</span>}
             <div className="ml-auto flex gap-1">
               <button type="button" onClick={() => void mv.newSession()} className="btn px-2 py-1 text-[11px]">New session</button>
@@ -241,17 +279,17 @@ export default function MultiverseView() {
             </div>
           )}
         </section>
-        <p className="px-1 text-[11px] text-slate-600">Branches are modelled futures of a synthetic match: each shows one sampled continuation, with probabilities from paired Monte Carlo simulation. Rewinding restores the exact stored state; nothing is re-simulated.</p>
+        <p className="mv-disclaimer text-xs text-slate-400">Synthetic match · Model estimates, not certainties. Each branch shows one sampled continuation. Rewind restores the same frozen state.</p>
       </section>
-      <aside className="min-w-0 space-y-3 lg:sticky lg:top-[62px] lg:max-h-[calc(100vh-78px)] lg:overflow-y-auto lg:pr-1">
-        <section className="glass p-3">
-          <h2 className="eyebrow mb-3">Your decision</h2>
+      <aside className="mv-inspector" aria-label="Decision and agent analysis">
+        <section className="glass mv-decision-panel p-4">
+          <h2 className="mb-3 text-lg font-bold text-white">Your decision</h2>
           <ActionComposer />
         </section>
         {st.job && ["pending", "running"].includes(st.job.status) && <LivePlanning />}
         {shownPlanning && (
           <section className="glass space-y-3 p-3">
-            <h2 className="eyebrow">{planning ? "Attack vs defence (this step)" : "Agent recommendation"}</h2>
+            <h2 className="text-sm font-bold text-white">{planning ? "Attack meets defence" : "Agent recommendation"}</h2>
             {narrative && (
               <article className="rounded-xl bg-white/[0.03] p-2" data-testid="mv-narrative">
                 <h3 className="text-sm font-bold text-white">{narrative.headline}</h3>

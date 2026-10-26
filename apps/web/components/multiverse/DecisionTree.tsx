@@ -4,10 +4,10 @@ import { clock } from "@/lib/format";
 import type { TreeNode } from "@/lib/multiverseApi";
 import { mv, useMv } from "@/lib/mvStore";
 
-const COL = 150;
-const ROW = 64;
-const W = 132;
-const H = 48;
+const COL = 244;
+const ROW = 78;
+const W = 220;
+const H = 62;
 
 function layout(nodes: TreeNode[], rootId: string) {
   const byId = new Map(nodes.map((n) => [n.node_id, n]));
@@ -83,14 +83,15 @@ export default function DecisionTree() {
               aria-label={`${n.label} ${n.outcome}`} className="cursor-pointer" data-testid={`tree-node-${n.kind}`}
               data-node-id={n.node_id}
               onClick={() => void mv.select(n.node_id, { play: n.kind !== "root" })}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && void mv.select(n.node_id, { play: n.kind !== "root" })}>
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void mv.select(n.node_id, { play: n.kind !== "root" }); } }}>
+              <title>{n.label} · {n.outcome || n.status}</title>
               <rect width={W} height={H} rx={2} fill={t.fill} stroke={t.stroke} strokeWidth={sel ? 2 : 1} />
               <rect width={3} height={H} fill={t.stroke} />
               {sel && <rect x={-3} y={-3} width={W + 6} height={H + 6} rx={3} fill="none" stroke="#8fca7c" strokeOpacity={0.25} strokeWidth={4} />}
-              <text x={10} y={14} fontSize={9} fill="#94a3b8" fontFamily="monospace">{clock(n.match_clock_ms)} {src}</text>
-              <text x={10} y={29} fontSize={11} fill="#f8fafc" fontWeight={700}>{n.label.slice(0, 20)}</text>
-              <text x={10} y={42} fontSize={9.5} fill={n.status === "terminal" ? "#fcd34d" : "#c9dca2"}>
-                {(n.kind === "root" ? "your move" : n.outcome || n.status).replace(/_/g, " ").slice(0, 18)}
+              <text x={12} y={16} fontSize={10} fill="#94a3b8" fontFamily="monospace">{clock(n.match_clock_ms)} {src}</text>
+              <text x={12} y={34} fontSize={12} fill="#f8fafc" fontWeight={700}>{n.label.length > 29 ? `${n.label.slice(0, 28)}…` : n.label}</text>
+              <text x={12} y={51} fontSize={11} fill={n.status === "terminal" ? "#fcd34d" : "#c9dca2"}>
+                {(n.kind === "root" ? "your move" : n.outcome || n.status).replace(/_/g, " ").slice(0, 24)}
                 {n.value_vs_counter != null ? ` · ${(n.value_vs_counter * 100).toFixed(1)}%` : ""}
               </text>
             </g>

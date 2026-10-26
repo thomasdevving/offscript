@@ -128,11 +128,20 @@ describe("visual components", () => {
     render(
       <Pitch match={match} ariaLabel="pitch" onArrowClick={(id) => (clicked = id)}
         frame={{ t_ms: 0, ball: [50, 34, 0], players: { H10: [50, 34], A06: [55, 30] }, possessor_id: "H10" }}
-        arrows={[{ id: "x", from: [50, 34], to: [70, 40], kind: "alternative", label: "Pass to X" }]} />,
+        arrows={[
+          { id: "x", from: [50, 34], to: [70, 40], kind: "alternative", label: "Pass to X" },
+          { id: "y", from: [60, 25], to: [60, 50], kind: "alternative", label: "Crossing pass" },
+        ]} />,
     );
     expect(screen.getByRole("img", { name: "pitch" })).toBeInTheDocument();
     expect(screen.getByText("10")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Pass to X" }));
     expect(clicked).toBe("x");
+    // SVG uses document paint order: even the last crossing route must be below all labels.
+    const routes = screen.getByTestId("pitch-routes");
+    const labels = screen.getByTestId("pitch-route-labels");
+    expect(routes.compareDocumentPosition(labels) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(labels.querySelectorAll("rect")).toHaveLength(2);
+    for (const background of labels.querySelectorAll("rect")) expect(background).toHaveAttribute("fill", "#07160f");
   });
 });

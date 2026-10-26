@@ -1,7 +1,8 @@
 "use client";
 
 import type { MatchInfo } from "@offscript/contracts";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { directionStyle, type Motion } from "@/lib/pitchDirections";
 import type { RenderFrame } from "@/lib/frames";
 
 export interface Arrow {
@@ -11,6 +12,8 @@ export interface Arrow {
   kind: "actual" | "selected" | "alternative" | "defense" | "recommended";
   label: string;
   rank?: number;
+  motion?: Motion;
+  badge?: string;
 }
 
 export interface Ring {
@@ -65,15 +68,29 @@ function Markings() {
   );
 }
 
-const labelText = (a: Arrow) => `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
-const labelWidth = (a: Arrow) => labelText(a).length * 0.62 + 1.4;
+const labelText = (a: Arrow) => a.badge ?? `${a.rank != null ? `${a.rank}. ` : ""}${a.label}`;
+const labelWidth = (a: Arrow, scale = 1) => a.badge ? Math.max(3.2, a.badge.length * 1.1 + 1.8) * scale : labelText(a).length * 0.72 + 1.6;
+const labelHeight = (a: Arrow, scale = 1) => a.badge ? 3.2 * scale : 2.5;
 type Box = { x: number; y: number; w: number; h: number };
+
+/** Slab intersection keeps labels clear of every route, including a neighbouring pass. */
+function crossesBox(a: Arrow, b: Box): boolean {
+  let lo = 0, hi = 1;
+  for (const [start, end, min, max] of [[a.from[0], a.to[0], b.x - .5, b.x + b.w + .5],
+    [a.from[1], a.to[1], b.y - .5, b.y + b.h + .5]]) {
+    const d = end - start;
+    if (Math.abs(d) < .001) { if (start < min || start > max) return false; }
+    else { const t1 = (min - start) / d, t2 = (max - start) / d; lo = Math.max(lo, Math.min(t1, t2)); hi = Math.min(hi, Math.max(t1, t2)); }
+    if (lo > hi) return false;
+  }
+  return true;
+}
 
 /**
  * Places every arrow label without overlaps: candidates along the arrow and on either side, best-ranked
  * arrow first, first free spot that stays on the pitch wins. Returns each label's top-left corner.
  */
-export function placeLabels(arrows: Arrow[]): Map<string, [number, number]> {
+export function placeLabels(arrows: Arrow[], scale = 1): Map<string, [number, number]> {
   const placed: Box[] = [];
   const out = new Map<string, [number, number]>();
   const hits = (b: Box) => placed.some((o) => b.x < o.x + o.w + 0.3 && o.x < b.x + b.w + 0.3 && b.y < o.y + o.h + 0.3 && o.y < b.y + b.h + 0.3);
@@ -82,16 +99,16 @@ export function placeLabels(arrows: Arrow[]): Map<string, [number, number]> {
     const [x1, y1] = a.from;
     const [x2, y2] = a.to;
     const ang = Math.atan2(y2 - y1, x2 - x1);
-    const w = labelWidth(a);
-    const h = 1.9;
+    const w = labelWidth(a, scale);
+    const h = labelHeight(a, scale);
     let pick: Box | null = null;
-    for (const t of [0.62, 0.8, 0.45, 0.95, 0.3]) {
-      for (const off of [1.6, -1.6, 3.4, -3.4]) {
+    for (const t of a.badge ? [1, .85, .65] : [0.62, 0.8, 0.45, 0.95, 0.3]) {
+      for (const off of a.badge ? [4, -4, 6, -6, 9, -9, 12, -12] : [3.4, -3.4, 5, -5, 8, -8]) {
         const mx = x1 + (x2 - x1) * t + Math.cos(ang + Math.PI / 2) * off;
         const my = y1 + (y2 - y1) * t + Math.sin(ang + Math.PI / 2) * off;
         const b = { x: mx - w / 2, y: my - h / 2, w, h };
         if (b.x < -2.5 || b.x + b.w > 107.5 || b.y < -2.5 || b.y + b.h > 70.5) continue;
-        if (!hits(b)) { pick = b; break; }
+        if (!hits(b) && !arrows.some((route) => crossesBox(route, b))) { pick = b; break; }
       }
       if (pick) break;
     }
@@ -106,49 +123,76 @@ export function placeLabels(arrows: Arrow[]): Map<string, [number, number]> {
   return out;
 }
 
-function ArrowShape({ a, onClick, labelAt }: { a: Arrow; onClick?: (id: string) => void; labelAt?: [number, number] }) {
-  const color = a.kind === "actual" ? "#f8fafc" : a.kind === "selected" ? "#d4ee8f" : a.kind === "defense" ? "#f97316"
-    : a.kind === "recommended" ? "#34d399" : "#cfe2b4";
-  const dash = a.kind === "actual" ? "1.2 0.8" : a.kind === "alternative" ? "0.6 0.6" : a.kind === "defense" ? "0.9 0.5" : undefined;
+function ArrowShape({ a, onClick, labelAt, scale }: { a: Arrow; onClick?: (id: string) => void; labelAt?: [number, number]; scale: number }) {
+  const { color, dash } = directionStyle(a.kind, a.motion);
   const [x1, y1] = a.from;
   const [x2, y2] = a.to;
   const ang = Math.atan2(y2 - y1, x2 - x1);
-  const hx = x2 - Math.cos(ang) * 1.6;
-  const hy = y2 - Math.sin(ang) * 1.6;
-  const left = [hx + Math.cos(ang + Math.PI / 2) * 0.8, hy + Math.sin(ang + Math.PI / 2) * 0.8];
-  const right = [hx + Math.cos(ang - Math.PI / 2) * 0.8, hy + Math.sin(ang - Math.PI / 2) * 0.8];
+  const head = Math.min(2.6, Math.hypot(x2 - x1, y2 - y1) * 0.4);
+  const hx = x2 - Math.cos(ang) * head;
+  const hy = y2 - Math.sin(ang) * head;
+  const left = [hx + Math.cos(ang + Math.PI / 2) * head * 0.48, hy + Math.sin(ang + Math.PI / 2) * head * 0.48];
+  const right = [hx + Math.cos(ang - Math.PI / 2) * head * 0.48, hy + Math.sin(ang - Math.PI / 2) * head * 0.48];
   // Label position comes from placeLabels (no overlaps); a lone arrow falls back to 62% along it.
   const [lx, ly] = labelAt ?? [x1 + (x2 - x1) * 0.62 - labelWidth(a) / 2, y1 + (y2 - y1) * 0.62 - 2.6];
   return (
     <g
-      role="button"
-      tabIndex={0}
+      role={onClick ? "button" : "img"}
+      tabIndex={onClick ? 0 : undefined}
       aria-label={a.label}
-      className="cursor-pointer focus:outline-none"
-      onClick={() => onClick?.(a.id)}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.(a.id)}
+      data-testid="pitch-action-arrow" data-motion={a.motion} data-kind={a.kind}
+      className={onClick ? "pitch-action-arrow cursor-pointer" : "pitch-action-arrow pointer-events-none"}
+      onClick={(e) => { if (onClick) { e.stopPropagation(); onClick(a.id); } }}
+      onKeyDown={(e) => { if (onClick && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); onClick(a.id); } }}
     >
-      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={3} />
-      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={a.kind === "selected" ? 0.55 : 0.38}
-        strokeDasharray={dash} opacity={a.kind === "alternative" ? 0.85 : 1} />
-      <polygon points={`${x2},${y2} ${left[0]},${left[1]} ${right[0]},${right[1]}`} fill={color} />
-      <g transform={`translate(${lx},${ly})`}>
-        <rect x={0} y={0} width={labelWidth(a)} height={1.9} rx={0.12}
-          fill="rgba(2,6,23,0.85)" stroke={color} strokeWidth={0.1} />
-        <text x={0.7} y={1.4} fontSize={1.15} fill={color} fontWeight={600}>{labelText(a)}</text>
-      </g>
+      <title>{a.label}: {a.motion ?? "action"} direction</title>
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={4} />
+      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke="#061e13" strokeWidth={1.5} opacity={0.85} />
+      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={a.kind === "selected" ? 0.75 : 0.55}
+        strokeLinecap="round" strokeDasharray={dash?.join(" ")} />
+      <circle cx={x1} cy={y1} r={0.65} fill={color} stroke="#061e13" strokeWidth={0.22} />
+      <circle cx={x2} cy={y2} r={1.7} fill="none" stroke={color} strokeWidth={0.22} opacity={0.65} />
+      <polygon points={`${x2},${y2} ${left[0]},${left[1]} ${right[0]},${right[1]}`} fill={color} stroke="#061e13" strokeWidth={0.15} />
+      {Math.hypot(x2 - x1, y2 - y1) > 12 && [0.35, 0.65].map((t) => (
+        <path key={t} d="M -0.8 -0.8 L 0 0 L -0.8 0.8" transform={`translate(${x1 + (x2 - x1) * t},${y1 + (y2 - y1) * t}) rotate(${ang * 180 / Math.PI})`}
+          fill="none" stroke={color} strokeWidth={0.4} strokeLinecap="round" strokeLinejoin="round" />
+      ))}
+      {onClick && <rect x={lx} y={ly} width={labelWidth(a, scale)} height={labelHeight(a, scale)} fill="transparent" />}
+    </g>
+  );
+}
+
+function ArrowLabel({ a, at, scale }: { a: Arrow; at: [number, number]; scale: number }) {
+  const { color } = directionStyle(a.kind, a.motion);
+  return (
+    <g transform={`translate(${at[0]},${at[1]})`} aria-hidden="true" pointerEvents="none">
+      <rect width={labelWidth(a, scale)} height={labelHeight(a, scale)} rx={a.badge ? .4 * scale : .12} fill="#07160f" stroke={color} strokeWidth={a.badge ? .2 * scale : .1} />
+      <text x={a.badge ? labelWidth(a, scale) / 2 : .8} y={a.badge ? 2.2 * scale : 1.75} textAnchor={a.badge ? "middle" : undefined}
+        fontSize={a.badge ? 1.8 * scale : 1.35} fill={color} fontWeight={700}>{labelText(a)}</text>
     </g>
   );
 }
 
 export default function Pitch(p: PitchProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [badgeScale, setBadgeScale] = useState(1);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      if (width > 0) setBadgeScale(Math.max(1, 22 * (L + 6) / (width * 3.2)));
+    });
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, []);
   const home = p.match.home;
   const away = p.match.away;
   const teamOf = new Map(p.match.players.map((pl) => [pl.player_id, pl]));
   const frame = p.frame;
   const tintStroke = p.tint === "simulated" ? "#d4ee8f" : p.tint === "snapshot" ? "#cfe2b4" : "transparent";
   return (
-    <svg viewBox={`-3 -3 ${L + 6} ${W + 6}`} className={`block h-auto w-full select-none ${p.onPitchClick ? "cursor-crosshair" : ""}`}
+    <svg ref={svgRef} viewBox={`-3 -3 ${L + 6} ${W + 6}`} className={`block h-auto w-full select-none ${p.onPitchClick ? "cursor-crosshair" : ""}`}
       role="img" aria-label={p.ariaLabel}
       onClick={(e) => {
         if (!p.onPitchClick) return;
@@ -229,8 +273,17 @@ export default function Pitch(p: PitchProps) {
         )}
       </g>
       {(() => {
-        const at = placeLabels(p.arrows ?? []);
-        return p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} labelAt={at.get(a.id)} />);
+        const at = placeLabels(p.arrows ?? [], badgeScale);
+        return <>
+          <g data-testid="pitch-routes">{p.arrows?.map((a) => <ArrowShape key={a.id} a={a} onClick={p.onArrowClick} labelAt={at.get(a.id)} scale={badgeScale} />)}</g>
+          {/* Paint every label after every route so a later arrow cannot cross its text. */}
+          <g pointerEvents="none" aria-hidden="true">{p.arrows?.filter((a) => a.badge).map((a) => {
+            const [x, y] = at.get(a.id)!;
+            return <line key={a.id} x1={a.to[0]} y1={a.to[1]} x2={x + labelWidth(a, badgeScale) / 2} y2={y + labelHeight(a, badgeScale) / 2}
+              stroke={directionStyle(a.kind, a.motion).color} strokeWidth={.18} />;
+          })}</g>
+          <g data-testid="pitch-route-labels">{p.arrows?.map((a) => <ArrowLabel key={a.id} a={a} at={at.get(a.id)!} scale={badgeScale} />)}</g>
+        </>;
       })()}
       {p.marker && (
         <g transform={`translate(${p.marker.x},${p.marker.y})`} pointerEvents="none">
