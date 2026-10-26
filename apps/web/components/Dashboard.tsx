@@ -114,7 +114,7 @@ export default function Dashboard() {
                 <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-400">{scenario.description}</p>
               </div>
             )}
-            <div className="mv-stage-panel frame w-full overflow-hidden p-1.5">
+            <div className="mv-stage-panel frame w-full overflow-hidden p-1.5" style={{ "--stage-reserve": "470px" } as React.CSSProperties}>
               <PitchStage />
             </div>
             {view === "simulated" ? <><WhatIfControls /><PlaybackControls /></>

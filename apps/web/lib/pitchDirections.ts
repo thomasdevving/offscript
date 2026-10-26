@@ -26,7 +26,8 @@ export function actionDirection(action: CandidateAction, snapshot: MatchStateSna
   const longitudinal = dx * attack;
   // Left/right in generated action names is player-relative. The icon shows the
   // precise screen direction; the caption only describes progress towards goal.
-  const progress = Math.abs(longitudinal) > distance * 0.25 ? longitudinal > 0 ? "Forward" : "Back" : "Across";
+  // Forward/back only within 60 degrees of the goal line direction; anything wider is mostly sideways.
+  const progress = Math.abs(longitudinal) > distance * 0.5 ? longitudinal > 0 ? "Forward" : "Back" : "Across";
   return { from, to, distance, angle: Math.atan2(dy, dx) * 180 / Math.PI,
     description: `${progress} · ${Math.round(distance)} m` };
 }

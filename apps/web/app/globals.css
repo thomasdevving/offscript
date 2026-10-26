@@ -16,7 +16,10 @@
 .mv-scoreboard { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--color-slate-200); }
 .mv-scoreboard b { font-size: 18px; font-variant-numeric: tabular-nums; color: var(--color-leaf-200); }
 .mv-pitch-stack { grid-column: 1; grid-row: 2; min-width: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
-.mv-stage-panel { min-width: 0; background: var(--color-panel); border: 1px solid var(--color-line); }
+/* The pitch keeps its 3:2 shape, so its width is capped by the screen height: on a laptop or 1080p screen the
+   pitch, its legend and the playback bar stay visible together. --stage-reserve is the height of everything else. */
+.mv-stage-panel { min-width: 0; width: 100%; margin-inline: auto; background: var(--color-panel); border: 1px solid var(--color-line);
+  max-width: max(560px, calc((100vh - var(--stage-reserve, 380px)) * 1.5)); }
 .mv-inspector { grid-column: 2; grid-row: 2; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .mv-map { grid-column: 1 / -1; grid-row: 3; min-width: 0; }
 .mv-disclaimer { grid-column: 1 / -1; grid-row: 4; }

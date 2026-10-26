@@ -45,7 +45,7 @@ export default function CompareModal() {
         <ol className="text-xs text-slate-300">
           {steps?.map((s) => (
             <li key={s.node_id}>
-              {s.action_label} <span className="text-slate-500">({s.action_source}{s.strategy_label ? ` vs ${s.strategy_label}` : ""})</span> → {(s.terminal_outcome ?? s.first_outcome ?? "").replace(/_/g, " ")}
+              {(s.action_label ?? "").replace(" (actual)", "")} <span className="text-slate-500">({s.action_source}{s.strategy_label ? ` vs ${s.strategy_label}` : ""})</span> → {(s.terminal_outcome ?? s.first_outcome ?? "").replace(/_/g, " ")}
               {s.p_goal_vs_counter != null && <span className="font-mono text-leaf-300"> · {pct(s.p_goal_vs_counter, lang)}</span>}
             </li>
           ))}
