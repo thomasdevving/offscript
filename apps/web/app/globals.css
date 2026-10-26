@@ -349,7 +349,8 @@ input[type="range"].timeline::-moz-range-thumb {
     aspect-ratio: 107 / 70;
     transform-style: preserve-3d;
     transform: translate(4%, 10%) rotateX(var(--tx)) rotateZ(var(--tz));
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* The stage and inverse-facing labels must use the same angle in the same frame. */
+    pointer-events: none;
   }
   .layer {
     position: absolute;
@@ -377,11 +378,9 @@ input[type="range"].timeline::-moz-range-thumb {
     background: linear-gradient(135deg, rgba(143, 202, 124, 0.09), rgba(143, 202, 124, 0.02));
     box-shadow: inset 0 0 0 1px rgba(143, 202, 124, 0.35), 0 0 40px rgba(95, 156, 94, 0.15);
     transform: translateZ(calc(var(--z) * var(--zs)));
-    animation: drift 7s ease-in-out infinite;
   }
   .branch-path {
     filter: drop-shadow(0 0 1.2px currentColor);
-    animation: flow 1.2s linear infinite;
   }
   /* Children that face the camera whatever the stage tilt. */
   .billboard {
@@ -454,8 +453,7 @@ input[type="range"].timeline::-moz-range-thumb {
     transform: rotateX(90deg);
   }
 
-  /* Drop line: hangs from a floating layer down to the real pitch. Its length follows the layer's
-     drift (same keyframes, duration and delay), so it always touches the player below. */
+  /* Drop line: hangs from a frozen future down to the same player on the real pitch. */
   .drop {
     position: absolute;
     width: 0;
@@ -464,7 +462,6 @@ input[type="range"].timeline::-moz-range-thumb {
     opacity: 0.75;
     transform-origin: 50% 0;
     transform: rotateX(-90deg);
-    animation: drop-drift 7s ease-in-out infinite;
   }
   /* Players repeated on each future: same coordinates, so a pass lands on its own layer's player. */
   .ghost-dot { opacity: 0.5; }
@@ -476,11 +473,6 @@ input[type="range"].timeline::-moz-range-thumb {
     background: rgba(4, 9, 6, 0.6);
     font-size: 10px;
     box-shadow: none;
-  }
-  .decision-ring {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: ring-pulse 2.4s ease-in-out infinite;
   }
 
   /* Headline word with a stepped extrusion. */
@@ -525,18 +517,6 @@ input[type="range"].timeline::-moz-range-thumb {
   .face.bottom { transform: rotateX(-90deg) translateZ(26px); background: rgba(4, 9, 6, 0.9); }
 }
 
-@keyframes drift {
-  0%, 100% { transform: translateZ(calc(var(--z) * var(--zs))); }
-  50% { transform: translateZ(calc(var(--z) * var(--zs) * 1.12)); }
-}
-@keyframes drop-drift {
-  0%, 100% { height: calc(var(--z) * var(--zs)); }
-  50% { height: calc(var(--z) * var(--zs) * 1.12); }
-}
-@keyframes ring-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.25); opacity: 0.25; }
-}
 @keyframes spin {
   from { transform: rotateX(-22deg) rotateY(0deg); }
   to { transform: rotateX(-22deg) rotateY(360deg); }

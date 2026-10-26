@@ -301,12 +301,12 @@ function Pin({ x, y, n, team }: { x: number; y: number; n: number; team: "home" 
  * One parallel future: a translucent copy of the same frozen moment, floating above the real pitch.
  * Every player is repeated as a flat dot at the same pitch coordinates, so the branch's pass runs
  * between this layer's own players; a drop line ties the receiver to the same player on the real
- * pitch below, moving in step with the layer's drift.
+ * pitch below. The layers stay frozen until the visitor moves the pointer over the scene.
  */
-function BranchLayer({ z, d, end, receiver, label, tone, delay }: {
-  z: number; d: string; end: [number, number]; receiver: readonly [number, number, ...number[]]; label: string; tone: string; delay: number;
+function BranchLayer({ z, d, end, receiver, label, tone }: {
+  z: number; d: string; end: [number, number]; receiver: readonly [number, number, ...number[]]; label: string; tone: string;
 }) {
-  const vars = { "--z": `${z}px`, animationDelay: `${delay}s` } as React.CSSProperties;
+  const vars = { "--z": `${z}px` } as React.CSSProperties;
   return (
     <div className="layer branch" style={vars}>
       <svg viewBox="-1 -1 107 70" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
@@ -334,15 +334,20 @@ function MultiverseScene({ lang }: { lang: Lang }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || reducedMotion.matches) return;
+      // Measure the stationary scene, never the transformed pitch or its overflowing layers.
       const r = el.getBoundingClientRect();
-      const nx = (e.clientX - r.left) / r.width - 0.5;
-      const ny = (e.clientY - r.top) / r.height - 0.5;
+      if (!r.width || !r.height) return;
+      const nx = Math.max(-0.5, Math.min(0.5, (e.clientX - r.left) / r.width - 0.5));
+      const ny = Math.max(-0.5, Math.min(0.5, (e.clientY - r.top) / r.height - 0.5));
       el.style.setProperty("--rx", `${(nx * 14).toFixed(2)}deg`);
       el.style.setProperty("--ry", `${(-ny * 10).toFixed(2)}deg`);
     };
-    window.addEventListener("pointermove", onMove);
-    return () => window.removeEventListener("pointermove", onMove);
+    // Keep the last pose on leave: no automatic drift or reset animation outside the field.
+    el.addEventListener("pointermove", onMove, { passive: true });
+    return () => el.removeEventListener("pointermove", onMove);
   }, []);
   return (
     <div ref={ref} className="scene" aria-hidden>
@@ -365,8 +370,8 @@ function MultiverseScene({ lang }: { lang: Lang }) {
           {/* The time beam: every future grows out of the same frozen moment. */}
           <span className="beam" style={pos(DECISION[0], DECISION[1])} />
         </div>
-        <BranchLayer z={120} d={`M ${DECISION[0]} ${DECISION[1]} Q 30 18 33 22 L 8 31`} end={[8, 31]} receiver={HOME[1]} label={`${L.alt1} · 2.0%`} tone="#8fca7c" delay={0} />
-        <BranchLayer z={230} d={`M ${DECISION[0]} ${DECISION[1]} Q 22 46 30 52`} end={[30, 52]} receiver={HOME[2]} label={`${L.alt2} · 0.0%`} tone="#cfe2b4" delay={1.2} />
+        <BranchLayer z={120} d={`M ${DECISION[0]} ${DECISION[1]} Q 30 18 33 22 L 8 31`} end={[8, 31]} receiver={HOME[1]} label={`${L.alt1} · 2.0%`} tone="#8fca7c" />
+        <BranchLayer z={230} d={`M ${DECISION[0]} ${DECISION[1]} Q 22 46 30 52`} end={[30, 52]} receiver={HOME[2]} label={`${L.alt2} · 0.0%`} tone="#cfe2b4" />
       </div>
     </div>
   );

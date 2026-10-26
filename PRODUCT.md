@@ -53,3 +53,7 @@ numbered endpoint markers, direction icons and legend as Multiverse. Its numbere
 options preview routes on hover or focus without requesting a trajectory; choosing
 an option still opens the existing simulated continuation. ACT identifies the
 observed choice. The full pitch and playback remain together in the left column.
+
+The landing hero field moves only while a mouse moves over its scene and holds
+its last pose when the pointer leaves. Keep the field, routes and decision marker
+still at rest; touch input and reduced-motion preferences do not trigger its tilt.
